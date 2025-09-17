@@ -16,3 +16,46 @@ spring:
             - Path=${app.api-prefix}/auth/**
           filters:
             - StripPrefix=2
+      routes:
+        - id: booking_service
+          uri: http://localhost:8081
+          predicates:
+            - Path=${app.api-prefix}/booking/**
+          filters:
+            - StripPrefix=2
+       routes:
+        - id: notification_service
+          uri: http://localhost:8082
+          predicates:
+            - Path=${app.api-prefix}/notification/**
+          filters:
+            - StripPrefix=2          
+      routes:
+        - id: payment_service
+          uri: http://localhost:8083
+          predicates:
+            - Path=${app.api-prefix}/payment/**
+          filters:
+            - StripPrefix=2
+      routes:
+        - id: pricing_service
+          uri: http://localhost:8084
+          predicates:
+            - Path=${app.api-prefix}/pricing/**
+          filters:
+            - StripPrefix=2
+      routes:
+        - id: schedule_service
+          uri: http://localhost:8085
+          predicates:
+            - Path=${app.api-prefix}/schedule/**
+          filters:
+            - StripPrefix=2
+      routes:
+        - id: tour_service
+          uri: http://localhost:8086
+          predicates:
+            - Path=${app.api-prefix}/tour/**
+          filters:
+            - StripPrefix=2   
+          
