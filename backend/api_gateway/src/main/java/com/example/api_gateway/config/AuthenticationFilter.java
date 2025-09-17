@@ -5,7 +5,6 @@ import com.example.api_gateway.dto.response.ApiResponse;
 import com.example.api_gateway.service.IdentityService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,9 +23,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import reactor.netty.http.server.HttpServerResponse;
-
-import java.security.Identity;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,8 +36,10 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     @NonFinal
     private String[] publicEndpoints = {
-            "/auth/users/.*",
+            "/auth/users/login",
             "/auth/users/register",
+            "/auth/users/refresh",
+            "/auth/users/introspect",
             "/notification/email/send",
             "/file/media/download/.*"
     };
@@ -52,24 +50,32 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("Enter authentication filter....");
+        log.info("Enter authentication filter...");
 
-        if (isPublicEndpoint(exchange.getRequest()))
+        if (isPublicEndpoint(exchange.getRequest())) {
             return chain.filter(exchange);
-        // Get token from authorization header
-        List<String> authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION);
-        if (CollectionUtils.isEmpty(authHeader))
-            return unauthenticated(exchange.getResponse());
+        }
 
-        String token = authHeader.getFirst().replace("Bearer ", "");
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return unauthenticated(exchange.getResponse());
+        }
+
+        String token = authHeader.substring(7); // bỏ "Bearer "
         log.info("Token: {}", token);
 
-        return identityService.introspect(token).flatMap(introspectResponse -> {
-            if (introspectResponse.getResult().isValid())
-                return chain.filter(exchange);
-            else
-                return unauthenticated(exchange.getResponse());
-        }).onErrorResume(throwable -> unauthenticated(exchange.getResponse()));
+        return identityService.introspect(token)
+                .flatMap(introspectResponse -> {
+                    if (introspectResponse.getResult().isValid()) {
+                        return chain.filter(exchange);
+                    } else {
+                        return unauthenticated(exchange.getResponse());
+                    }
+                })
+                .onErrorResume(e -> {
+                    log.error("Error while introspecting token", e);
+                    return unauthenticated(exchange.getResponse());
+                });
     }
 
     @Override

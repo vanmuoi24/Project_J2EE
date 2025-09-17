@@ -1,4 +1,4 @@
-package com.example.auth_service.config;
+package com.example.booking_service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,12 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final String[] PUBLIC_URLS = {
-            "/users/register",
-            "/auth/login",
-            "/auth/refresh",
-            "/auth/introspect",
-            "/swagger-ui/**",
-            "/swagger-ui.html"
+
 
     };
 

@@ -1,4 +1,4 @@
-package com.example.auth_service.config;
+package com.example.notification_sevice.config;
 
 import java.io.IOException;
 
@@ -9,8 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.example.auth_service.dto.request.ApiResponse;
-import com.example.auth_service.exception.ErrorCode;
+import com.example.notification_sevice.dto.request.ApiResponse;
+import com.example.notification_sevice.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {

@@ -3,10 +3,16 @@ package com.example.auth_service.service;
 import java.util.HashSet;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.auth_service.dto.request.UserCreationRequest;
+import com.example.auth_service.dto.response.PageResponse;
 import com.example.auth_service.dto.response.UserResponse;
 import com.example.auth_service.entity.User;
 import com.example.auth_service.exception.AppException;
@@ -39,5 +45,13 @@ public class UserService {
 
         // 4. Convert User entity → UserResponse DTO
         return userMapper.toUserResponse(user);
+    }
+
+    public UserResponse getAllUser() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toUserResponse)
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        
     }
 }

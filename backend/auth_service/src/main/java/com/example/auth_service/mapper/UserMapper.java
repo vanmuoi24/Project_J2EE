@@ -13,9 +13,7 @@ import com.example.auth_service.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    // Convert request DTO to entity
     User toUser(UserCreationRequest request);
-
-    // Convert entity to response DTO
     UserResponse toUserResponse(User user);
+    java.util.List<UserResponse> toUserResponseList(java.util.Set<User> users);
 }
