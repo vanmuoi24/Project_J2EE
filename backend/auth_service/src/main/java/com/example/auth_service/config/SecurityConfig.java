@@ -1,4 +1,4 @@
-package com.example.schedule_service.config;
+package com.example.auth_service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

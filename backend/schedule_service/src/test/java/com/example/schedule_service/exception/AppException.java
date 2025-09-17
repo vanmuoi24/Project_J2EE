@@ -1,4 +1,4 @@
-package com.example.auth_service.exception;
+package com.example.schedule_service.exception;
 
 public class AppException extends RuntimeException {
  public AppException(ErrorCode errorCode) {

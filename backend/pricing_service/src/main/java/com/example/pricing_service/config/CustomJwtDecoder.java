@@ -1,4 +1,4 @@
-package com.example.auth_service.config;
+package com.example.pricing_service.config;
 
 import java.text.ParseException;
 

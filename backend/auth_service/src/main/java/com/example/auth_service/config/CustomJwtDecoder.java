@@ -1,4 +1,4 @@
-package com.example.schedule_service.config;
+package com.example.auth_service.config;
 
 import java.text.ParseException;
 

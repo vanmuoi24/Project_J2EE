@@ -1,4 +1,4 @@
-package com.example.auth_service.exception;
+package com.example.booking_service.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 

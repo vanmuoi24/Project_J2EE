@@ -1,4 +1,4 @@
-package  com.example.payment_service.config;
+package com.example.auth_service.config;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;

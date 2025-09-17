@@ -1,4 +1,4 @@
-package com.example.booking_service.config
+package  com.example.schedule_service.config;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
