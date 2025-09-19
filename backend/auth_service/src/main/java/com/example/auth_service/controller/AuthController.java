@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.auth_service.dto.request.ApiResponse;
 import com.example.auth_service.dto.request.AuthenticationRequest;
+import com.example.auth_service.dto.request.ChangePasswordRequest;
 import com.example.auth_service.dto.request.IntrospectRequest;
 import com.example.auth_service.dto.request.LogoutRequest;
 import com.example.auth_service.dto.request.RefreshRequest;
@@ -20,7 +21,7 @@ import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+        
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -52,5 +53,12 @@ public class AuthController {
         authService.logout(request);
         return ApiResponse.<Void>builder().build();
     }
+
+    @PostMapping("/Change-password")
+    ApiResponse<Void> changePassword(@RequestBody ChangePasswordRequest request) throws ParseException, JOSEException {
+        authService.changePassword(request);
+        return ApiResponse.<Void>builder().message("Change password successfully").build();
+    }
+
 
 }
