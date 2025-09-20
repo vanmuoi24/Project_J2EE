@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.auth_service.dto.request.AuthenticationRequest;
+import com.example.auth_service.dto.request.ChangePasswordRequest;
 import com.example.auth_service.dto.request.IntrospectRequest;
 import com.example.auth_service.dto.request.RefreshRequest;
 import com.example.auth_service.dto.response.AuthenticationResponse;
@@ -48,6 +49,8 @@ public class AuthService {
     UserRepository userRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
+
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
@@ -200,6 +203,27 @@ public class AuthService {
                 com.example.auth_service.entity.InvalidatedToken.builder()
                         .id(signedJWT.getJWTClaimsSet().getJWTID())
                         .build());
+    }
+
+    public void changePassword(ChangePasswordRequest request) throws ParseException, JOSEException {
+        var signedJWT = verifyToken(request.getToken(), false);
+        var username = signedJWT.getJWTClaimsSet().getSubject();
+        var user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+
+        // Kiểm tra confirmPassword
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+
+        // Kiểm tra mật khẩu cũ
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.OLD_PASSWORD_NOT_MATCH);
+        }
+
+        // Cập nhật mật khẩu mới
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 
 }
