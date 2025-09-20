@@ -19,8 +19,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final String[] PUBLIC_URLS = {
-
-
+        "users/login",
+        "users/register",
     };
 
     private final CustomJwtDecoder customJwtDecoder;

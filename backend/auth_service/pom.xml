@@ -109,10 +109,10 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<importOrder>
-					<!-- Specify either order or file, but not both -->
-					<order>java,jakarta,org,com,com.diffplug,</order>
-				</importOrder>
+<!--				<importOrder>-->
+<!--					&lt;!&ndash; Specify either order or file, but not both &ndash;&gt;-->
+<!--					<order>java,jakarta,org,com,com.diffplug,</order>-->
+<!--				</importOrder>-->
 			</plugin>
 		</plugins>
 	</build>
