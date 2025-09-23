@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "f4192d6e-8251-46d9-ada5-78d0bf1d9f96",
+		"name": "TourBackEndAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28903223"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"taikhoan123\",\r\n    \"password\": \"Muoi2402\",\r\n    \"email\":\"domuoiggh@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"taikhoan123\",\r\n    \"password\": \"Muoi2402\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8888/api/v1/auth/users/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8888",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"token\":\"eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJ0b3VydHJhdmVsLmNvbSIsInN1YiI6IjEiLCJleHAiOjE3NTc2OTE2MTAsImlhdCI6MTc1NzY4ODAxMCwianRpIjoiNjdhZjFiYWQtYWEwNC00ZjdjLWIwZjktZGNiZDdkN2VkYmQxIn0.Ych012ugGGdCaKD5B1xSrxbm_yf3K7YRzyEZCnCgZZHTSU0hY5a1yMcUFpwrsVlQMAZpC7oqPX-XK4tOGBxiAg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "introspect",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"token\":\"eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJ0b3VydHJhdmVsLmNvbSIsInN1YiI6IjEiLCJleHAiOjE3NTc2OTE0MjgsImlhdCI6MTc1NzY4NzgyOCwianRpIjoiNWFhMmM0ZjgtOGRiYS00ZWIwLTg3OWYtZDBhNTFhM2M1MTFmIn0.yVrQURCXmTj1WuKW7WOxWJ56rvdYFwq-Js8VONSXrIbPKLZu2A7ESZS2iZjuXLHWswRTvP_oUJXl_kIpuAOflw\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/auth/introspect",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"auth",
+								"introspect"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "ListUserPagination",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
