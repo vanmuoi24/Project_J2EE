@@ -1,17 +1,17 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.tsx";
-import { BrowserRouter } from "react-router-dom";
-import RouterApp from "./router/RouterApp.tsx";
-import viVN from "antd/locale/vi_VN";
-import { ConfigProvider } from "antd";
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <ConfigProvider locale={viVN}>
-      <BrowserRouter>
-        <RouterApp />
-      </BrowserRouter>
-    </ConfigProvider>
-  </StrictMode>
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "antd/dist/reset.css";
+import { store, persistor } from "@/store/index";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <App />
+      </PersistGate>
+    </Provider>
+  </React.StrictMode>
 );

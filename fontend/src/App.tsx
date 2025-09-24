@@ -1,7 +1,4 @@
-import "./App.css";
-
-function App() {
-  return <div>123</div>;
+import AppRoutes from "@routes/AppRoutes";
+export default function App() {
+  return <AppRoutes />;
 }
-
-export default App;
