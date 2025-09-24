@@ -9,15 +9,19 @@ import com.example.tour_service.dto.response.TourResponse;
 import com.example.tour_service.dto.response.VehicleResponse;
 import com.example.tour_service.entity.Location;
 import com.example.tour_service.entity.Tour;
+import com.example.tour_service.entity.TourDeparture;
 import com.example.tour_service.entity.Vehicle;
 import com.example.tour_service.exception.AppException;
 import com.example.tour_service.exception.ErrorCode;
 import com.example.tour_service.repository.LocationRepository;
+import com.example.tour_service.repository.TourDepartureRepository;
 import com.example.tour_service.repository.TourRepository;
 import com.example.tour_service.repository.VehicleRepository;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +31,32 @@ public class TourService {
     private final LocationRepository locationRepository; // cần thêm repo cho Location
     private final VehicleRepository vehicleRepository;
     private final PricingClient pricingClient;
+
+    public TourResponse getTourById(int id) {
+        Tour tour = tourRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+
+        TourResponse response = toResponse(tour);
+        ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
+        response.setTourPrice(priceResp.getResult());
+
+        return response;
+    }
+
+    public List<TourResponse> getAllTours() {
+        return tourRepository.findAll().stream()
+                .map(tour -> {
+                    TourResponse response = toResponse(tour);
+
+                    ApiResponse<TourPriceResponse> priceResp =
+                            pricingClient.getPriceById(tour.getTourPriceId());
+                    response.setTourPrice(priceResp.getResult());
+
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
+
 
     public TourResponse createTour(TourRequest request) {
         Location departure = locationRepository.findById(request.getDepartureLocationId())
@@ -53,31 +83,43 @@ public class TourService {
         return toResponse(saved);
     }
 
-    public TourResponse getTourById(int id, boolean includePrice) {
-        Tour tour = tourRepository.findById(id)
+    public TourResponse updateTour(int id, TourRequest request) {
+        Tour existingTour = tourRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
 
-        TourResponse response = toResponse(tour);
-        System.out.println("na");
+        Location existingDepartureLocation = locationRepository.findById(request.getDepartureLocationId())
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
 
-        if (includePrice && tour.getTourPriceId() != null) {
-            try {
-                System.out.println("Calling PricingClient with id: " + tour.getTourPriceId());
-                ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
-                System.out.println("priceResp: " + priceResp);
-                response.setTourPrice(priceResp.getResult());
-                System.out.println("ha");
-            } catch (FeignException e) {
-                System.out.println("FeignException: status=" + e.status() + ", body=" + e.contentUTF8());
-                response.setTourPrice(null);
-            } catch (Exception e) {
-                System.out.println("Other exception: " + e.getMessage());
-                response.setTourPrice(null);
-            }
+        Location existingDestinationLocation = locationRepository.findById(request.getDestinationLocationId())
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+
+
+        Vehicle existingVehicle = vehicleRepository.findById(request.getVehicleId())
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+
+
+        //Cap nhat Tour
+        existingTour.setTourTitle(request.getTourTitle());
+        existingTour.setDescription(request.getDescription());
+        existingTour.setDuration(request.getDuration());
+        existingTour.setDepartureLocation(existingDepartureLocation);
+        existingTour.setDestinationLocation(existingDestinationLocation);
+        existingTour.setVehicle(existingVehicle);
+        existingTour.setTourPriceId(request.getTourPriceId());
+
+        Tour saved = tourRepository.save(existingTour);
+        return toResponse(saved);
+    }
+
+    public void deleteTour(int id) {
+        if (!tourRepository.existsById(id)) {
+            throw new AppException(ErrorCode.INVALID_KEY);
         }
 
-        return response;
+        tourRepository.deleteById(id);
     }
+
+
 
     private TourResponse toResponse(Tour tour) {
         return TourResponse.builder()
@@ -103,7 +145,6 @@ public class TourService {
                                 .name(tour.getVehicle().getVehicleType())
                                 .build()
                 )
-                .tourPriceId(tour.getTourPriceId())
                 .build();
     }
 }

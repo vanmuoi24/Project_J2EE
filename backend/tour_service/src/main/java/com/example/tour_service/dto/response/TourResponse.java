@@ -20,6 +20,5 @@ public class TourResponse {
     LocationResponse destinationCity;
     BigDecimal basePrice;
     VehicleResponse vehicle;
-    Long tourPriceId;
     TourPriceResponse tourPrice;
 }
