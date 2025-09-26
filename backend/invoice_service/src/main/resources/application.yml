@@ -1,11 +1,11 @@
 server:
-  port: 8086
+  port: 8087
   servlet:
-    context-path: /tour
+    context-path: /invoice
 
 spring:
   application:
-    name: tour-service
+    name: invoice-service
   datasource:
     url: "jdbc:mysql://localhost:3306/DBtour"
     driver-class-name: "com.mysql.cj.jdbc.Driver"
@@ -19,5 +19,5 @@ spring:
       hibernate.dialect: org.hibernate.dialect.MySQLDialect
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
-  valid-duration: 15000 # in second
+  valid-duration: 1500 # in second
   refreshable-duration: 36000 # in seconds

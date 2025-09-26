@@ -1,0 +1,20 @@
+package com.example.booking_service.dto.request.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CustomerRequest {
+    String id;
+    String fullName;
+    String birthdate;
+    String address;
+    String bookingType;
+    String gender;
+    String status;
+}

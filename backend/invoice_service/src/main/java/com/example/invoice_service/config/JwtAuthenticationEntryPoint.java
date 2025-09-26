@@ -1,4 +1,4 @@
-package com.example.booking_service.config;
+package com.example.invoice_service.config;
 
 import java.io.IOException;
 
@@ -9,8 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.example.booking_service.dto.request.response.ApiResponse;
-import com.example.booking_service.exception.ErrorCode;
+import com.example.invoice_service.dto.response.ApiResponse;
+import com.example.invoice_service.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
