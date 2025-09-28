@@ -1,36 +1,33 @@
 package com.example.booking_service.service;
 
+import com.example.booking_service.client.UserClient;
 import com.example.booking_service.dto.request.request.BookingRequest;
-import com.example.booking_service.dto.request.response.ApiResponse;
 import com.example.booking_service.dto.request.response.BookingResponse;
-import com.example.booking_service.entity.Booking;
-import com.example.booking_service.entity.BookingStatus;
+import com.example.booking_service.entity.*;
 import com.example.booking_service.exception.AppException;
 import com.example.booking_service.exception.ErrorCode;
 import com.example.booking_service.mapper.BookingMapper;
 import com.example.booking_service.repository.BookingRepository;
+import com.example.booking_service.repository.CustomerBookingRepository;
+import com.example.booking_service.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.awt.print.Book;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BookingService {
+    private final ClientRequest userService;
+    private final UserClient userClient;
     private final BookingRepository bookingRepository;
+    private final CustomerRepository customerRepository;
+    private final CustomerBookingRepository customerBookingRepository;
     private final BookingMapper bookingMapper;
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final String url = "http://localhost:8888/api/v1/auth/users/";
-//    private final String getAllCustomerUrl =
 
     public List<BookingResponse> getAllBookings() {
         List<Booking> bookings = bookingRepository.findAll();
@@ -43,28 +40,10 @@ public class BookingService {
         return bookingMapper.toBookingResponse(booking);
     }
 
-    public ResponseEntity<String> getUserByIdUrl(Long id, String jwtToken){
-        String customUrl = String.format(url + "%d", id);
-        System.err.println(customUrl);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", jwtToken);  // đã gồm "Bearer ..."
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<String> responseEntity = restTemplate.exchange(
-                customUrl,
-                HttpMethod.GET,
-                requestEntity,
-                String.class
-        );
-
-        if (!responseEntity.getStatusCode().is2xxSuccessful() || responseEntity.getBody() == null) {
-            throw new RuntimeException("USER ID IS UNEXISTED");
-        }
-        return responseEntity;
-    }
-
-    public BookingResponse createBooking(BookingRequest bookingRequest, String jwtToken){
-        getUserByIdUrl(Long.parseLong(bookingRequest.getUserId()), jwtToken);
+    public BookingResponse createBooking(BookingRequest bookingRequest, String jwtToken) {
+//        userService.getUserExistedById(Long.parseLong(bookingRequest.getUserId()), jwtToken);
+        userClient.getUserById(Long.parseLong(bookingRequest.getUserId()));
+        System.err.println(bookingRequest);
 
         Booking booking = bookingMapper.toBooking(bookingRequest);
         booking.setStatus(BookingStatus.CONFIRMED);
@@ -72,13 +51,45 @@ public class BookingService {
         booking.setCreatedAt(LocalDateTime.now());
         booking.setTourDepartureId(Integer.parseInt(bookingRequest.getTourDepartureId()));
 
+        List<Customer> customers;
         try {
+            customers = bookingRequest.getListOfCustomers().stream()
+                    .map(cusReq -> {
+                        LocalDate birthdate = LocalDate.parse(cusReq.getBirthdate());
+                        int age = Period.between(birthdate, LocalDate.now()).getYears();
+                        boolean genderValue = cusReq.getGender().equalsIgnoreCase("Male") ? true : false;
+                        BookingType bookingType;
+
+                        if(age < 2){
+                            bookingType = BookingType.INFANT;
+                        }
+                        if(age >= 2 && age <= 4){
+                            bookingType = BookingType.TODDLER;
+                        }
+                        if(age >= 5 && age >= 11){
+                            bookingType = BookingType.CHILDREN;
+                        }
+                        else {
+                            bookingType = BookingType.ADULT;
+                        }
+
+                        return Customer.builder()
+                                .fullName(cusReq.getFullName())
+                                .address(cusReq.getAddress())
+                                .dateOfBirth(birthdate)
+                                .status(CustomerStatus.BOOKED)
+                                .gender(genderValue)
+                                .bookingType(bookingType)
+                                .build();
+                    }).toList();
+
+            customerRepository.saveAll(customers);
             bookingRepository.save(booking);
-        } catch (DataIntegrityViolationException exception){
+        } catch (DataIntegrityViolationException exception) {
             throw new RuntimeException(exception);
         }
 
-        return bookingMapper.toBookingResponse(booking);
+        return bookingMapper.toBookingResponse(booking, customers);
     }
 
 }

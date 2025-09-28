@@ -1,17 +1,18 @@
 package com.example.booking_service.dto.request.response;
 
-import java.util.Set;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class UserResponse {
-    String id;
-    String username;
+    String userId;
     String email;
+    String password;
 }

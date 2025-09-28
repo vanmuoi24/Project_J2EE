@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class BookingRequest {
     private String userId;
     private String tourDepartureId;
+    private List<CustomerRequest> listOfCustomers;
 }

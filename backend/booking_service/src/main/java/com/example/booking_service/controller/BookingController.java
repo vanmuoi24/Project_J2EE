@@ -42,8 +42,7 @@ public class BookingController {
     public ApiResponse<BookingResponse> createBooking(
             @RequestBody BookingRequest request,
             @RequestHeader("Authorization") String authHeader){
-//        System.err.println(request);
-        return ApiResponse.<BookingResponse>builder()
+            return ApiResponse.<BookingResponse>builder()
                 .result(bookingService.createBooking(request, authHeader))
                 .message("Created successfully")
                 .build();

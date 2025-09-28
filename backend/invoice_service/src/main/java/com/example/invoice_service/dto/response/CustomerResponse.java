@@ -1,16 +1,14 @@
-package com.example.booking_service.dto.request.response;
+package com.example.invoice_service.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-
+@Builder
 public class CustomerResponse {
     private String id;
     private String fullName;

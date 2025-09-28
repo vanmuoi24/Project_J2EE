@@ -30,6 +30,9 @@ public class Invoice {
     @Column(name = "status", nullable = false)
     private InvoiceStatus status;
 
+    @Column(name = "total_booking_tour_expense", nullable = false)
+    private float totalBookingTourExpense;
+
     @PrePersist
     protected void onDateOfPayment() {
         if (this.dayOfPay == null) {

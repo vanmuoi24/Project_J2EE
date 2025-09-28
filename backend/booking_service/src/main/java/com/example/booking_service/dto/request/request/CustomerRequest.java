@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class CustomerRequest {
-    String id;
     String fullName;
     String birthdate;
     String address;

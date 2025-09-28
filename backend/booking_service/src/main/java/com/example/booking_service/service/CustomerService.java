@@ -31,17 +31,16 @@ public class CustomerService {
         return customerMapper.toCustomerResponse(customer);
     }
 
-    public CustomerResponse createCustomer(CustomerRequest customerRequest){
-        Customer customer = customerMapper.toCustomer(customerRequest);
-
-        customer.setFullName(customer.getFullName());
-        customer.setAddress(customer.getAddress());
+    public List<CustomerResponse> createCustomers(List<CustomerRequest> customerRequests){
+        List<Customer> customers = customerRequests.stream()
+                .map(customerMapper::toCustomer)
+                .toList();
 
         try {
-            customerRepository.save(customer);
+            List<Customer> savedCustomers = customerRepository.saveAll(customers);
         }catch (DataIntegrityViolationException exception){
             throw exception;
         }
-        return customerMapper.toCustomerResponse(customer);
+        return customerMapper.toCustomerResponseList(customers);
     }
 }

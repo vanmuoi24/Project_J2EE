@@ -36,10 +36,11 @@ public class InvoiceController {
     }
 
     @PostMapping("/create")
-    public ApiResponse<InvoiceResponse> createBooking(@RequestBody InvoiceRequest request) {
-//        System.err.println(request);
-        return ApiResponse.<InvoiceResponse>builder()
-                .result(invoiceService.createInvoice(request))
+    public ApiResponse<InvoiceResponse> createBooking(
+            @RequestBody InvoiceRequest request,
+            @RequestHeader("Authorization") String authHeader){
+            return ApiResponse.<InvoiceResponse>builder()
+                .result(invoiceService.createInvoice(request, authHeader))
                 .message("Created successfully")
                 .build();
     }

@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "booking")
@@ -29,6 +32,9 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
     private BookingStatus status;
+
+    @OneToMany(mappedBy = "booking")
+    private Set<CustomerBooking> customerBookings = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
