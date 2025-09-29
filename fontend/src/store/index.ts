@@ -3,8 +3,11 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage/session'; // sessionStorage
 import authReduder from '@/store/slices/authSlice';
+import lcReducer from '@/store/slices/lcSlice';
+
 const rootReducer = combineReducers({
 	auth: authReduder,
+	lc: lcReducer,
 });
 
 const persistConfig = {
