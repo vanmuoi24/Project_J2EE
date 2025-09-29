@@ -32,6 +32,7 @@ public class Customer {
     @Column(name = "address", nullable = true)
     private String address;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "booking_type", nullable = false)
     private BookingType bookingType;
 

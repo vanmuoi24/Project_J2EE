@@ -1,8 +1,8 @@
 package com.example.booking_service.service;
 
 import com.example.booking_service.client.UserClient;
-import com.example.booking_service.dto.request.request.BookingRequest;
-import com.example.booking_service.dto.request.response.BookingResponse;
+import com.example.booking_service.dto.request.BookingRequest;
+import com.example.booking_service.dto.response.BookingResponse;
 import com.example.booking_service.entity.*;
 import com.example.booking_service.exception.AppException;
 import com.example.booking_service.exception.ErrorCode;
@@ -22,7 +22,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BookingService {
-    private final ClientRequest userService;
     private final UserClient userClient;
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
@@ -40,8 +39,7 @@ public class BookingService {
         return bookingMapper.toBookingResponse(booking);
     }
 
-    public BookingResponse createBooking(BookingRequest bookingRequest, String jwtToken) {
-//        userService.getUserExistedById(Long.parseLong(bookingRequest.getUserId()), jwtToken);
+    public BookingResponse createBooking(BookingRequest bookingRequest) {
         userClient.getUserById(Long.parseLong(bookingRequest.getUserId()));
         System.err.println(bookingRequest);
 
@@ -58,7 +56,7 @@ public class BookingService {
                         LocalDate birthdate = LocalDate.parse(cusReq.getBirthdate());
                         int age = Period.between(birthdate, LocalDate.now()).getYears();
                         boolean genderValue = cusReq.getGender().equalsIgnoreCase("Male") ? true : false;
-                        BookingType bookingType;
+                        BookingType bookingType = BookingType.ADULT;
 
                         if(age < 2){
                             bookingType = BookingType.INFANT;
@@ -69,7 +67,7 @@ public class BookingService {
                         if(age >= 5 && age >= 11){
                             bookingType = BookingType.CHILDREN;
                         }
-                        else {
+                        if(age >= 12){
                             bookingType = BookingType.ADULT;
                         }
 
@@ -88,7 +86,6 @@ public class BookingService {
         } catch (DataIntegrityViolationException exception) {
             throw new RuntimeException(exception);
         }
-
         return bookingMapper.toBookingResponse(booking, customers);
     }
 

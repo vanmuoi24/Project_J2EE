@@ -1,11 +1,9 @@
-package com.example.booking_service.dto.request.response;
+package com.example.booking_service.dto.response;
 
-import com.example.booking_service.dto.request.request.CustomerRequest;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -20,5 +18,5 @@ public class BookingResponse {
     private String tourDepartureId;
     private String createAt;
     private String status;
-    private List<CustomerRequest> listOfCustomers;
+    private List<CustomerResponse> listOfCustomers;
 }

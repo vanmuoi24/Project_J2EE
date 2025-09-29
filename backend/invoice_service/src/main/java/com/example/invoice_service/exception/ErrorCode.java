@@ -21,6 +21,8 @@ public enum ErrorCode {
     INVALID_TOKEN(1010, "Invalid token", HttpStatus.UNAUTHORIZED),
     EXPIRED_TOKEN(1011, "Token is expired", HttpStatus.UNAUTHORIZED),
     PASSWORD_NOT_MATCH(1012, "Password not match", HttpStatus.BAD_REQUEST),
+    TOUR_DEPARTURE_NOT_EXISTED(1013, "Tour departure not existed", HttpStatus.NOT_FOUND),
+    PRICE_NOT_EXISTED(1013, "Price not existed", HttpStatus.NOT_FOUND)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

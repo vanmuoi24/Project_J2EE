@@ -17,12 +17,16 @@ public class InvoiceResponse {
     private String dateOfTransaction;
     private String paymentMethodId;
     private String status;
-    private String totalAdult;
-    private String totalChildren;
-    private String totalToddler;
-    private String totalInfant;
+    private String totalCountOfAdult;
+    private String totalCountOfChildren;
+    private String totalCountOfTodler;
+    private String totalCountOfInfant;
+    private String totalChargeOfAdult;
+    private String totalChargeOfChildren;
+    private String totalChargeOfTodler;
+    private String totalChargeOfInfant;
     private String totalExtraFee;
-    private String totalBooking;
+    private String totalCountOfBooking;
     private String totalBookingTourExpense;
     private List<CustomerResponse> customerResponseList;
 }

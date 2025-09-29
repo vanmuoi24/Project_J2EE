@@ -1,11 +1,8 @@
 package com.example.booking_service.controller;
 
-import com.example.booking_service.dto.request.request.BookingRequest;
-import com.example.booking_service.dto.request.request.CustomerRequest;
-import com.example.booking_service.dto.request.response.ApiResponse;
-import com.example.booking_service.dto.request.response.BookingResponse;
-import com.example.booking_service.dto.request.response.CustomerResponse;
-import com.example.booking_service.entity.Customer;
+import com.example.booking_service.dto.request.CustomerRequest;
+import com.example.booking_service.dto.response.ApiResponse;
+import com.example.booking_service.dto.response.CustomerResponse;
 import com.example.booking_service.service.CustomerService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +38,7 @@ public class CustomerController {
 
     @PostMapping("/create")
     public ApiResponse<List<CustomerResponse>> createCustomers(
-            @RequestBody List<CustomerRequest> request,
-            @RequestHeader("Authorization") String authHeader){
+            @RequestBody List<CustomerRequest> request) {
         return ApiResponse.<List<CustomerResponse>>builder()
                 .result(customerService.createCustomers(request))
                 .message("Created successfully")

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/invoice")
+@RequestMapping("/direct")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 
@@ -20,7 +20,7 @@ public class InvoiceController {
     private final InvoiceService invoiceService;
     
     @GetMapping("/{id}")
-    public ApiResponse<InvoiceResponse> getBookingsById(@PathVariable Long id) {
+    public ApiResponse<InvoiceResponse> getInvoiceById(@PathVariable Long id) {
         return ApiResponse.<InvoiceResponse>builder()
                 .result(invoiceService.getInvoiceById(id))
                 .message("Got successfully")
@@ -28,7 +28,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/all")
-    public ApiResponse<List<InvoiceResponse>> getAllBookings() {
+    public ApiResponse<List<InvoiceResponse>> getAllInvoices() {
         return ApiResponse.<List<InvoiceResponse>>builder()
                 .result(invoiceService.getAllInvoices())
                 .message("Got successfully")
@@ -36,11 +36,10 @@ public class InvoiceController {
     }
 
     @PostMapping("/create")
-    public ApiResponse<InvoiceResponse> createBooking(
-            @RequestBody InvoiceRequest request,
-            @RequestHeader("Authorization") String authHeader){
+    public ApiResponse<InvoiceResponse> createInvoice(
+            @RequestBody InvoiceRequest request){
             return ApiResponse.<InvoiceResponse>builder()
-                .result(invoiceService.createInvoice(request, authHeader))
+                .result(invoiceService.createInvoice(request))
                 .message("Created successfully")
                 .build();
     }

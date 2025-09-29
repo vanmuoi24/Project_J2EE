@@ -12,10 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class InvoiceRequest {
-    private String userId;
-    private String dateOfTransaction;
-    private String paymentMethodId;
-    private String status;
-    private String totalBookingTourExpense;
-    private List<CustomerRequest> listOfCustomers;
+    private BookingRequest bookingRequest;
 }

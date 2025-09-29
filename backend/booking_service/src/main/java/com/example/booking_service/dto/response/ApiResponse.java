@@ -1,4 +1,4 @@
-package com.example.booking_service.dto.request.response;
+package com.example.booking_service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

@@ -1,13 +1,12 @@
 package com.example.booking_service.service;
 
-import com.example.booking_service.dto.request.request.CustomerRequest;
-import com.example.booking_service.dto.request.response.CustomerResponse;
+import com.example.booking_service.dto.request.CustomerRequest;
+import com.example.booking_service.dto.response.CustomerResponse;
 import com.example.booking_service.entity.Customer;
 import com.example.booking_service.exception.AppException;
 import com.example.booking_service.exception.ErrorCode;
 import com.example.booking_service.mapper.CustomerMapper;
 import com.example.booking_service.repository.CustomerRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

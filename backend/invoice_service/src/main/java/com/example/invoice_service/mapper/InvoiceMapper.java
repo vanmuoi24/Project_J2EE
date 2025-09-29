@@ -7,7 +7,12 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 
 public interface InvoiceMapper {
+    // DTO -> Entity
     Invoice toInvoice(InvoiceRequest request);
+
+    // Entity -> DTO
     InvoiceResponse toInvoiceResponse(Invoice invoice);
+
+    // List Entity -> List DTO
     java.util.List<InvoiceResponse> toInvoiceResponseList(java.util.List<Invoice> invoices);
 }

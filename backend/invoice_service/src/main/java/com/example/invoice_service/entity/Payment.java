@@ -16,5 +16,5 @@ public class Payment {
     private int id;
 
     @Column(name = "method", nullable = true, length = 20)
-    private Payment method;
+    private Method method;
 }

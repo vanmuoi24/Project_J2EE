@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Primary;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "booking")
+@Table(name = "invoice")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,6 +27,7 @@ public class Invoice {
     @Column(name = "pay_method_id", nullable = false)
     private int paymentMethorId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private InvoiceStatus status;
 
@@ -34,16 +35,9 @@ public class Invoice {
     private float totalBookingTourExpense;
 
     @PrePersist
-    protected void onDateOfPayment() {
-        if (this.dayOfPay == null) {
-            this.dayOfPay = LocalDateTime.now();
-        }
-    }
-
-    @PrePersist
     protected void onStatus() {
-        if (this.status == null) {
-            this.status = InvoiceStatus.WAITING;
-        }
+        this.dayOfPay = LocalDateTime.now();
+        this.status = InvoiceStatus.PAID;
+
     }
 }
