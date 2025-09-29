@@ -84,8 +84,19 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isPublicEndpoint(ServerHttpRequest request) {
+        String path = request.getURI().getPath();
         return Arrays.stream(publicEndpoints)
-                .anyMatch(s -> request.getURI().getPath().matches(apiPrefix + s));
+                .anyMatch(pattern -> {
+                    // Nếu pattern là regex thì .matches(), còn không thì so sánh startsWith
+                    if (pattern.contains(".*")) {
+                        return path.matches(apiPrefix + pattern);
+                    } else if (pattern.endsWith("/**")) {
+                        String base = pattern.substring(0, pattern.length() - 3);
+                        return path.startsWith(apiPrefix + base);
+                    } else {
+                        return path.equals(apiPrefix + pattern);
+                    }
+                });
     }
 
     Mono<Void> unauthenticated(ServerHttpResponse response) {
