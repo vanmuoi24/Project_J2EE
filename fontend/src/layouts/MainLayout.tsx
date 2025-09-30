@@ -3,6 +3,7 @@ import TopNavbar from "@/components/Share/TopNavbar"
 import { Layout } from "antd"
 import { Content, Footer, Header } from "antd/es/layout/layout"
 import { Outlet } from "react-router-dom"
+import {Footer as MyFooter }from '@/components/Share/Footer'
 
 export default function MainLayout() {
   return (
@@ -14,8 +15,8 @@ export default function MainLayout() {
       <Content >
         <Outlet />
       </Content>
-      <Footer >
-         PhathociT Design ©{new Date().getFullYear()} Created by Ant UED
+      <Footer  style={{padding: 0}}>
+        <MyFooter/>
       </Footer>
     </Layout>
   )

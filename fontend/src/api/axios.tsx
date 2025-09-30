@@ -7,7 +7,7 @@ const axiosClient = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Interceptor request (ví dụ thêm token)
+// Interceptor request 
 axiosClient.interceptors.request.use((config) => {
   const token = sessionService.getToken()
   if (token) {
