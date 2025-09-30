@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
-import {  Button, ConfigProvider, Layout, Menu, Tabs  } from "antd";
+import {  Button, ConfigProvider, Menu, Tabs  } from "antd";
 import { CloseOutlined, MenuOutlined } from "@ant-design/icons";
 import brand from "@/assets/images/brand.jpg";
 import Container from "./Container";
 import type { TabsProps } from "antd/lib";
 import { useState } from "react";
-
-const { Header } = Layout;
 
 const Navbar: React.FC = () => {
   const items: TabsProps["items"] = [
@@ -126,7 +124,7 @@ const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   
   return (
-    <Header
+    <div
       style={{
         background: "#fff",
         height: 60
@@ -208,7 +206,8 @@ const Navbar: React.FC = () => {
           borderRadius: 8,
           display: isOpen ? 'flex' : 'none',
           justifyContent: 'space-between',
-          padding: 8
+          padding: 8, 
+          zIndex: 99
         }}>
             <ConfigProvider
             theme={{
@@ -236,7 +235,7 @@ const Navbar: React.FC = () => {
           </Button>
       </div>
       </Container>
-    </Header>
+    </div>
   );
 };
 

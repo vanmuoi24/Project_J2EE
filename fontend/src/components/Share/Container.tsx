@@ -11,7 +11,7 @@ const Container: React.FC<ContainerProps> = ({ children, style, className }) => 
     <div
       className={className}
       style={{
-        width: 1400,
+        width: 1200,
         margin: "0 auto",
         paddingInline: 24,
         maxWidth: "100%",

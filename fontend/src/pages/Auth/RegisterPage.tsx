@@ -1,4 +1,4 @@
-import TopNavbar from "@/components/Home/TopNavbar"
+import TopNavbar from "@/components/Share/TopNavbar"
 import { registerService } from "@/services/authServices"
 import { LockOutlined, MailOutlined, PhoneOutlined, UserOutlined } from "@ant-design/icons"
 import { Button, Form, Input, Card, Typography, Checkbox, message } from "antd"

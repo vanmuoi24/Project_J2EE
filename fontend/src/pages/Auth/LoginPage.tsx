@@ -1,10 +1,10 @@
   import { useAppDispatch, useAppSelector } from "@/store/hooks";
   import { loginUser } from "@/store/slices/authSlice";
   import { LockOutlined, UserOutlined } from "@ant-design/icons"
-  import { Button, Form, Input, Card, Typography, Alert, message, Divider, Space } from "antd"
+  import { Button, Form, Input, Card, Typography, message, Divider, Space } from "antd"
   import {  Navigate, useNavigate } from "react-router-dom";
   import logo from '@/assets/images/logo.png'
-  import TopNavbar from "@/components/Home/TopNavbar";
+  import TopNavbar from "@/components/Share/TopNavbar";
 import { GoogleLogin } from "@react-oauth/google";
 
   export default function LoginPage() {

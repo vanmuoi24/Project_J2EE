@@ -1,15 +1,22 @@
-import Navbar from "@/components/Home/Navbar"
-import TopNavbar from "@/components/Home/TopNavbar"
+import Navbar from "@/components/Share/Navbar"
+import TopNavbar from "@/components/Share/TopNavbar"
+import { Layout } from "antd"
+import { Content, Footer, Header } from "antd/es/layout/layout"
 import { Outlet } from "react-router-dom"
 
 export default function MainLayout() {
   return (
-    <div>
-      <TopNavbar />
-      <Navbar/>
-      <main>
+    <Layout >
+        <Header style={{backgroundColor: '#fff', padding: 0, height: 100}} >
+            <TopNavbar />
+            <Navbar/>
+        </Header>
+      <Content >
         <Outlet />
-      </main>
-    </div>
+      </Content>
+      <Footer >
+         PhathociT Design ©{new Date().getFullYear()} Created by Ant UED
+      </Footer>
+    </Layout>
   )
 }

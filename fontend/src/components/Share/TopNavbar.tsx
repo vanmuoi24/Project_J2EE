@@ -1,13 +1,12 @@
-import { Layout, Dropdown, Button, Typography, Space } from "antd";
+import { Dropdown, Button, Typography, Space } from "antd";
 import { PhoneOutlined, UserOutlined } from "@ant-design/icons";
 import flag from '@/assets/images/en.png'
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import ModalChangeLC from "./Modal/ModalChangeLC";
+import ModalChangeLC from "@/components/Home/Modal/ModalChangeLC";
 import  { useState } from "react";
 import Container from "./Container";
 
-const { Header } = Layout;
 
 export default function TopNavbar() {
    const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -40,7 +39,7 @@ export default function TopNavbar() {
    ];
 
   return (
-    <Header style={{ 
+    <div style={{ 
       background: '#dcefff', height: '40px'
     }}>
       <Container  style={{display: 'flex',
@@ -69,6 +68,6 @@ export default function TopNavbar() {
         </Space>
         <ModalChangeLC isOpen={isOpen} setIsOpen={setIsOpen} />
       </Container>
-    </Header>
+    </div>
   );
 }
