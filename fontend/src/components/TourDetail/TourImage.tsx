@@ -1,6 +1,7 @@
 import { Image, Row, Col } from "antd";
 import img from "../../assets/slide_cb_0_tuiblue-3.webp";
 
+
 export default function TourImages() {
   return (
     <Row gutter={12}>
