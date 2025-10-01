@@ -15,7 +15,7 @@ public class Itinerary {
     private int id;
 
     @Column(nullable = false)
-    private int day_number;
+    private int dayNumber;
 
     @Column(nullable = false)
     private String title;

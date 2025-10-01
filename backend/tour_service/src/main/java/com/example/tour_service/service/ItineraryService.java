@@ -44,10 +44,10 @@ public class ItineraryService {
 
         Itinerary lastItinerary = itineraryRepository.findTopByTourIdOrderByDayNumberDesc(tour.getId());
 
-        int nextDayNumber = (lastItinerary == null) ? 1 : lastItinerary.getDay_number() + 1;
+        int nextDayNumber = (lastItinerary == null) ? 1 : lastItinerary.getDayNumber() + 1;
 
         Itinerary itinerary = Itinerary.builder()
-                .day_number(nextDayNumber)
+                .dayNumber(nextDayNumber)
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .meal(request.getMeal())
@@ -75,10 +75,10 @@ public class ItineraryService {
         itineraryRepository.deleteById(id);
     }
 
-    private ItineraryResponse toResponse(Itinerary itinerary) {
+    public ItineraryResponse toResponse(Itinerary itinerary) {
         return ItineraryResponse.builder()
                 .id(itinerary.getId())
-                .dayNumber(itinerary.getDay_number())
+                .dayNumber(itinerary.getDayNumber())
                 .title(itinerary.getTitle())
                 .description(itinerary.getDescription())
                 .meal(itinerary.getMeal())

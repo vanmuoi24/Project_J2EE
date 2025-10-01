@@ -1,17 +1,14 @@
 package com.example.tour_service.service;
 
 import com.example.tour_service.client.PricingClient;
-import com.example.tour_service.dto.response.ApiResponse;
+import com.example.tour_service.dto.response.*;
 import com.example.tour_service.dto.request.TourRequest;
-import com.example.tour_service.dto.response.LocationResponse;
-import com.example.tour_service.dto.response.TourPriceResponse;
-import com.example.tour_service.dto.response.TourResponse;
-import com.example.tour_service.dto.response.VehicleResponse;
 import com.example.tour_service.entity.Location;
 import com.example.tour_service.entity.Tour;
 import com.example.tour_service.entity.Vehicle;
 import com.example.tour_service.exception.AppException;
 import com.example.tour_service.exception.ErrorCode;
+import com.example.tour_service.repository.ItineraryRepository;
 import com.example.tour_service.repository.LocationRepository;
 import com.example.tour_service.repository.TourRepository;
 import com.example.tour_service.repository.VehicleRepository;
@@ -26,9 +23,11 @@ import java.util.stream.Collectors;
 public class TourService {
 
     private final TourRepository tourRepository;
-    private final LocationRepository locationRepository; // cần thêm repo cho Location
+    private final LocationRepository locationRepository;
     private final VehicleRepository vehicleRepository;
     private final PricingClient pricingClient;
+
+    private final ItineraryService itineraryService;
 
     public TourResponse getTourById(int id) {
         Tour tour = tourRepository.findById(id)
@@ -36,6 +35,7 @@ public class TourService {
 
         TourResponse response = toResponse(tour);
         ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
+
         response.setTourPrice(priceResp.getResult());
 
         return response;
@@ -129,11 +129,13 @@ public class TourService {
                 .departureCity(
                         LocationResponse.builder()
                                 .city(tour.getDepartureLocation().getCity())
+                                .type(tour.getDepartureLocation().getType())
                                 .build()
                 )
                 .destinationCity(
                         LocationResponse.builder()
                                 .city(tour.getDestinationLocation().getCity())
+                                .type(tour.getDestinationLocation().getType())
                                 .build()
                 )
                 .basePrice(tour.getBasePrice())
@@ -143,6 +145,7 @@ public class TourService {
                                 .name(tour.getVehicle().getVehicleType())
                                 .build()
                 )
+                .itineraries(itineraryService.getByTourId(tour.getId()))
                 .build();
     }
 }
