@@ -1,7 +1,7 @@
 package com.example.tour_service.service;
 
 import com.example.tour_service.client.PricingClient;
-import com.example.tour_service.dto.request.ApiResponse;
+import com.example.tour_service.dto.response.ApiResponse;
 import com.example.tour_service.dto.request.TourRequest;
 import com.example.tour_service.dto.response.LocationResponse;
 import com.example.tour_service.dto.response.TourPriceResponse;
@@ -9,12 +9,10 @@ import com.example.tour_service.dto.response.TourResponse;
 import com.example.tour_service.dto.response.VehicleResponse;
 import com.example.tour_service.entity.Location;
 import com.example.tour_service.entity.Tour;
-import com.example.tour_service.entity.TourDeparture;
 import com.example.tour_service.entity.Vehicle;
 import com.example.tour_service.exception.AppException;
 import com.example.tour_service.exception.ErrorCode;
 import com.example.tour_service.repository.LocationRepository;
-import com.example.tour_service.repository.TourDepartureRepository;
 import com.example.tour_service.repository.TourRepository;
 import com.example.tour_service.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
