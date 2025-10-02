@@ -74,6 +74,7 @@ public class TourService {
                 .destinationLocation(destination)
                 .vehicle(vehicle)
                 .tourPriceId(request.getTourPriceId())
+                .imageIds(request.getImageIds())
                 .build();
 
         Tour saved = tourRepository.save(tour);
@@ -104,6 +105,7 @@ public class TourService {
         existingTour.setDestinationLocation(existingDestinationLocation);
         existingTour.setVehicle(existingVehicle);
         existingTour.setTourPriceId(request.getTourPriceId());
+        existingTour.setImageIds(request.getImageIds());
 
         Tour saved = tourRepository.save(existingTour);
         return toResponse(saved);
@@ -146,6 +148,7 @@ public class TourService {
                                 .build()
                 )
                 .itineraries(itineraryService.getByTourId(tour.getId()))
+                .imageIds(tour.getImageIds())
                 .build();
     }
 }

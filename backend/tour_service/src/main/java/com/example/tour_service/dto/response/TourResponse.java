@@ -23,4 +23,5 @@ public class TourResponse {
     VehicleResponse vehicle;
     TourPriceResponse tourPrice;
     List<ItineraryResponse> itineraries;
+    List<String> imageIds;
 }
