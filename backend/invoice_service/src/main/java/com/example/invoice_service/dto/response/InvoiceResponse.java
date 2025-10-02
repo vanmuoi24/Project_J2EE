@@ -14,19 +14,19 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InvoiceResponse {
     private String userId;
+    private String bookingId;
     private String dateOfTransaction;
     private String paymentMethodId;
     private String status;
     private String totalCountOfAdult;
     private String totalCountOfChildren;
-    private String totalCountOfTodler;
+    private String totalCountOfToddler;
     private String totalCountOfInfant;
     private String totalChargeOfAdult;
     private String totalChargeOfChildren;
-    private String totalChargeOfTodler;
+    private String totalChargeOfToddler;
     private String totalChargeOfInfant;
     private String totalExtraFee;
-    private String totalCountOfBooking;
     private String totalBookingTourExpense;
     private List<CustomerResponse> customerResponseList;
 }

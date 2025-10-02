@@ -12,12 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class BookingRequest {
+    private String bookingId;
     private String userId;
     private String tourDepartureId;
     private List<CustomerRequest> listOfCustomers;
-    private String departureDate;
-    private String returnDate;
-    private String availableSeats;
-    private String tourId;
-    private String priceId;
 }

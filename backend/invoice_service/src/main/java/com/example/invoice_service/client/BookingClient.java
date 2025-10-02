@@ -13,6 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
         configuration = FeignAuthConfig.class
 )
 public interface BookingClient {
-    @GetMapping("/{id}")
-    ApiResponse<TourPriceResponse> getPriceById(@PathVariable("id") Long id);
+    @GetMapping("/book/{id}")
+    String getBookingById(@PathVariable("id") Long id);
 }

@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
 public class UserResponse {
-    String userId;
+    String id;
+    String username;
     String email;
-    String password;
 }

@@ -21,6 +21,9 @@ public class Invoice {
     @Column(name = "account_id", nullable = false)
     private int accountId;
 
+    @Column(name = "booking_id", nullable = false)
+    private int bookingId;
+
     @Column(name = "day_of_pay", nullable = false)
     private LocalDateTime dayOfPay;
 
