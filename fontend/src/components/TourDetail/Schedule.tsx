@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Calendar, Button, Row, Col, List, Card, ConfigProvider, Typography } from "antd";
-import type { Moment } from "moment";
-import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import viVN from "antd/locale/vi_VN";
