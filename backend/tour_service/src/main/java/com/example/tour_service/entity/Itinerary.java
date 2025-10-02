@@ -1,6 +1,5 @@
 package com.example.tour_service.entity;
 
-import com.example.tour_service.enums.LocationType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,15 +9,24 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Location {
+public class Itinerary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)
-    private String city;
+    private int dayNumber;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LocationType type;
+    private String title;
+
+    @Column(nullable = false)
+    private String description;
+
+    @Column(nullable = false)
+    private String meal;
+
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "tour_id")
+    private Tour tour;
 }

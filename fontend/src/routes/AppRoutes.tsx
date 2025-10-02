@@ -16,6 +16,7 @@ import ManagerBooking from "../components/Admin/ManagerBooking/ManagerBooking";
 import ManagerPromotion from "../components/Admin/ManagerPomt/ManagerPomt";
 import ManagerSchedule from "../components/Admin/ManagerTour/ManagerSchedule";
 import ManagerDestination from "../components/Admin/ManagerTour/ManagerDestination";
+import TourDetail from "@/layouts/TourDetail";
 
 export default function AppRoutes() {
   return (
@@ -24,6 +25,7 @@ export default function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
+          <Route path="/detail/:id" element={<TourDetail />}/>
         </Route>
 
         <Route element={<RouteGuard isPrivate={false} />}>
