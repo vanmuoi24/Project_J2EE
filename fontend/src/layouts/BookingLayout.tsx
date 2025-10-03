@@ -6,8 +6,6 @@ import TourDetailCard from "@/components/TourDetail/TourDetailCard";
 import Itinerary from "@/components/TourDetail/Itinerary";
 import ImportantInfo from "@/components/TourDetail/ImportantInfo";
 import BookingExpense from "@/components/Booking/BookingExpense";
-import Schedule from "@/components/TourDetail/Schedule";
-import TourCard from "@/components/TourDetail/TourCardProps";
 import TourCardProps from "@/components/TourDetail/TourCardProps";
 import TourImages from "@/components/TourDetail/TourImage";
 
