@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Getter
@@ -45,5 +46,9 @@ public class Tour {
 
     @Column(nullable = false, name = "price_id")
     private Long tourPriceId;
+
+    @ElementCollection
+    @Column(name = "image_id")
+    private List<String> imageIds;
 
 }
