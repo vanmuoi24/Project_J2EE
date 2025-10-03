@@ -1,10 +1,11 @@
 package com.example.tour_service.service;
 
 import com.example.tour_service.client.PricingClient;
-import com.example.tour_service.dto.response.ApiResponse;
+import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourDepartureRequest;
 import com.example.tour_service.dto.response.TourDepartureResponse;
 import com.example.tour_service.dto.response.TourPriceResponse;
+import com.example.tour_service.dto.response.TourResponse;
 import com.example.tour_service.entity.Tour;
 import com.example.tour_service.entity.TourDeparture;
 import com.example.tour_service.exception.AppException;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 

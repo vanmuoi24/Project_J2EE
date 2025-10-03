@@ -1,4 +1,4 @@
-package com.example.tour_service.dto.response;
+package com.example.tour_service.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

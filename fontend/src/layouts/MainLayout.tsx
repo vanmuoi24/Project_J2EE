@@ -1,14 +1,13 @@
-import Navbar from "@/components/Home/Navbar"
-import TopNavbar from "@/components/Home/TopNavbar"
+import Navbar from "@/components/Navbar"
 import { Outlet } from "react-router-dom"
 
 export default function MainLayout() {
   return (
     <div>
-      <TopNavbar />
       <Navbar/>
       <main>
-        <Outlet />
+        Đây là MainLayout
+        <Outlet /> {/* render page con */}
       </main>
     </div>
   )

@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -22,6 +21,4 @@ public class TourResponse {
     BigDecimal basePrice;
     VehicleResponse vehicle;
     TourPriceResponse tourPrice;
-    List<ItineraryResponse> itineraries;
-    List<String> imageIds;
 }
