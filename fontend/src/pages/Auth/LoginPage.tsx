@@ -1,29 +1,35 @@
   import { useAppDispatch, useAppSelector } from "@/store/hooks";
   import { loginUser } from "@/store/slices/authSlice";
   import { LockOutlined, UserOutlined } from "@ant-design/icons"
-  import { Button, Form, Input, Card, Typography, message, Divider, Space } from "antd"
+  import { Button, Form, Input, Card, Typography, message, Divider, Space, Alert } from "antd"
   import {  Navigate, useNavigate } from "react-router-dom";
   import logo from '@/assets/images/logo.png'
   import TopNavbar from "@/components/Share/TopNavbar";
 import { GoogleLogin } from "@react-oauth/google";
+import { sessionService } from "@/services/sessionServices";
 
   export default function LoginPage() {
     const navigate = useNavigate()
     const dispatch = useAppDispatch();
     const {loading, error, isAuth} = useAppSelector(state => state.auth)
 
-    const onFinish = (values: { email: string; password: string }) => {
-      dispatch(loginUser(values))
-      .unwrap()
-        .then((res) => {
-          if (res.code === 1000) {
-            message.success("Đăng nhập thành công!", 3);
-            navigate("/admin")
-          }
-        })
-        .catch(() => {
-          // lỗi đã được lưu trong redux error
-        })
+    const onFinish = async (values: { email: string; password: string }) => {
+      try {
+        const res = await dispatch(loginUser(values)).unwrap();
+        
+        if (res.code === 1000) {
+          sessionService.setSession(
+            res.result.token,
+            res.result.user
+          );
+          message.success("Đăng nhập thành công!", 3);
+          navigate("/admin")
+        }
+         
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        console.error(error || "Đăng nhập thất bại");
+      }
     }
 
     if (isAuth) {
@@ -59,14 +65,14 @@ import { GoogleLogin } from "@react-oauth/google";
               Đăng nhập
             </Typography.Title>
 
-            {/* {error && (
+            {error && (
               <Alert
                 message={error}
                 type="error"
                 showIcon
                 style={{ marginBottom: 16 }}
               />
-            )} */}
+            )}
 
             <Form
               name="login_form"

@@ -44,7 +44,7 @@ export const registerService = async (
 			'/auth/users/register',
 			data
 		);
-
+		console.log('>>>', res);
 		if (res.code !== 1000) {
 			throw new Error(res?.message || 'Register failed');
 		}
@@ -67,5 +67,30 @@ export const logoutService = async (token: string): Promise<void> => {
 		await axiosClient.post('/auth/users/logout', { token });
 	} finally {
 		sessionService.clearSession();
+	}
+};
+
+export const refreshTokenService = async (
+	token: string
+): Promise<LoginResponse> => {
+	try {
+		const res: LoginResponse = await axiosClient.post(
+			'/auth/users/refresh',
+			token
+		);
+
+		if (res.code !== 1000) {
+			throw new Error(res?.message || 'Refresh failed');
+		}
+		return res;
+	} catch (err: unknown) {
+		if (axios.isAxiosError(err)) {
+			const serverError = err.response?.data as { message?: string };
+			throw new Error(serverError?.message || 'Refresh failed');
+		}
+		if (err instanceof Error) {
+			throw err;
+		}
+		throw new Error('Unexpected error');
 	}
 };

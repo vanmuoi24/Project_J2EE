@@ -201,7 +201,7 @@ const Navbar: React.FC = () => {
       <div style={{
           position: 'absolute',
           width: "97%",
-          backgroundColor: '#aaaaaaff',
+          backgroundColor: '#ffff',
           top: '110%',
           borderRadius: 8,
           display: isOpen ? 'flex' : 'none',

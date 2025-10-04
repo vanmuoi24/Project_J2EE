@@ -6,27 +6,27 @@ const { TabPane } = Tabs;
 
 const regions = {
   "Miền Bắc": [
-    { name: "Hà Nội", image: "https://picsum.photos/400/250?random=21" },
-    { name: "Hạ Long", image: "https://picsum.photos/400/250?random=22" },
-    { name: "Sa Pa", image: "https://picsum.photos/400/250?random=23" },
-    { name: "Ninh Bình", image: "https://picsum.photos/400/250?random=24" },
+    { name: "Hà Nội", image: "" },
+    { name: "Hạ Long", image: "" },
+    { name: "Sa Pa", image: "" },
+    { name: "Ninh Bình", image: "" },
   ],
   "Miền Trung": [
-    { name: "Đà Nẵng", image: "https://picsum.photos/400/250?random=25" },
-    { name: "Huế", image: "https://picsum.photos/400/250?random=26" },
-    { name: "Nha Trang", image: "https://picsum.photos/400/250?random=27" },
-    { name: "Quy Nhơn", image: "https://picsum.photos/400/250?random=28" },
+    { name: "Đà Nẵng", image: "" },
+    { name: "Huế", image: "" },
+    { name: "Nha Trang", image: "" },
+    { name: "Quy Nhơn", image: "" },
   ],
   "Tây Nguyên": [
-    { name: "Đà Lạt", image: "https://picsum.photos/400/250?random=29" },
-    { name: "Buôn Ma Thuột", image: "https://picsum.photos/400/250?random=30" },
-    { name: "Pleiku", image: "https://picsum.photos/400/250?random=31" },
+    { name: "Đà Lạt", image: "" },
+    { name: "Buôn Ma Thuột", image: "" },
+    { name: "Pleiku", image: "" },
   ],
   "Miền Nam": [
-    { name: "TP. Hồ Chí Minh", image: "https://picsum.photos/400/250?random=32" },
-    { name: "Phú Quốc", image: "https://picsum.photos/400/250?random=33" },
-    { name: "Cần Thơ", image: "https://picsum.photos/400/250?random=34" },
-    { name: "Vũng Tàu", image: "https://picsum.photos/400/250?random=35" },
+    { name: "TP. Hồ Chí Minh", image: "" },
+    { name: "Phú Quốc", image: "" },
+    { name: "Cần Thơ", image: "" },
+    { name: "Vũng Tàu", image: "" },
   ],
 };
 

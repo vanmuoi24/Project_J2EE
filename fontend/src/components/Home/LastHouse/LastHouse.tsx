@@ -14,6 +14,7 @@ import {
 } from "@ant-design/icons";
 import { Button } from "antd";
 import { useEffect, useState } from "react";
+import { getAllTours } from "@/services/tourServices";
 
 const NextArrow = (props: React.ComponentPropsWithoutRef<'div'> & { onClick?: () => void }) => {
   const { onClick } = props;
@@ -99,7 +100,7 @@ const deals = [
     duration: "4N3Đ",
     seats: 4,
     price: "8,500,000₫",
-    image: "https://picsum.photos/400/250?random=11",
+    image: "",
     saleEnd: new Date().getTime() + 1000 * 60 * 60 * 24, // 24h
   },
   {
@@ -110,7 +111,7 @@ const deals = [
     duration: "5N4Đ",
     seats: 6,
     price: "6,900,000₫",
-    image: "https://picsum.photos/400/250?random=12",
+    image: "",
     saleEnd: new Date().getTime() + 1000 * 60 * 90, // 90 phút
   },
   {
@@ -121,7 +122,7 @@ const deals = [
     duration: "6N5Đ",
     seats: 10,
     price: "12,300,000₫",
-    image: "https://picsum.photos/400/250?random=13",
+    image: "",
     saleEnd: new Date().getTime() + 1000 * 60 * 60 * 12, // 12h
   },
   {
@@ -132,7 +133,7 @@ const deals = [
     duration: "7N6Đ",
     seats: 8,
     price: "19,900,000₫",
-    image: "https://picsum.photos/400/250?random=14",
+    image: "",
     saleEnd: new Date().getTime() + 1000 * 60 * 45, // 45 phút
   },
   {
@@ -143,7 +144,7 @@ const deals = [
     duration: "3N2Đ",
     seats: 15,
     price: "3,500,000₫",
-    image: "https://picsum.photos/400/250?random=15",
+    image: "",
     saleEnd: new Date().getTime() + 1000 * 60 * 60 * 48, // 2 ngày
   },
   {
@@ -154,7 +155,7 @@ const deals = [
     duration: "4N3Đ",
     seats: 12,
     price: "5,200,000₫",
-    image: "https://picsum.photos/400/250?random=16",
+    image: "",
     saleEnd: new Date().getTime() + 1000 * 60 * 10, // 10 phút
   },
   {
@@ -165,7 +166,7 @@ const deals = [
     duration: "10N9Đ",
     seats: 5,
     price: "59,000,000₫",
-    image: "https://picsum.photos/400/250?random=17",
+    image: "",
     saleEnd: new Date().getTime() + 1000 * 60 * 60 * 3, // 3h
   },
   {
@@ -176,13 +177,18 @@ const deals = [
     duration: "6N5Đ",
     seats: 7,
     price: "35,000,000₫",
-    image: "https://picsum.photos/400/250?random=18",
+    image: "",
     saleEnd: new Date().getTime() + 1000 * 30, // 30 giây
   },
 ];
 
 const [timeLeft, setTimeLeft] = useState<{ [key: string]: string }>({});
-
+  const getTours = async () => {
+    await getAllTours()
+  }  
+useEffect(()=> {
+    getTours()
+  }, [])
   // 🕒 Countdown xử lý
   useEffect(() => {
     const interval = setInterval(() => {

@@ -19,12 +19,12 @@ export default function RegisterPage() {
   const onFinish = async (values: ValuesRegister) => {
     const data = {
       username: values.email,
-	password: values.password,
-	email: values.email,
-	firstName: values.fullname,
-	lastName: values.fullname,
-	dob: "",
-	city:""
+      password: values.password,
+      email: values.email,
+      firstName: values.fullname,
+      lastName: values.fullname,
+      dob: "",
+      city:""
     }
     const res = await registerService(data);
 
