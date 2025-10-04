@@ -56,7 +56,7 @@ axiosClient.interceptors.response.use(
         const token = sessionService.getToken();
         if (!token) {
           sessionService.clearSession();
-          window.location.href = "/login";
+          // window.location.href = "/login";
           return Promise.reject(error);
         }
 
@@ -79,7 +79,7 @@ axiosClient.interceptors.response.use(
         processQueue(err, null);
         isRefreshing = false;
         sessionService.clearSession();
-        window.location.href = "/login";
+        // window.location.href = "/login";
         return Promise.reject(err);
       }
     }

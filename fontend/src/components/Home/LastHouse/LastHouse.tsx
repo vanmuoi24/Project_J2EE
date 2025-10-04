@@ -189,7 +189,7 @@ const [timeLeft, setTimeLeft] = useState<{ [key: string]: string }>({});
 useEffect(()=> {
     getTours()
   }, [])
-  // 🕒 Countdown xử lý
+  // Countdown xử lý
   useEffect(() => {
     const interval = setInterval(() => {
       const updated: { [key: string]: string } = {};
