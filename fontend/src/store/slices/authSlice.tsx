@@ -66,14 +66,13 @@ const authSlice = createSlice({
 			.addCase(loginUser.fulfilled, (state, action) => {
 				state.loading = false;
 				state.isAuth = true;
-				state.user = action.payload.result.user;
-				state.token = action.payload.result.token;
-				state.expiryTime = action.payload.result.expiryTime;
+				state.user = action.payload?.result.user;
+				state.token = action.payload?.result.token;
+				state.expiryTime = action.payload?.result.expiryTime;
 			})
 			.addCase(loginUser.rejected, (state, action) => {
 				state.loading = false;
-				state.error = action.error.message ?? "Đăng nhập thất bại";
-
+				state.error = typeof action.payload === 'string' ? action.payload : "Đăng nhập thất bại";
 			})
 			// Logout
 			.addCase(logoutUser.fulfilled, (state) => {
@@ -84,7 +83,8 @@ const authSlice = createSlice({
 				state.error = null;
 			})
 			.addCase(logoutUser.rejected, (state, action) => {
-				state.error = action.error.message ?? "Đăng xuất thất bại";
+				state.error = typeof action.payload === 'string' ? action.payload : "Đăng xuất thất bại";
+
 			})
 
 			//refresh

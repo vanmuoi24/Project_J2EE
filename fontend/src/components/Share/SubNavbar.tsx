@@ -1,7 +1,6 @@
-import { Dropdown, Button, Typography, Space, message } from "antd";
+import { Dropdown, Button, Typography, message } from "antd";
 import { PhoneOutlined, UserOutlined } from "@ant-design/icons";
 import flag from '@/assets/images/en.png'
-import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import ModalChangeLC from "@/components/Home/Modal/ModalChangeLC";
 import  { useState } from "react";
@@ -17,20 +16,7 @@ export default function TopNavbar() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-   const LanguageCurrency = styled.div`
-   height: 100%;
-   display: flex;
-   align-items: center;
-   gap: 18px;
-   padding: 2px 6px;
-   border-radius: 4px;
-   cursor: pointer;
-   transition: background 0.2s;
-
-   &:hover {
-      background: #f0f0f0; /* xám nhạt */
-   }
-   `;
+  
    const userMenu = user && user !== null && [
       {
          key: "profile",
@@ -55,33 +41,27 @@ export default function TopNavbar() {
   
 
   return (
-    <div style={{ 
-      background: '#dcefff', height: '40px'
-    }}>
-      <Container  style={{display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      height: '40px'}} >
-        <Typography.Paragraph style={{ textAlign: "center", marginBottom: 0, fontSize: 13}}>
-          
+    <div className="bg-[#dcefff] py-[8px]">
+      <Container className="flex justify-between items-center">
+        <Typography.Paragraph className="text-center !mb-[0px] text-[13px]">
           <PhoneOutlined/>
-          <a href="tel:0799664334" style={{color: '#e01600', fontWeight: 'bold'}}> 0799 664 334</a> - Daily: 8:00 AM - 11:00 PM
+          <a href="tel:0799664334" className="!text-[#e01600] font-[600]"> 0799 664 334</a> - Daily: 8:00 AM - 11:00 PM
         </Typography.Paragraph>
-        <Space size="large" align="center">
-          <LanguageCurrency onClick={()=> setIsOpen(!isOpen)}>
-            <img
+        <div className="flex items-center justify-center gap-[12px]">
+          <div className="h-full flex items-center gap-[10px] px-[6px] py-[2px] rounded-[4px] cursor-pointer hover:bg-[#f0f0f0]" onClick={()=> setIsOpen(!isOpen)}>
+            <img  
               src={flag}
               alt="VN"
-              style={{ width: 20, height: 20, objectFit: "cover" }}
+              className="w-[20px] h-[20px] object-cover"
               />
-            <span style={{ fontSize: 13, fontWeight: 'bold', lineHeight: 1 }}>VNĐ</span>
-          </LanguageCurrency>        
+            <span className="text-[13px]/[1] font-[700]">VNĐ</span>
+          </div>        
           <Dropdown menu={{ items: userMenu }} placement="bottomRight" arrow>
             <UserOutlined
-              style={{ fontSize: 20, color: "black", cursor: "pointer" }}
+              className="text-[20px] text-black cursor-pointer"
               />
           </Dropdown>
-        </Space>
+        </div>
         <ModalChangeLC isOpen={isOpen} setIsOpen={setIsOpen} />
       </Container>
     </div>

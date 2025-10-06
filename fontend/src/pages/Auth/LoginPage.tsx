@@ -4,7 +4,7 @@
   import { Button, Form, Input, Card, Typography, message, Divider, Space, Alert } from "antd"
   import {  Navigate, useNavigate } from "react-router-dom";
   import logo from '@/assets/images/logo.png'
-  import TopNavbar from "@/components/Share/TopNavbar";
+  import SubNavbar from "@/components/Share/SubNavbar";
 import { GoogleLogin } from "@react-oauth/google";
 import { sessionService } from "@/services/sessionServices";
 
@@ -14,9 +14,7 @@ import { sessionService } from "@/services/sessionServices";
     const {loading, error, isAuth} = useAppSelector(state => state.auth)
 
     const onFinish = async (values: { email: string; password: string }) => {
-      try {
         const res = await dispatch(loginUser(values)).unwrap();
-        
         if (res.code === 1000) {
           sessionService.setSession(
             res.result.token,
@@ -25,11 +23,6 @@ import { sessionService } from "@/services/sessionServices";
           message.success("Đăng nhập thành công!", 3);
           navigate("/admin")
         }
-         
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.error(error || "Đăng nhập thất bại");
-      }
     }
 
     if (isAuth) {
@@ -38,7 +31,7 @@ import { sessionService } from "@/services/sessionServices";
 
     return (
       <>
-      <TopNavbar/>
+      <SubNavbar/>
         <div
           style={{
             display: "flex",

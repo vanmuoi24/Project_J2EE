@@ -9,12 +9,8 @@ type ContainerProps = {
 const Container: React.FC<ContainerProps> = ({ children, style, className }) => {
   return (
     <div
-      className={className}
+      className={`${className} w-[1280px] my-[0px] mx-auto max-w-full`}
       style={{
-        width: 1200,
-        margin: "0 auto",
-        paddingInline: 24,
-        maxWidth: "100%",
         ...style,
       }}
     >

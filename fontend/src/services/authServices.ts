@@ -16,13 +16,6 @@ export const loginService = async (
 			'/auth/users/login',
 			data
 		);
-
-		if (res.code !== 1000) {
-			throw new Error(res?.message || 'Login failed');
-		}
-
-		sessionService.setSession(res.result.token, res.result.user);
-
 		return res;
 	} catch (err: unknown) {
 		if (axios.isAxiosError(err)) {

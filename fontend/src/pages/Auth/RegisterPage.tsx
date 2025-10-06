@@ -1,4 +1,4 @@
-import TopNavbar from "@/components/Share/TopNavbar"
+import SubNavbar from "@/components/Share/SubNavbar"
 import { registerService } from "@/services/authServices"
 import { LockOutlined, MailOutlined, PhoneOutlined, UserOutlined } from "@ant-design/icons"
 import { Button, Form, Input, Card, Typography, Checkbox, message } from "antd"
@@ -36,7 +36,7 @@ export default function RegisterPage() {
 
   return (
     <>
-    <TopNavbar/>
+    <SubNavbar/>
      <div
       style={{
         display: "flex",

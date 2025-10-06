@@ -6,7 +6,6 @@ import {
   EnvironmentOutlined,
   CalendarOutlined,
   FieldTimeOutlined,
-  TeamOutlined,
   NumberOutlined,
   ClockCircleOutlined,
   LeftOutlined,
@@ -17,7 +16,7 @@ import { useEffect, useState } from "react";
 import { getAllTours } from "@/services/tourServices";
 import type { ITour } from "@/types/Tour";
 import dayjs from "dayjs";
-import  { formatCurrencyVND } from "@/utils";
+import    { formatCurrencyVND } from "@/utils";
 
 const NextArrow = (props: React.ComponentPropsWithoutRef<'div'> & { onClick?: () => void }) => {
   const { onClick } = props;

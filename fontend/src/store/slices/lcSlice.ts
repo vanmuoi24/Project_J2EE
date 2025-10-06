@@ -6,7 +6,7 @@ type LCState = {
 };
 
 const initialState: LCState = {
-	currency: 'VND',
+	currency: 'VNĐ',
 	language: 'VN',
 };
 

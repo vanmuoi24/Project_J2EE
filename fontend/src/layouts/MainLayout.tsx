@@ -1,23 +1,21 @@
-import Navbar from "@/components/Share/Navbar"
-import TopNavbar from "@/components/Share/TopNavbar"
-import { Layout } from "antd"
-import { Content, Footer, Header } from "antd/es/layout/layout"
-import { Outlet } from "react-router-dom"
+import Navbar from "@/components/Share/Navbar/Navbar"
+import SubNavbar from "@/components/Share/SubNavbar"
+  import { Outlet } from "react-router-dom"
 import {Footer as MyFooter }from '@/components/Share/Footer'
 
 export default function MainLayout() {
   return (
-    <Layout >
-        <Header style={{backgroundColor: '#fff', padding: 0, height: 100}} >
-            <TopNavbar />
+    <>
+        <header>
+            <SubNavbar />
             <Navbar/>
-        </Header>
-      <Content >
+        </header>
+      <main >
         <Outlet />
-      </Content>
-      <Footer  style={{padding: 0}}>
+      </main>
+      <footer>
         <MyFooter/>
-      </Footer>
-    </Layout>
+      </footer>
+    </>
   )
 }

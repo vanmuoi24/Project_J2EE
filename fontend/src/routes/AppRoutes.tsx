@@ -8,6 +8,7 @@ import DashboardPage from "@/pages/Dashboard";
 import ProfilePage from "@/pages/Profile";
 import LoginPage from "@/pages/Auth/LoginPage";
 import RegisterPage from "@/pages/Auth/RegisterPage";
+import Tours from "@/pages/Tours/page";
 import RouteGuard from "./RouteGuard";
 import LayoutAdmin from "../pages/Admin/LayoutAdmin";
 import ManagerUser from "../components/Admin/ManagerUser/ManagerUser";
@@ -25,7 +26,11 @@ export default function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
+          <Route path="/tours/*" element={<Tours />} />
           <Route path="/detail/:id" element={<TourDetail />}/>
+          <Route element={<RouteGuard isPrivate />}>
+            <Route path="/profile" element={<ProfilePage />}/>
+          </Route>
         </Route>
 
         <Route element={<RouteGuard isPrivate={false} />}>
