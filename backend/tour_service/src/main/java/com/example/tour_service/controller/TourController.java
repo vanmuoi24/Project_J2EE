@@ -18,7 +18,7 @@ public class TourController {
 
     @GetMapping("/{id}")
     public ApiResponse<TourResponse> getTourById(@PathVariable Integer id) {
-        return ApiResponse.<TourResponse>builder()
+        return ApiResponse. <TourResponse>builder()
                 .result(tourService.getTourById(id))
                 .message("Got successfully")
                 .build();
