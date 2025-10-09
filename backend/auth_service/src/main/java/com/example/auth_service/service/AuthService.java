@@ -63,7 +63,7 @@ public class AuthService {
     @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
 
-    public AuthenticationResponse authenticated(AuthenticationRequest request) {
+    public AuthenticationResponse   authenticated(AuthenticationRequest request) {
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         var user = userRepository

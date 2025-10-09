@@ -1,6 +1,6 @@
 import { Route, BrowserRouter, Routes } from "react-router-dom";
 import MainLayout from "@layouts/MainLayout";
-import Home from "@pages/Home";
+import Home from "@pages/Home/page";
 import About from "@pages/About";
 import NotFound from "@pages/NotFound";
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -8,6 +8,7 @@ import DashboardPage from "@/pages/Dashboard";
 import ProfilePage from "@/pages/Profile";
 import LoginPage from "@/pages/Auth/LoginPage";
 import RegisterPage from "@/pages/Auth/RegisterPage";
+import Tours from "@/pages/Tours/page";
 import RouteGuard from "./RouteGuard";
 import LayoutAdmin from "../pages/Admin/LayoutAdmin";
 import ManagerUser from "../components/Admin/ManagerUser/ManagerUser";
@@ -24,6 +25,14 @@ export default function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
+<<<<<<< HEAD
+=======
+          <Route path="/tours/*" element={<Tours />} />
+          <Route path="/detail/:id" element={<TourDetail />}/>
+          <Route element={<RouteGuard isPrivate />}>
+            <Route path="/profile" element={<ProfilePage />}/>
+          </Route>
+>>>>>>> 01a2cac
         </Route>
 
         <Route element={<RouteGuard isPrivate={false} />}>

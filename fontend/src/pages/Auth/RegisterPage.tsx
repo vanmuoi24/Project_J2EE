@@ -1,10 +1,18 @@
+<<<<<<< HEAD
 import { LockOutlined, UserOutlined } from "@ant-design/icons"
 import { Button, Form, Input, Card, Typography } from "antd"
+=======
+import SubNavbar from "@/components/Share/SubNavbar"
+import { registerService } from "@/services/authServices"
+import { LockOutlined, MailOutlined, PhoneOutlined, UserOutlined } from "@ant-design/icons"
+import { Button, Form, Input, Card, Typography, Checkbox, message } from "antd"
+>>>>>>> 01a2cac
 import { useNavigate } from "react-router-dom"
 
 export default function RegisterPage() {
   const navigate = useNavigate()
 
+<<<<<<< HEAD
   const onFinish = (values: { username: string; password: string }) => {
     console.log("Login success:", values)
     // 🔑 TODO: gọi API login, lưu token vào localStorage / context
@@ -14,6 +22,30 @@ export default function RegisterPage() {
 
   return (
     <div
+=======
+  const onFinish = async (values: ValuesRegister) => {
+    const data = {
+      username: values.email,
+      password: values.password,
+      email: values.email,
+      firstName: values.fullname,
+      lastName: values.fullname,
+      dob: "",
+      city:""
+    }
+    const res = await registerService(data);
+
+    if (res.code === 1000) {
+      message.success("Đăng kí thành công")
+      navigate("/login")
+    }
+  }
+
+  return (
+    <>
+    <SubNavbar/>
+     <div
+>>>>>>> 01a2cac
       style={{
         display: "flex",
         justifyContent: "center",

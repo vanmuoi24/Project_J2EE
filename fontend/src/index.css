@@ -1,0 +1,44 @@
+<<<<<<< HEAD
+=======
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset hiện đại */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	height: 100%;
+	font-family: sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+	display: block;
+	max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+	font: inherit;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+>>>>>>> 01a2cac

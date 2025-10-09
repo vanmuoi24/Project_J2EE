@@ -11,13 +11,6 @@ export const loginService = async (
 			'/auth/users/login',
 			data
 		);
-
-		if (res.code !== 1000) {
-			throw new Error(res?.message || 'Login failed');
-		}
-
-		sessionService.setSession(res.result.token, res.result.user);
-
 		return res;
 	} catch (err: unknown) {
 		if (axios.isAxiosError(err)) {
@@ -31,10 +24,61 @@ export const loginService = async (
 	}
 };
 
+export const registerService = async (
+	data: RegisterRequest
+): Promise<RegisterResponse> => {
+	try {
+		const res: RegisterResponse = await axiosClient.post(
+			'/auth/users/register',
+			data
+		);
+		console.log('>>>', res);
+		if (res.code !== 1000) {
+			throw new Error(res?.message || 'Register failed');
+		}
+
+		return res;
+	} catch (err: unknown) {
+		if (axios.isAxiosError(err)) {
+			const serverError = err.response?.data as { message?: string };
+			throw new Error(serverError?.message || 'Register failed');
+		}
+		if (err instanceof Error) {
+			throw err;
+		}
+		throw new Error('Unexpected error');
+	}
+};
+
 export const logoutService = async (token: string): Promise<void> => {
 	try {
 		await axiosClient.post('/auth/users/logout', { token });
 	} finally {
 		sessionService.clearSession();
+	}
+};
+
+export const refreshTokenService = async (
+	token: string
+): Promise<LoginResponse> => {
+	try {
+		const res: LoginResponse = await axiosClient.post(
+			'/auth/users/refresh',
+			token
+		);
+
+		if (res.code !== 1000) {
+			throw new Error(res?.message || 'Refresh failed');
+		}
+		return res;
+	} catch (err: unknown) {
+		if (axios.isAxiosError(err)) {
+			const serverError = err.response?.data as { message?: string };
+			throw new Error(serverError?.message || 'Refresh failed');
+		}
+		if (err instanceof Error) {
+			throw err;
+		}
+		throw new Error('Unexpected error');
 	}
 };
