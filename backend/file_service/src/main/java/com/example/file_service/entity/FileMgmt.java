@@ -34,4 +34,7 @@ public class FileMgmt {
 
     @Column(name = "path")
     String path;
+
+    @Column(name = "url")
+    String url;
 }

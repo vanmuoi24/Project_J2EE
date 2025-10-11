@@ -1,59 +1,48 @@
 package com.example.file_service.repository;
 
-
-import org.springframework.beans.factory.annotation.Value;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import com.example.file_service.dto.FileInfo;
+import com.example.file_service.entity.FileMgmt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.DigestUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.file_service.dto.FileInfo;
-import com.example.file_service.entity.FileMgmt;
-
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 @Repository
 public class FileRepository {
-    @Value("${app.file.storage-dir}")
-    String storageDir;
 
-    @Value("${app.file.download-prefix}")
-    String urlPrefix;
+    @Autowired
+    private Cloudinary cloudinary;
 
     public FileInfo store(MultipartFile file) throws IOException {
-        Path folder = Paths.get(storageDir);
-
-        String fileExtension = StringUtils
-                .getFilenameExtension(file.getOriginalFilename());
-
-        String fileName = Objects.isNull(fileExtension)
-                ? UUID.randomUUID().toString()
-                : UUID.randomUUID() + "." + fileExtension;
-
-        Path filePath = folder.resolve(fileName).normalize().toAbsolutePath();
-
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        // Upload lên Cloudinary
+        Map uploadResult = cloudinary.uploader().upload(
+                file.getBytes(),
+                ObjectUtils.asMap(
+                        "public_id", UUID.randomUUID().toString(),
+                        "resource_type", "auto" // auto: ảnh/video/pdf đều được
+                ));
 
         return FileInfo.builder()
-                .name(fileName)
+                .name(Objects.toString(uploadResult.get("original_filename"), "unknown"))
                 .size(file.getSize())
                 .contentType(file.getContentType())
-                .md5Checksum(DigestUtils.md5DigestAsHex(file.getInputStream()))
-                .path(filePath.toString())
-                .url(urlPrefix + fileName)
+                .path(Objects.toString(uploadResult.get("public_id"), ""))
+                .url(Objects.toString(uploadResult.get("secure_url"), ""))
                 .build();
     }
 
     public Resource read(FileMgmt fileMgmt) throws IOException {
-        var data = Files.readAllBytes(Path.of(fileMgmt.getPath()));
+        // Cloudinary không cần đọc file từ local.
+        // Nếu bạn muốn tải file từ URL của Cloudinary:
+        byte[] data = new java.net.URL(fileMgmt.getUrl()).openStream().readAllBytes();
         return new ByteArrayResource(data);
     }
 }

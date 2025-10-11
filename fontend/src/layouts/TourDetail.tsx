@@ -11,6 +11,7 @@ import img from '../assets/slide_cb_0_tuiblue-3.webp';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getTourById } from '@/services/tourServices';
+import Comment from '@/components/Comment/Comment';
 
 const { Title } = Typography;
 
@@ -100,6 +101,7 @@ export default function TourDetail() {
               </div>
             </Col>
           </Row>
+          <Comment />
           <Title
             level={3}
             style={{
