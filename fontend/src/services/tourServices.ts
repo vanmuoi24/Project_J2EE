@@ -1,5 +1,5 @@
 import axiosClient from "@/api/axios";
-import type { ITourResponse } from "@/types/Tour";
+import type { ApiResponse, ITour, ITourDeparture, ITourResponse } from "@/types/Tour";
 import axios from "axios";
 
 export const getAllTours = async () => {
@@ -21,6 +21,11 @@ export const getAllTours = async () => {
   }
 };
 
-export const getTourById = (id: number) => {
+export const getTourById = (id: number): Promise<ApiResponse<ITour>> => {
   return axiosClient.get(`/tour/tours/${id}`);
 };
+
+export const getDepartureByTourId = (id: number): Promise<ApiResponse<ITourDeparture[]>> => {
+  return axiosClient.get(`/tour/tour-departures/tour/${id}`);
+};
+
