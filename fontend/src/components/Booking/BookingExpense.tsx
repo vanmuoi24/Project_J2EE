@@ -1,4 +1,5 @@
-import { Card, Typography, Row, Col } from "antd";
+import { Card, Typography, Row, Col, Button, Modal, message } from "antd";
+import { useNavigate, useNavigation } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -12,6 +13,7 @@ type BookingExpenseProps = {
   total: number;
   items: ExpenseItem[];
   singleRoomSurcharge?: number;
+  onConfirm?: () => void | Promise<void>;
 };
 
 function formatCurrency(value: number) {
@@ -20,9 +22,29 @@ function formatCurrency(value: number) {
 
 export default function BookingExpense({
   total,
-  items,
   singleRoomSurcharge = 0,
+  items,
+  onConfirm,
 }: BookingExpenseProps) {
+  
+  const handleConfirm = () => {
+    Modal.confirm({
+      title: 'Xác nhận đặt tour',
+      content: 'Bạn có chắc chắn muốn đặt tour này?',
+      okText: 'Xác nhận',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await Promise.resolve(onConfirm?.());
+          message.success('Đặt tour thành công');
+        } catch (err: any) {
+          message.error(err?.message || 'Đặt tour thất bại');
+          throw err;
+        }
+      }
+    });
+  };
+  
   return (
     <>
       <Row justify="space-between" align="middle">
@@ -60,6 +82,11 @@ export default function BookingExpense({
             <Text>{formatCurrency(singleRoomSurcharge)}</Text>
           </Col>
         </Row>
+      </div>
+      <div style={{ marginTop: 16 }}>
+        <Button type="primary" block size="large" onClick={handleConfirm}>
+          Xác nhận đặt tour
+        </Button>
       </div>
       </>
   );

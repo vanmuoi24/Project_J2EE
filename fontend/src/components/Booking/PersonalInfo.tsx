@@ -1,10 +1,16 @@
 import { Form, Input } from "antd";
 
-export default function PersonalInfo() {
+export default function PersonalInfo({ onFormReady }: { onFormReady?: (form: any) => void }) {
+  const [form] = Form.useForm();
+
+  // expose form to parent
+  if (onFormReady) onFormReady(form);
+
   return (
     <div>
       <h2 className="text-lg font-semibold mb-4">Thông tin cá nhân</h2>
       <Form
+        form={form}
         layout="vertical"
         name="personalInfo"
         initialValues={{}}

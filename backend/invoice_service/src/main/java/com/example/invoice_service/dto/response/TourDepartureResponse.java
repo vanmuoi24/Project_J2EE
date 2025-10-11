@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TourDepartureResponse {
-    int id;
+    String id;
     String tourCode;
-    LocalDateTime departureDate;
-    LocalDateTime returnDate;
-    Short availableSeats;
-    int tourId;
+    String departureDate;
+    String returnDate;
+    String availableSeats;
+    String tourId;
     TourPriceResponse tourPrice;
 }

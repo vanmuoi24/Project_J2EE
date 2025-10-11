@@ -18,5 +18,7 @@ public class BookingResponse {
     private String tourDepartureId;
     private String createAt;
     private String status;
+    private String message;
     private List<CustomerResponse> listOfCustomers;
+    private TourDepartureResponse tourDepartureResponse;
 }

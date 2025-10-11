@@ -18,6 +18,7 @@ public class InvoiceResponse {
     private String dateOfTransaction;
     private String paymentMethodId;
     private String status;
+    private String message;
     private String totalCountOfAdult;
     private String totalCountOfChildren;
     private String totalCountOfToddler;

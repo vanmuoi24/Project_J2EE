@@ -1,6 +1,6 @@
 import { Dropdown, Button, Typography, message } from "antd";
 import { PhoneOutlined, UserOutlined } from "@ant-design/icons";
-import flag from '@/assets/images/en.png'
+import flag from "@/assets/images/en.png";
 import { useNavigate } from "react-router-dom";
 import ModalChangeLC from "@/components/Home/Modal/ModalChangeLC";
 import  { useState } from "react";

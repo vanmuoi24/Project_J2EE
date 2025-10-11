@@ -1,5 +1,10 @@
 import axiosClient from '@/api/axios';
-import type { LoginRequest, LoginResponse } from '@/types/Auth';
+import type {
+	LoginRequest,
+	LoginResponse,
+	RegisterRequest,
+	RegisterResponse,
+} from '@/types/Auth';
 import { sessionService } from './sessionServices';
 import axios from 'axios';
 

@@ -1,28 +1,21 @@
-<<<<<<< HEAD
-import { LockOutlined, UserOutlined } from "@ant-design/icons"
-import { Button, Form, Input, Card, Typography } from "antd"
-=======
 import SubNavbar from "@/components/Share/SubNavbar"
 import { registerService } from "@/services/authServices"
 import { LockOutlined, MailOutlined, PhoneOutlined, UserOutlined } from "@ant-design/icons"
 import { Button, Form, Input, Card, Typography, Checkbox, message } from "antd"
->>>>>>> 01a2cac
 import { useNavigate } from "react-router-dom"
+
+type ValuesRegister =  {
+  fullname: string,     
+   email: string,
+   phone: string,      
+   password: string,
+   confirmPassword: string
+    agreement: boolean,
+}
 
 export default function RegisterPage() {
   const navigate = useNavigate()
 
-<<<<<<< HEAD
-  const onFinish = (values: { username: string; password: string }) => {
-    console.log("Login success:", values)
-    // 🔑 TODO: gọi API login, lưu token vào localStorage / context
-    localStorage.setItem("isAuth", "true")
-    navigate("/dashboard")
-  }
-
-  return (
-    <div
-=======
   const onFinish = async (values: ValuesRegister) => {
     const data = {
       username: values.email,
@@ -45,7 +38,6 @@ export default function RegisterPage() {
     <>
     <SubNavbar/>
      <div
->>>>>>> 01a2cac
       style={{
         display: "flex",
         justifyContent: "center",
@@ -54,58 +46,104 @@ export default function RegisterPage() {
         background: "#f5f5f5",
       }}
     >
-      <Card style={{ width: 360 }}>
+      <Card style={{ width: 520, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
         <Typography.Title level={3} style={{ textAlign: "center" }}>
-          Đăng kí
+          Đăng ký hội viên
         </Typography.Title>
 
-        <Form
-          name="login_form"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          layout="vertical"
-        >
+        <Form name="register_form" onFinish={onFinish} layout="vertical">
           <Form.Item
-            name="username"
-            label="Tài khoản"
-            rules={[{ required: true, message: "Nhập tài khoản!" }]}
+            name="fullname"
+            label="Họ tên"
+            rules={[{ required: true, message: "Nhập họ tên!" }]}
           >
-            <Input prefix={<UserOutlined />} placeholder="Nhập username" />
+            <Input prefix={<UserOutlined />} placeholder="Nhập họ tên" />
+          </Form.Item>
+
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: "Nhập email!" },
+              { type: "email", message: "Email không hợp lệ!" },
+            ]}
+          >
+            <Input prefix={<MailOutlined />} placeholder="Nhập email" />
+          </Form.Item>
+
+          <Form.Item
+            name="phone"
+            label="Số điện thoại"
+            rules={[
+              { required: true, message: "Nhập số điện thoại!" },
+              { pattern: /^[0-9]{9,11}$/, message: "Số điện thoại không hợp lệ!" },
+            ]}
+          >
+            <Input prefix={<PhoneOutlined />} placeholder="Nhập số điện thoại" />
           </Form.Item>
 
           <Form.Item
             name="password"
             label="Mật khẩu"
             rules={[{ required: true, message: "Nhập mật khẩu!" }]}
+            hasFeedback
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Nhập password" />
+            <Input.Password prefix={<LockOutlined />} placeholder="Nhập mật khẩu" />
+          </Form.Item>
+
+          <Form.Item
+            name="confirmPassword"
+            label="Nhập lại mật khẩu"
+            dependencies={["password"]}
+            hasFeedback
+            rules={[
+              { required: true, message: "Nhập lại mật khẩu!" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("Mật khẩu không khớp!"));
+                },
+              }),
+            ]}
+          >
+            <Input.Password prefix={<LockOutlined />} placeholder="Nhập lại mật khẩu" />
+          </Form.Item>
+
+          <Form.Item
+            name="agreement"
+            valuePropName="checked"
+            rules={[
+              {
+                validator: (_, value) =>
+                  value ? Promise.resolve() : Promise.reject(new Error("Bạn cần đồng ý điều khoản")),
+              },
+            ]}
+          >
+            <Checkbox>
+              Tôi đã đọc và đồng ý với <a href="#" style={{textDecoration: "underline", color: "#4b83fa"}}>Điều khoản đăng ký hội viên</a>
+            </Checkbox>
           </Form.Item>
 
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ width: "100%", marginBottom: 8 }}
-            >
-              Đăng kí
+            <Button type="primary" htmlType="submit" style={{ width: "100%", marginBottom: 8 }}>
+              Đăng ký
             </Button>
-            <Button
-              block
-              type="link"
-              onClick={() => navigate("/login")}
-            >
-              Đăng nhập
-            </Button>
-            <Button
-              block
-              type="link"
-              onClick={() => navigate("/")}
-            >
+            <Typography.Paragraph style={{ textAlign: "center", marginBottom: 0 }}>
+              Đã có tài khoản?
+                    <Button type="link" onClick={() => navigate('/login')    } style={{ padding: 0 }}>
+                      Đăng nhập ngay
+                    </Button>
+                  </Typography.Paragraph>
+            <Button block type="link" onClick={() => navigate("/")}>
               Về trang chủ
             </Button>
           </Form.Item>
         </Form>
       </Card>
     </div>
+    </>
+
   )
 }

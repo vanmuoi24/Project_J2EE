@@ -2,6 +2,7 @@ package com.example.invoice_service.client;
 
 import com.example.invoice_service.config.FeignAuthConfig;
 import com.example.invoice_service.dto.response.ApiResponse;
+import com.example.invoice_service.dto.response.BookingResponse;
 import com.example.invoice_service.dto.response.TourPriceResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,5 +15,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 )
 public interface BookingClient {
     @GetMapping("/book/{id}")
-    String getBookingById(@PathVariable("id") Long id);
+    ApiResponse<BookingResponse> getBookingById(@PathVariable("id") Long id);
 }

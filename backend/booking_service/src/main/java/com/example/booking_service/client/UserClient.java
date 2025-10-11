@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
-        name = "pricing-service",
+        name = "user-service",
         url = "http://localhost:8888/api/v1/auth",
         configuration = FeignAuthConfig.class
 )
