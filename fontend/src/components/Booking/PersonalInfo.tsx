@@ -1,10 +1,14 @@
 import { Form, Input } from "antd";
+import { useEffect } from "react";
 
 export default function PersonalInfo({ onFormReady }: { onFormReady?: (form: any) => void }) {
   const [form] = Form.useForm();
 
   // expose form to parent
-  if (onFormReady) onFormReady(form);
+  useEffect(() => {
+    if (onFormReady) onFormReady(form);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
 
   return (
     <div>
@@ -27,7 +31,17 @@ export default function PersonalInfo({ onFormReady }: { onFormReady?: (form: any
         <Form.Item
           label="Tuổi"
           name="age"
-          rules={[{ required: true, message: "Vui lòng nhập tuổi!" }]}
+          rules={[
+            { required: true, message: "Vui lòng nhập tuổi"},
+            {
+              validator: (_: any, value: any) => {
+                const num = Number(value);
+                if (Number.isNaN(num)) return Promise.reject(new Error("Tuổi không hợp lệ"));
+                if (num < 18) return Promise.reject(new Error("Tuổi phải lớn hơn hoặc bằng 18"));
+                return Promise.resolve();
+              },
+            },
+          ]}
         >
           <Input type="number" placeholder="Nhập tuổi" />
         </Form.Item>
@@ -46,7 +60,13 @@ export default function PersonalInfo({ onFormReady }: { onFormReady?: (form: any
         <Form.Item
           label="Số điện thoại"
           name="phone"
-          rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
+          rules={[
+            { required: true, message: "Vui lòng nhập số điện thoại!" },
+            {
+              pattern: /^\d{10}$/, // exactly 10 digits
+              message: "Số điện thoại phải đủ 10 chữ số",
+            },
+          ]}
         >
           <Input placeholder="Nhập số điện thoại" />
         </Form.Item>

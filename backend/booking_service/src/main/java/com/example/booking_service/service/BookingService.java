@@ -121,9 +121,10 @@ public class BookingService {
                                 .status(CustomerStatus.BOOKED)
                                 .gender(genderValue)
                                 .bookingType(bookingType)
-//                                .booking(booking) // nếu Customer có quan hệ ManyToOne Booking
+                                .booking(booking) // nếu Customer có quan hệ ManyToOne Booking
                                 .build();
                     }).toList();
+
 
             // --- Lưu danh sách khách hàng --- //
             customerRepository.saveAll(customers);
@@ -131,7 +132,7 @@ public class BookingService {
             // --- TRẢ KẾT QUẢ ---
             return BookingResponse.builder()
                     .id(String.valueOf(booking.getId()))
-                    .createAt(String.valueOf(booking.getCreatedAt()))
+                    .createdAt(String.valueOf(booking.getCreatedAt()))
                     .accountId(String.valueOf(booking.getAccountId()))
                     .listOfCustomers(customerMapper.toCustomerResponseList(customers))
                     .tourDepartureResponse(departureResponse.getResult())

@@ -45,3 +45,19 @@ export interface ITourResponse {
 	message?: string;
 	result: ITour[];
 }
+
+export interface ITourDeparture {
+	id: string;
+    tourCode: string;
+    departureDate: string;
+    returnDate: string;
+    availableSeats: string;
+    tourId: string;
+    tourPrice: ITourPrice;
+}
+
+export interface ITourDepartureResponse {
+	code: number;
+	message?: string;
+	result: ITourDeparture;
+}

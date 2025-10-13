@@ -14,7 +14,17 @@ import {
 const { Title } = Typography;
 const { Option } = Select;
 
-export default function ListOfCustomerInfo({ onFormReady }: { onFormReady?: (form: any) => void }) {
+export default function ListOfCustomerInfo({
+  onFormReady,
+  personalFormGetter,
+  onCustomersChange,
+}: {
+  onFormReady?: (form: any) => void;
+  /** optional getter function provided by parent to read personal info form values */
+  personalFormGetter?: () => any;
+  /** notify parent when customers change */
+  onCustomersChange?: (customers: any[]) => void;
+}) {
   const [form] = Form.useForm();
   // expose to parent
   if (onFormReady) onFormReady(form);
@@ -34,9 +44,33 @@ export default function ListOfCustomerInfo({ onFormReady }: { onFormReady?: (for
     form.setFieldsValue({ customers: [...customers, newItem] });
   };
 
+  // // add default customer from personal info as first adult
+  // const addDefaultCustomer = () => {
+  //   const personal = personalFormGetter ? personalFormGetter() : null;
+  //   const customers = form.getFieldValue("customers") || [];
+  //   if (!personal) return;
+  //   idCounter.current += 1;
+  //   const item = {
+  //     id: idCounter.current,
+  //     type: "adult",
+  //     fullName: personal.fullName || "",
+  //     gender: personal.gender || undefined,
+  //     birthDate: personal.birthDate || null,
+  //     address: personal.address || personal?.address || "",
+  //   };
+  //   form.setFieldsValue({ customers: [item, ...customers] });
+  // };
+
   return (
     <div>
-      <Form form={form} layout="vertical" name="list_of_customers">
+      <Form
+        form={form}
+        layout="vertical"
+        name="list_of_customers"
+        onValuesChange={() => {
+          if (onCustomersChange) onCustomersChange(form.getFieldValue('customers') || []);
+        }}
+      >
         <Title level={4}>Hành khách</Title>
 
         {/* Add buttons */}
@@ -102,7 +136,7 @@ export default function ListOfCustomerInfo({ onFormReady }: { onFormReady?: (for
                       </p>
                     </Col>
                     <Col span={4} className="text-right">
-                      <Button type="link" danger onClick={() => remove(name)}>
+                        <Button type="link" danger onClick={() => remove(name)}>
                         Xóa
                       </Button>
                     </Col>
@@ -163,6 +197,8 @@ export default function ListOfCustomerInfo({ onFormReady }: { onFormReady?: (for
             </>
           )}
         </Form.List>
+
+        {/* helper: if parent wants to ensure first customer exists, they can call this exposed method via ref */}
 
         <Divider />
 

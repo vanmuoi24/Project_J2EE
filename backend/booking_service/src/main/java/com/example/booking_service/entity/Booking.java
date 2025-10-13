@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,8 +34,8 @@ public class Booking {
     @Column(name = "status", length = 20, nullable = false)
     private BookingStatus status;
 
-    @OneToMany(mappedBy = "booking")
-    private Set<CustomerBooking> customerBookings = new HashSet<>();
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Customer> customers = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

@@ -31,7 +31,8 @@ export default function AppRoutes() {
           <Route path="/tours/*" element={<Tours />} />
           <Route path="/detail/:id" element={<TourDetail />}/>
           <Route path="/booking" element={<Booking />}/>
-          <Route path="/invoice" element={<Invoice />}/>
+          {/* <Route path="/invoice/user/:userId/booking/:bookingId" element={<Invoice />} /> */}
+          <Route path="/invoice" element={<Invoice />} />
           <Route element={<RouteGuard isPrivate />}>
             <Route path="/profile" element={<ProfilePage />}/>
           </Route>

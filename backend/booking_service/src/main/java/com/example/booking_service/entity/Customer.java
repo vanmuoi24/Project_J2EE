@@ -40,6 +40,7 @@ public class Customer {
     @Column(name = "status", nullable = false)
     private CustomerStatus status;
 
-    @OneToMany(mappedBy = "customer")
-    private Set<CustomerBooking> customerBookings = new HashSet<CustomerBooking>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id", nullable = false)
+    private Booking booking;
 }

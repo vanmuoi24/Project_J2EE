@@ -16,7 +16,7 @@ public class BookingResponse {
     private String id;
     private String accountId;
     private String tourDepartureId;
-    private String createAt;
+    private String createdAt;
     private String status;
     private String message;
     private List<CustomerResponse> listOfCustomers;
