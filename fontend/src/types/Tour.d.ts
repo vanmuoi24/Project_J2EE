@@ -25,14 +25,6 @@ export interface IItinerary {
 	meal: string;
 }
 
-export interface ITourDeparture {
-	id: number;
-	tourCode: string;
-	departureDate: LocalDateTime;
-	returnDate: LocalDateTime;
-	availableSeats: Short;
-}
-
 export interface ITour {
 	id: number;
 	tourTitle: string;
@@ -54,14 +46,20 @@ export interface ITourResponse {
 	result: ITour[];
 }
 
-export interface ApiResponse<T> {
-  code: number;
-  message?: string;
-  result: T;
+export interface ITourDeparture {
+	id: int;
+    tourCode: string;
+    departureDate: string;
+    returnDate: string;
+    availableSeats: string;
+    tourId: string;
+    tourPrice: ITourPrice;
 }
 
 type ToursResponse = ApiResponse<ITour[]>;
 
 type TourResponse = ApiResponse<ITour>;
 
-type IDepartureResponse = ApiResponse<ITourDeparture[]>;
+type DeparturesResponse = ApiResponse<ITourDeparture[]>;
+
+type DepartureResponse = ApiResponse<ITourDeparture>;

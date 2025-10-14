@@ -61,6 +61,7 @@ const tours = [
 
 export default function TourDetail() {
   const [dataDetailtour, setDataDetailTour] = useState<ITour | null>(null);
+  const [selectedDepartureId, setSelectedDepartureId] = useState<number | null>(null);
   const { id } = useParams<{ id: string }>();
 
   const fechDataTourById = async () => {
@@ -72,6 +73,12 @@ export default function TourDetail() {
   useEffect(() => {
     fechDataTourById();
   }, [id]);
+
+  const handleSelectDeparture = (departureId: number) => {
+    setSelectedDepartureId(departureId);
+    console.log('Selected Departure ID:', departureId);
+  };
+
   return (
     <div style={{ padding: '24px 0' }}>
       <Row justify="center">
@@ -83,7 +90,7 @@ export default function TourDetail() {
           <Row gutter={24}>
             <Col span={17}>
               <TourImages />
-              {dataDetailtour && <Schedule tourId={dataDetailtour.id} basePrice={dataDetailtour.basePrice} />}
+              {dataDetailtour && <Schedule tourId={dataDetailtour.id} basePrice={dataDetailtour.basePrice} onSelectDepartureId={handleSelectDeparture}/>}
               <AdditionalInfo />
               <Itinerary />
               <ImportantInfo />
@@ -97,7 +104,7 @@ export default function TourDetail() {
                   alignSelf: 'flex-start', // đảm bảo sticky tính từ đầu Col
                 }}
               >
-                <TourDetailCard />
+                <TourDetailCard tourData={dataDetailtour} selectedDepartureId={selectedDepartureId}/>
               </div>
             </Col>
           </Row>

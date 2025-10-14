@@ -3,7 +3,6 @@ import type { CollapseProps } from "antd";
 import type { CSSProperties } from "react";
 
 const { Title } = Typography;
-const { Panel } = Collapse;
 
 const pStyle: React.CSSProperties = { 
   fontSize: 12,

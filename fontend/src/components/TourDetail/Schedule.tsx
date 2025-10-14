@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Calendar, Button, Row, Col, List, Card, ConfigProvider, Typography } from "antd";
+import { Calendar, Button, Row, Col, List, Card, ConfigProvider, Typography, Divider, Space } from "antd";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import viVN from "antd/locale/vi_VN";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
-import type { IDepartureResponse } from "@/types/Tour";
 import { getDepartureByTourId } from "@/services/tourServices";
+import type { DeparturesResponse, ITourDeparture } from "@/types/Tour";
+import { ArrowLeft, Bus, PlaneLanding, PlaneTakeoff } from "lucide-react";
 
 dayjs.locale("vi");
 
@@ -14,27 +15,33 @@ const { Title, Text } = Typography;
 interface ScheduleProps {
   tourId?: number;
   basePrice?: number;
+  onSelectDepartureId?: (id: number) => void;
 }
 
-export default function Schedule({ tourId, basePrice }: ScheduleProps) {
+export default function Schedule({ tourId, basePrice, onSelectDepartureId }: ScheduleProps) {
   const [selectedMonth, setSelectedMonth] = useState<string>();
   const [currentDate, setCurrentDate] = useState(dayjs(""));
-  const [specialDates, setSpecialDates] = useState<Record<string, string>>({});
+  const [specialDates, setSpecialDates] = useState<Record<string, { id: number, price: string }>>({});
   const [hoverDate, setHoverDate] = useState<string | null>(null);
   const [specialMonths, setSpecialMonths] = useState<string[]>([]);
-  
+  const [selectedDepartureId, setSelectedDepartureId] = useState<number | null>(null);
+
+
   const fechDataDepartureById = async () => {
     const res = await getDepartureByTourId(Number(tourId));
-    const data: IDepartureResponse = res;
-    const newSpecialDates: Record<string, string> = {};
+    const data: DeparturesResponse = res;
+    const newSpecialDates: Record<string, { id: number, price: string }> = {};
     const monthsWithDepartures = new Set<string>();
 
-    data.result.forEach(dep => {
+    data.result.forEach((dep: ITourDeparture) => {
       const date = dayjs(dep.departureDate);
       const dateKey = dayjs(dep.departureDate).format("YYYY-MM-DD");
-      newSpecialDates[dateKey] = basePrice !== undefined
-        ? `${(basePrice / 1000).toLocaleString("en-US")}K`
-        : "";
+      newSpecialDates[dateKey] = {
+        id: dep.id,
+        price: basePrice !== undefined
+          ? `${(basePrice / 1000).toLocaleString("en-US")}K`
+          : ""
+      }
 
       monthsWithDepartures.add(date.format("YYYY-MM"));
     });
@@ -42,7 +49,7 @@ export default function Schedule({ tourId, basePrice }: ScheduleProps) {
     setSpecialDates(newSpecialDates);
     setSpecialMonths(monthArray);
 
-    if (monthArray.length>0 && !selectedMonth){
+    if (monthArray.length > 0 && !selectedMonth) {
       setSelectedMonth(monthArray[0]);
       const [m, y] = monthArray[0].split("/");
       setCurrentDate(dayjs(`${y}-${m}-01`));
@@ -56,6 +63,7 @@ export default function Schedule({ tourId, basePrice }: ScheduleProps) {
 
 
   const handleMonthSelect = (month: string) => {
+    setSelectedDepartureId(null);
     setSelectedMonth(month);
     const [m, y] = month.split("/");
     setCurrentDate(dayjs(`${y}-${m}-01`));
@@ -106,7 +114,7 @@ export default function Schedule({ tourId, basePrice }: ScheduleProps) {
 
   //  Hàm render Calendar
   const renderCalendar = () => (
-    <Card style={{ width: "100%", boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
+    <Card style={{ borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
       <ConfigProvider locale={viVN}>
         <Calendar
           fullscreen={false}
@@ -122,7 +130,7 @@ export default function Schedule({ tourId, basePrice }: ScheduleProps) {
 
             const canGoPrev = specialMonths?.includes(prevMonthStr);
             const canGoNext = specialMonths?.includes(nextMonthStr);
-            
+
             return (
               <div style={{ textAlign: "center", marginBottom: 10 }}>
                 <Button
@@ -172,11 +180,20 @@ export default function Schedule({ tourId, basePrice }: ScheduleProps) {
   // Hàm render ô ngày
   const dateCellRender = (value: any) => {
     const dateStr = dayjs(value).format("YYYY-MM-DD");
-    const isSpecial = specialDates[dateStr];
+    const special = specialDates[dateStr];
+    const isSpecial = Boolean(special);
     const isHover = hoverDate === dateStr;
+
+    const handleClick = () => {
+      if (special) {
+        setSelectedDepartureId(special.id);
+        onSelectDepartureId?.(special.id);
+      }
+    };
 
     return (
       <div
+        onClick={handleClick}
         onMouseEnter={() => setHoverDate(dateStr)}
         onMouseLeave={() => setHoverDate(null)}
         style={{
@@ -201,11 +218,295 @@ export default function Schedule({ tourId, basePrice }: ScheduleProps) {
 
         {/* Giá */}
         <div style={{ fontSize: 14, fontWeight: "700", color: isSpecial ? "#E01600" : "transparent" }}>
-          {isSpecial || "—"}
+          {special?.price || "—"}
         </div>
       </div>
     );
   };
+
+  const renderTravelInfoCard = () => {
+    return (
+      <Card styles={{ body: { paddingTop: 20 }, }} style={{ borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
+        <Row justify="space-between" align="middle" >
+          <Col>
+            <Space
+              align="center"
+              style={{ cursor: "pointer", fontWeight: 500 }}
+            >
+              <ArrowLeft size={15} />
+              <Text style={{ fontSize: 13, fontWeight: "bold" }}>Quay lại</Text>
+            </Space>
+          </Col>
+          <Col>
+            <div style={{ fontSize: 18, fontWeight: "bold", color: "#E01600" }}>
+              25/10/2025
+            </div>
+          </Col>
+        </Row>
+
+        <Divider style={{ margin: "0 0 10px 0", fontSize: 15, fontWeight: "bold", color: "#155790" }}>Phương tiện di chuyển</Divider>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "stretch",
+            gap: 24, // tương tự gutter={24}
+          }}
+        >
+          {/* Cột trái */}
+          <div style={{ flex: 1 }}>
+            <Text style={{ fontWeight: "bold", fontSize: 13 }}>Ngày đi - 29/10/2025</Text>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: 4,
+              }}
+            >
+              <Text style={{fontWeight: 500, fontSize: 13}}>20:00</Text>
+              <div
+                style={{
+                  flex: 1,
+                  height: 1,
+                  backgroundColor: "#d9d9d9",
+                  margin: "0 8px",
+                  position: "relative",
+                }}
+              >
+                <Bus
+                  size={16}
+                  color="#1677ff"
+                  style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: "50%",
+                    transform: "translate(-50%, -50%)",
+                    background: "#fff", // che đường kẻ phía sau
+                  }}
+                />
+              </div>
+              <Text style={{fontWeight: 500, fontSize: 13}}>22:00</Text>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: 4,
+              }}
+            >
+              <Text style={{fontWeight: 500, fontSize: 13}}>Phú Quốc</Text>
+              <Text style={{fontWeight: 500, fontSize: 13}}>Phú Quốc</Text>
+            </div>
+          </div>
+
+          {/* Divider dọc */}
+          <Divider
+            type="vertical"
+            style={{
+              height: "auto",
+              alignSelf: "stretch",
+              margin: 0,
+            }}
+          />
+
+          {/* Cột phải */}
+          <div style={{ flex: 1 }}>
+            <Text style={{ fontWeight: "bold", fontSize: 13 }}>Ngày về - 29/10/2025</Text>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: 4,
+              }}
+            >
+              <Text style={{fontWeight: 500, fontSize: 13}}>20:00</Text>
+              <div
+                style={{
+                  flex: 1,
+                  height: 1,
+                  backgroundColor: "#d9d9d9",
+                  margin: "0 8px",
+                  position: "relative",
+                }}
+              >
+                <Bus
+                  size={16}
+                  color="#1677ff"
+                  style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: "50%",
+                    transform: "translate(-50%, -50%)",
+                    background: "#fff", // che đường kẻ phía sau
+                  }}
+                />
+              </div>
+              <Text style={{fontWeight: 500, fontSize: 13}}>22:00</Text>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: 4,
+              }}
+            >
+              <Text style={{fontWeight: 500, fontSize: 13}}>Phú Quốc</Text>
+              <Text style={{fontWeight: 500, fontSize: 13}}>Phú Quốc</Text>
+            </div>
+          </div>
+        </div>
+
+        <Divider style={{ margin: "10px 0", fontSize: 15, fontWeight: "bold", color: "#155790" }}>Giá Combo</Divider>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "stretch",
+            gap: 24,
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                marginTop: 4,
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Text style={{ fontWeight: 500, fontSize: 13 }}>Người lớn</Text>
+                <Text type="secondary" style={{ fontWeight: 500, fontSize: 10 }}>(Từ 12 tuổi trở lên)</Text>
+              </div>
+              <Text style={{ fontWeight: "bold", fontSize: 13, color: "#E01600" }}>18.990.000 đ</Text>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                marginTop: 4,
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Text style={{ fontWeight: 500, fontSize: 13 }}>Trẻ em</Text>
+                <Text type="secondary" style={{ fontWeight: 500, fontSize: 10 }}>(Từ 5 đến 11 tuổi)</Text>
+              </div>
+              <Text style={{ fontWeight: "bold", fontSize: 13, color: "#E01600" }}>18.990.000 đ</Text>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                marginTop: 4,
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Text style={{ fontWeight: 500, fontSize: 13 }}>Trẻ nhỏ</Text>
+                <Text type="secondary" style={{ fontWeight: 500, fontSize: 10 }}>(Từ 2 - 4 tuổi)</Text>
+              </div>
+              <Text style={{ fontWeight: "bold", fontSize: 13, color: "#E01600" }}>5.500.000 đ</Text>
+            </div>
+          </div>
+
+          <Divider
+            type="vertical"
+            style={{
+              height: "auto",
+              alignSelf: "stretch",
+              margin: 0,
+            }}
+          /> 
+        
+          <div style={{ flex: 1 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                marginTop: 4,
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Text style={{ fontWeight: 500, fontSize: 13 }}>Em bé</Text>
+                <Text type="secondary" style={{ fontWeight: 500, fontSize: 10 }}>(Dưới 2 tuổi)</Text>
+              </div>
+              <Text style={{ fontWeight: "bold", fontSize: 13, color: "#E01600" }}>5.500.000 đ</Text>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                marginTop: 4,
+              }}
+            >
+              <Text style={{ fontWeight: 500, fontSize: 13 }}>Phụ thu phòng đơn</Text>
+              <Text style={{ fontWeight: "bold", fontSize: 13, color: "#E01600" }}>5.500.000 đ</Text>
+            </div>
+          </div>
+        </div>
+
+        <Divider style={{ margin: "10px 0", fontSize: 15, fontWeight: "bold", color: "#155790" }}>Thông tin thêm</Divider>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "stretch",
+            gap: 24,
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: "bold", fontSize: 13 }}>Địa điểm tập trung</div>
+            <div style={{display: "flex"}}>
+              <div style={{ fontWeight: 700, fontSize: 12 }}>10:00 19/10/2025</div>
+              <div style={{ fontWeight: 500, fontSize: 12 , marginLeft: 3}}>Đang cập nhật</div>
+            </div>
+          </div>
+
+          <Divider
+            type="vertical"
+            style={{
+              height: "auto",
+              alignSelf: "stretch",
+              margin: 0,
+            }}
+          /> 
+        
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: "bold", fontSize: 13 }}>Địa điểm khách sạn</div>
+            <div style={{ fontWeight: 500, fontSize: 11 }}>263 Lê Hồng Phong, Phường Thắng Tam, Thành phố Vũng Tàu, Bà Rịa - Vũng Tàu, Việt Nam.</div>
+          </div>
+          
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "stretch",
+            gap: 24,
+            backgroundColor: "#FDF3EB",
+            color: "#EFAF76",
+            fontWeight: 500,
+            fontSize: 11,
+            padding: 10,
+            borderRadius: 10,
+            marginTop: 10
+          }}
+        >
+          Combo không hoàn, không hủy, không đổi. Giá áp dụng tối thiểu cho 2 khách/ booking. Quý khách cần mang theo CCCD/Passport gốc còn hạn để làm thủ tục nhận phòng. Giá chưa bao gồm chỗ ngồi cho trẻ em dưới 4 tuổi, nếu muốn mua thêm ghế ngồi trên xe vui lòng liên hệ phụ trách để được báo giá. Tổng đài tư vấn 1800.646.888.<br/>Thông tin xe sẽ được cập nhật theo tình hình thực tế số lượng khách tham gia trong tour.
+        </div>
+
+      </Card>
+    );
+  }
 
   return (
     <div>
@@ -214,8 +515,9 @@ export default function Schedule({ tourId, basePrice }: ScheduleProps) {
       </Title>
       <Row gutter={17}>
         <Col span={4}>{renderMonthSelector()}</Col>
-        <Col span={20}>{renderCalendar()}</Col>
+        <Col span={20}>{selectedDepartureId ? renderTravelInfoCard(): renderCalendar()}</Col>
       </Row>
+     
     </div>
 
   );
