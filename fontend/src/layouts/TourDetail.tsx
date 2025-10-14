@@ -76,9 +76,8 @@ export default function TourDetail() {
     fechDataTourById();
   }, [id]);
 
-  const handleSelectDeparture = (departureId: number) => {
+  const handleSelectDeparture = (departureId: number | null) => {
     setSelectedDepartureId(departureId);
-    console.log('Selected Departure ID:', departureId);
   };
 
   return (
@@ -92,9 +91,9 @@ export default function TourDetail() {
           <Row gutter={24}>
             <Col span={17}>
               <TourImages />
-              {dataDetailtour && <Schedule tourId={dataDetailtour.id} basePrice={dataDetailtour.basePrice} onSelectDepartureId={handleSelectDeparture}/>}
+              {dataDetailtour && <Schedule tourData={dataDetailtour} onSelectDepartureId={handleSelectDeparture}/>}
               <AdditionalInfo />
-              <Itinerary />
+              <Itinerary tourId={dataDetailtour?.id}/>
               <ImportantInfo />
             </Col>
 

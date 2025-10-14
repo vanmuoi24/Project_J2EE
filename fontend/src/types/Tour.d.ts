@@ -1,3 +1,5 @@
+import type { AxiosResponse } from "./comment";
+
 export interface ICity {
   city: string;
   type: string;
@@ -56,10 +58,12 @@ export interface ITourDeparture {
     tourPrice: ITourPrice;
 }
 
-type ToursResponse = ApiResponse<ITour[]>;
+type ToursResponse = AxiosResponse<ITour[]>;
 
-type TourResponse = ApiResponse<ITour>;
+type TourResponse = AxiosResponse<ITour>;
 
-type DeparturesResponse = ApiResponse<ITourDeparture[]>;
+type TourDeparturesResponse = AxiosResponse<ITourDeparture[]>;
 
-type DepartureResponse = ApiResponse<ITourDeparture>;
+type TourDepartureResponse = AxiosResponse<ITourDeparture>;
+
+type ItineraryResponse = AxiosResponse<IItinerary[]>;
