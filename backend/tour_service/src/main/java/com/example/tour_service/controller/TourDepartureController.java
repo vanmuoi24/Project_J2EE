@@ -2,6 +2,7 @@ package com.example.tour_service.controller;
 
 import com.example.tour_service.dto.response.ApiResponse;
 import com.example.tour_service.dto.request.TourDepartureRequest;
+import com.example.tour_service.dto.response.ItineraryResponse;
 import com.example.tour_service.dto.response.TourDepartureResponse;
 import com.example.tour_service.service.TourDepartureService;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,18 @@ public class TourDepartureController {
                 .build();
     }
 
-    @GetMapping
+    @GetMapping("/list")
     public ApiResponse<List<TourDepartureResponse>> getAll() {
         return ApiResponse.<List<TourDepartureResponse>>builder()
                 .result(tourDepartureService.getAllTourDeparture())
+                .message("Fetched successfully")
+                .build();
+    }
+
+    @GetMapping("/tour/{tourId}")
+    public ApiResponse<List<TourDepartureResponse>> getByTourId(@PathVariable int tourId) {
+        return ApiResponse.<List<TourDepartureResponse>>builder()
+                .result(tourDepartureService.getTourDepartureByTourId(tourId))
                 .message("Fetched successfully")
                 .build();
     }

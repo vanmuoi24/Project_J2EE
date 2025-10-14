@@ -14,6 +14,7 @@ import com.example.tour_service.repository.TourRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +39,20 @@ public class TourDepartureService {
 
     public List<TourDepartureResponse> getAllTourDeparture(){
         return tourDepartureRepository.findAll().stream()
+                .map(tourDeparture -> {
+                    TourDepartureResponse response = toResponse(tourDeparture);
+                    ApiResponse<TourPriceResponse> priceResp =
+                            pricingClient.getPriceById(tourDeparture.getTour().getTourPriceId());
+                    response.setTourPrice(priceResp.getResult());
+
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<TourDepartureResponse> getTourDepartureByTourId(int id){
+        return tourDepartureRepository.findByTourId(id).stream()
+                .filter(tourDeparture -> tourDeparture.getDepartureDate().isAfter(LocalDateTime.now()))
                 .map(tourDeparture -> {
                     TourDepartureResponse response = toResponse(tourDeparture);
                     ApiResponse<TourPriceResponse> priceResp =

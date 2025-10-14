@@ -24,7 +24,7 @@ public class TourController {
                 .build();
     }
 
-    @GetMapping
+    @GetMapping("/list")
     public ApiResponse<List<TourResponse>> getAll() {
         return ApiResponse.<List<TourResponse>>builder()
                 .result(tourService.getAllTours())

@@ -41,7 +41,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/auth/users/refresh",
             "/auth/users/introspect",
             "/notification/email/send",
-            "/file/media/download/.*"
+            "/file/media/download/.*",
+            "/pricing/prices/.*",
+            "/tour/tours/.*",
+            "/tour/tour-departures/tour/.*",
+            "/tour/tour-departures/.*"
     };
 
     @Value("${app.api-prefix}")
