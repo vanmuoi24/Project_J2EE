@@ -45,7 +45,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/pricing/prices/.*",
             "/tour/tours/.*",
             "/tour/tour-departures/tour/.*",
-            "/tour/tour-departures/.*"
+            "/tour/tour-departures/.*",
+            "/tour/itineraries/tour/.*"
     };
 
     @Value("${app.api-prefix}")

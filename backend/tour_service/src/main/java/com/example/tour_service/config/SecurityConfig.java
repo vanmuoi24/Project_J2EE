@@ -22,7 +22,8 @@
             "/tours/list",
             "/tours/**",
             "/tour-departures/tour/**",
-            "/tour-departures/**"
+            "/tour-departures/**",
+            "/itineraries/tour/**"
         };
 
         private final CustomJwtDecoder customJwtDecoder;
