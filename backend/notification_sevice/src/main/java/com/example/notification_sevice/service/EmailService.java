@@ -6,13 +6,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.example.notification_sevice.dto.reponse.EmailResponse;
+
 import com.example.notification_sevice.dto.request.EmailRequest;
 import com.example.notification_sevice.dto.request.SendEmailRequest;
 import com.example.notification_sevice.dto.request.Sender;
 import com.example.notification_sevice.exception.AppException;
 import com.example.notification_sevice.exception.ErrorCode;
-import com.example.notification_sevice.repository.httpClient.EmailClient;
+import com.example.notification_sevice.repository.httpclient.EmailClient;
 
 import feign.FeignException;
 import lombok.experimental.NonFinal;
@@ -27,7 +27,7 @@ public class EmailService {
     @NonFinal
     String apiKey;
 
-    public EmailResponse sendEmail(SendEmailRequest request) {
+    public com.example.notification_sevice.dto.response.EmailResponse sendEmail(SendEmailRequest request) {
         EmailRequest emailRequest = EmailRequest.builder()
                 .sender(Sender.builder()
                         .name("TenTour")
@@ -40,7 +40,7 @@ public class EmailService {
         try {
             return emailClient.sendEmail(apiKey, emailRequest);
         } catch (FeignException e){
-            throw new AppException(ErrorCode.CANNOT_SEND_EMAIL);
+            throw new AppException(ErrorCode.INVALID_EMAIL);
         }
     }
 }

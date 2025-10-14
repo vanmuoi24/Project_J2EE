@@ -26,3 +26,4 @@ export interface CreateCommentRequest {
   rating: number;
   userId: number;
 }
+
