@@ -5,7 +5,7 @@ import "dayjs/locale/vi";
 import viVN from "antd/locale/vi_VN";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import { getDepartureByTourId, getTourDepartureById } from "@/services/tourServices";
-import type { DepartureResponse, DeparturesResponse, ITour, ITourDeparture } from "@/types/Tour";
+import type { TourDepartureResponse, TourDeparturesResponse, ITour, ITourDeparture } from "@/types/Tour";
 import { ArrowLeft, Bus } from "lucide-react";
 
 dayjs.locale("vi");
@@ -31,7 +31,7 @@ export default function Schedule({ tourData, onSelectDepartureId }: ScheduleProp
 
   const fechDataDepartureById = async () => {
     const res = await getDepartureByTourId(Number(tourData?.id));
-    const data: DeparturesResponse = res;
+    const data: TourDeparturesResponse = res;
     const newSpecialDates: Record<string, { id: number, price: string }> = {};
     const monthsWithDepartures = new Set<string>();
 
@@ -62,7 +62,7 @@ export default function Schedule({ tourData, onSelectDepartureId }: ScheduleProp
   const fetchDataTourDepartureById = async () => {
     if (!selectedDepartureId) return;
     const res = await getTourDepartureById(selectedDepartureId);
-    const data: DepartureResponse = res;
+    const data: TourDepartureResponse = res;
     setDataDetailTourDeparture(data.result);
   }
 
