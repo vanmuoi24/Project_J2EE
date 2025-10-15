@@ -1,78 +1,18 @@
+import { getItineraryByTourId } from "@/services/tourServices";
+import type { IItinerary, ItineraryResponse } from "@/types/Tour";
 import { Collapse, theme, Typography } from "antd";
-import type { CollapseProps } from "antd";
-import type { CSSProperties } from "react";
+import { useEffect, useState } from "react";
 
 const { Title } = Typography;
+const { Panel } = Collapse;
 
-const getItems:(panelStyle: CSSProperties) => CollapseProps['items'] = (panelStyle) => [
-    {
-      key: "1",
-      label: (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          <span style={{fontWeight: "650", fontSize: 13}}>Ngày 1: Đà Nẵng - SB Nội Bài (Hà Nội)</span>
-          <span style={{ fontWeight: 500, fontSize: 12, color: "#555" }}>
-            00 bữa ăn (tự túc ăn ngày đầu tiên)
-          </span>
-        </div>
-      ),
-      children: (
-        <div style={{ borderTop: "1px solid rgba(0,0,0,0.15)"}}>
-          <p>
-            Quý khách tập trung tại sân bay Đà Nẵng, hướng dẫn viên hỗ trợ làm thủ tục bay đi Hà
-            Nội.
-          </p>
-          <div style={{ textAlign: "right" }}>
-            <b>Nghỉ đêm tại Hà Nội</b>
-          </div>
-        </div>
-      ),
-      style: panelStyle,
-    },
-    {
-      key: "2",
-      label: (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          <span style={{fontWeight: "650", fontSize: 13}}>Ngày 2: Hà Nội - Lạng Sơn - Cao Bằng: 'Chạm vào di sản'</span>
-          <span style={{ fontWeight: 500, fontSize: 12, color: "#555" }}>03 bữa ăn (sáng, trưa, chiều)</span>
-        </div>
-      ),
-      children: (
-        <div style={{ borderTop: "1px solid rgba(0,0,0,0.15)"}}>
-          <p>
-            Quý khách tập trung tại sân bay Đà Nẵng, hướng dẫn viên hỗ trợ làm thủ tục bay đi Hà
-            Nội.
-          </p>
-          <div style={{ textAlign: "right" }}>
-            <b>Nghỉ đêm tại Hà Nội</b>
-          </div>
-        </div>
-      ),
-      style: panelStyle,
-    },
-    {
-      key: "3",
-      label: (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          <span style={{fontWeight: "650", fontSize: 13}}>Ngày 3: Non nước Cao Bằng - Trùng Khánh</span>
-          <span style={{ fontWeight: 500, fontSize: 12, color: "#555" }}>03 bữa ăn (sáng, trưa, chiều)</span>
-        </div>
-      ),
-      children: (
-        <div style={{ borderTop: "1px solid rgba(0,0,0,0.15)"}}>
-          <p>
-            Quý khách tập trung tại sân bay Đà Nẵng, hướng dẫn viên hỗ trợ làm thủ tục bay đi Hà
-            Nội.
-          </p>
-          <div style={{ textAlign: "right" }}>
-            <b>Nghỉ đêm tại Hà Nội</b>
-          </div>
-        </div>
-      ),
-      style: panelStyle,
-    },
-  ];
 
-const Itinerary: React.FC = () => {
+
+interface ItineraryProps {
+  tourId?: number | null;
+}
+
+const Itinerary: React.FC<ItineraryProps> = ({ tourId }) => {
   const { token } = theme.useToken();
 
   const panelStyle: React.CSSProperties = {
@@ -81,6 +21,18 @@ const Itinerary: React.FC = () => {
     borderRadius: token.borderRadiusLG,
     border: "none",
   };
+
+  const [dataItinerary, setDataItinerary] = useState<IItinerary[]>([]);
+
+  const fechDataItineraryByTourId = async () => {
+    const res = await getItineraryByTourId(Number(tourId));
+    const data: ItineraryResponse = res;
+    setDataItinerary(data.result);
+  };
+
+  useEffect(() => {
+    fechDataItineraryByTourId();
+  }, [tourId]);
 
   return (
     <div>
@@ -92,12 +44,65 @@ const Itinerary: React.FC = () => {
       </Title>
 
       <Collapse
-        items={getItems(panelStyle)}
         expandIconPosition="end"
         bordered={false}
         style={{ background: token.colorBgContainer }}
         className="custom-collapse"
-      />
+      >
+        {dataItinerary.map((item) => (
+          <Panel
+            header={
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                <span style={{ fontWeight: 650, fontSize: 13 }}>
+                  Ngày {item.dayNumber}: {item.title}
+                </span>
+                <span style={{ fontWeight: 500, fontSize: 12, color: "#555" }}>{item.meal}</span>
+              </div>
+            }
+            key={item.id}
+            style={panelStyle}
+          >
+            <div style={{ position: "relative", paddingLeft: 12}}>
+              <div
+                style={{
+                  borderLeft: "1px dashed #1765AC",
+                  borderTop: "1px solid rgba(0,0,0,0.15)",
+                  paddingLeft: 12,
+                  position: "relative",
+                }}
+              >
+                <p style={{ marginTop: 10 }}>{item.description}</p>
+
+                {/* Hai chấm tròn */}
+                <span
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: -3,
+                    width: 4,
+                    height: 4,
+                    borderRadius: "50%",
+                    backgroundColor: "#1677ff",
+                  }}
+                />
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: -3,
+                    width: 4,
+                    height: 4,
+                    borderRadius: "50%",
+                    backgroundColor: "#1677ff",
+                  }}
+                />
+              </div>
+            </div>
+
+          </Panel>
+        ))}
+      </Collapse>
+
     </div>
   );
 };

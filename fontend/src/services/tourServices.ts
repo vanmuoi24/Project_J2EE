@@ -1,10 +1,11 @@
 import axiosClient from "@/api/axios";
-import type { ITourResponse } from "@/types/Tour";
+import type { AxiosResponse } from "@/types/comment";
+import type { IItinerary, ITour, ITourDeparture, ITourResponse } from "@/types/Tour";
 import axios from "axios";
 
 export const getAllTours = async () => {
   try {
-    const res: ITourResponse = await axiosClient.get("/tour/tours");
+    const res: ITourResponse = await axiosClient.get("/tour/tours/list");
     if (res.code !== 1000) {
       throw new Error(res?.message || "Get all tours failed");
     }
@@ -21,6 +22,20 @@ export const getAllTours = async () => {
   }
 };
 
-export const getTourById = (id: number) => {
+export const getTourById = (id: number): Promise<AxiosResponse<ITour>> => {
   return axiosClient.get(`/tour/tours/${id}`);
 };
+
+export const getDepartureByTourId = (id: number): Promise<AxiosResponse<ITourDeparture[]>> => {
+  return axiosClient.get(`/tour/tour-departures/tour/${id}`);
+};
+
+export const getTourDepartureById = (id: number) : Promise<AxiosResponse<ITourDeparture>> => {
+  return axiosClient.get(`/tour/tour-departures/${id}`);
+};
+
+export const getItineraryByTourId = (id: number) : Promise<AxiosResponse<IItinerary[]>> => {
+  return axiosClient.get(`/tour/itineraries/tour/${id}`);
+};
+
+
