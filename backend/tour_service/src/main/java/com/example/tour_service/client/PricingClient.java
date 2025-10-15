@@ -1,7 +1,7 @@
 package com.example.tour_service.client;
 
 import com.example.tour_service.config.FeignAuthConfig;
-import com.example.tour_service.dto.response.ApiResponse;
+import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.response.TourPriceResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

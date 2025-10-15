@@ -533,5 +533,3 @@ export default function Schedule({ tourData, onSelectDepartureId }: ScheduleProp
 
   );
 }
-
-

@@ -19,5 +19,9 @@ spring:
       hibernate.dialect: org.hibernate.dialect.MySQLDialect
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
+<<<<<<< HEAD
   valid-duration: 500000 # in second
+=======
+  valid-duration: 15000 # in second
+>>>>>>> 36b0d30dd64d1d5fd9385dabe168388c1f72f378
   refreshable-duration: 36000 # in seconds

@@ -1,5 +1,6 @@
 import { Modal, Typography, Divider } from "antd";
 import React from "react";
+import styled from "styled-components";
 import vnFlag from "@/assets/images/vi.png";
 import usFlag from "@/assets/images/en.png";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -11,20 +12,32 @@ type Props = {
   setIsOpen: (val: boolean) => void;
 };
 
-
+const OptionContainer = styled.div<{ selected?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: ${(props) => (props.selected ? "#e6f7ff" : "transparent")};
+  &:hover {
+    background: #f0f0f0;
+  }
+`;
 
 const ModalChangeLC: React.FC<Props> = ({ isOpen, setIsOpen }) => {
   const dispatch = useAppDispatch();
 
   const { currency, language } = useAppSelector((state: RootState) => state.lc);
 
-  const [selectedCurrency, setSelectedCurrency] = React.useState<string>(currency||"VNĐ");
-  const [selectedLang, setSelectedLang] = React.useState<string>(language||"VN");
+  const [selectedCurrency, setSelectedCurrency] = React.useState<string>("VND");
+  const [selectedLang, setSelectedLang] = React.useState<string>("VN");
 
   const handleOk = () => {
     setIsOpen(false);
     dispatch(setCurrency(selectedCurrency))  
     dispatch(setLanguage(selectedLang))  
+    console.log("Tiền tệ: ",currency, " Ngôn ngữ: ", language);
   };
 
   const handleCancel = () => setIsOpen(false);
@@ -38,35 +51,32 @@ const ModalChangeLC: React.FC<Props> = ({ isOpen, setIsOpen }) => {
       okText="Lưu"
       cancelText="Hủy"
     >
-      <div className="flex items-center gap-[16px]">
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         {/* Tiền tệ */}
-        <div className="flex text-center flex-col">
+        <div style={{ flex: 1, textAlign: "center" }}>
           <Typography.Text strong>Tiền tệ</Typography.Text>
-          <div className="mt-[8px] flex justify-center gap-[8px]">
-            <div 
-              className={`flex items-center gap-[8px] px-[12px] py-[8px] 
-                rounded-[4px] cursor-pointer hover:bg-[#f0f0f0]
-                ${ selectedCurrency === "VNĐ"
-                  ? "bg-[#e6f4ff] text-[#1677ff]"
-                  : "hover:bg-[#f0f0f0]"         
-              }`} 
-              onClick={() => setSelectedCurrency("VNĐ")}
+          <div style={{ marginTop: 8, display: "flex", justifyContent: "center", gap: 8 }}>
+            <OptionContainer
+              selected={currency === "VND"}
+              onClick={() => setSelectedCurrency("VND")}
             >
               <span>₫</span>
               <span>VNĐ</span>
-            </div>
-            <div 
-              className={`flex items-center gap-[8px] px-[12px] py-[8px] 
-                rounded-[4px] cursor-pointer hover:bg-[#f0f0f0]
-                ${ selectedCurrency === "USD"
-                  ? "bg-[#e6f4ff] text-[#1677ff]"
-                  : "hover:bg-[#f0f0f0]"         
-              }`} 
+            </OptionContainer>
+            <OptionContainer
+              selected={currency === "USD"}
               onClick={() => setSelectedCurrency("USD")}
             >
               <span>$</span>
               <span>USD</span>
-            </div>
+            </OptionContainer>
+            <OptionContainer
+              selected={currency === "EUR"}
+              onClick={() => setSelectedCurrency("EUR")}
+            >
+              <span>€</span>
+              <span>EUR</span>
+            </OptionContainer>
           </div>
         </div>
 
@@ -75,31 +85,21 @@ const ModalChangeLC: React.FC<Props> = ({ isOpen, setIsOpen }) => {
         {/* Ngôn ngữ */}
         <div style={{ flex: 1, textAlign: "center" }}>
           <Typography.Text strong>Ngôn ngữ</Typography.Text>
-           <div className="mt-[8px] flex justify-center gap-[8px]">
-            <div 
-              className={`flex items-center gap-[8px] px-[12px] py-[8px] 
-                rounded-[4px] cursor-pointer hover:bg-[#f0f0f0]
-                ${ selectedLang === "VN"
-                  ? "bg-[#e6f4ff] text-[#1677ff]"
-                  : "hover:bg-[#f0f0f0]"         
-              }`} 
+          <div style={{ marginTop: 8, display: "flex", justifyContent: "center", gap: 8 }}>
+            <OptionContainer
+              selected={language === "VN"}
               onClick={() => setSelectedLang("VN")}
             >
               <img src={vnFlag} alt="VN" style={{ width: 20, height: 14 }} />
               <span>VN</span>
-            </div>
-            <div 
-              className={`flex items-center gap-[8px] px-[12px] py-[8px] 
-                rounded-[4px] cursor-pointer hover:bg-[#f0f0f0]
-                ${ selectedLang === "ENG"
-                  ? "bg-[#e6f4ff] text-[#1677ff]"
-                  : "hover:bg-[#f0f0f0]"         
-              }`} 
+            </OptionContainer>
+            <OptionContainer
+              selected={selectedLang === "ENG"}
               onClick={() => setSelectedLang("ENG")}
             >
               <img src={usFlag} alt="ENG" style={{ width: 20, height: 14 }} />
               <span>ENG</span>
-            </div>
+            </OptionContainer>
           </div>
         </div>
       </div>

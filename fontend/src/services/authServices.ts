@@ -53,6 +53,7 @@ export const refreshTokenService = async (token: string): Promise<LoginResponse>
   try {
     const res: LoginResponse = await axiosClient.post('/auth/users/refresh', token);
 
+<<<<<<< HEAD
     if (res.code !== 1000) {
       throw new Error(res?.message || 'Refresh failed');
     }
@@ -76,3 +77,20 @@ export const getListComentByTour = (id: number): Promise<AxiosResponse> => {
 export const createComent = (data: CreateCommentRequest): Promise<AxiosResponse> => {
   return axiosClient.post('/auth/reviews', data);
 };
+=======
+		if (res.code !== 1000) {
+			throw new Error(res?.message || 'Refresh failed');
+		}
+		return res;
+	} catch (err: unknown) {
+		if (axios.isAxiosError(err)) {
+			const serverError = err.response?.data as { message?: string };
+			throw new Error(serverError?.message || 'Refresh failed');
+		}
+		if (err instanceof Error) {
+			throw err;
+		}
+		throw new Error('Unexpected error');
+	}
+};
+>>>>>>> 36b0d30dd64d1d5fd9385dabe168388c1f72f378
