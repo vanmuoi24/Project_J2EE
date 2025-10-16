@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Dropdown, Button, Typography, message } from 'antd';
 import { PhoneOutlined, UserOutlined } from '@ant-design/icons';
 import flag from '@/assets/images/en.png';
@@ -9,19 +8,6 @@ import Container from './Container';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store';
 import { logoutUser } from '@/store/slices/authSlice';
-=======
-import { Dropdown, Button, Typography, message } from "antd";
-import { PhoneOutlined, UserOutlined } from "@ant-design/icons";
-import flag from "@/assets/images/en.png";
-import { useNavigate } from "react-router-dom";
-import ModalChangeLC from "@/components/Home/Modal/ModalChangeLC";
-import  { useState } from "react";
-import Container from "./Container";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import type { RootState } from "@/store";
-import { logoutUser } from "@/store/slices/authSlice";
-
->>>>>>> 36b0d30dd64d1d5fd9385dabe168388c1f72f378
 
 export default function TopNavbar() {
   const [isOpen, setIsOpen] = useState<boolean>(false);

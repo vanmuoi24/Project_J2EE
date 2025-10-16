@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.file_service.dto.reponse.FileData;
 import com.example.file_service.dto.reponse.FileResponse;
+import com.example.file_service.entity.FileMgmt;
 import com.example.file_service.mapper.FileMgmtMapper;
 import com.example.file_service.repository.FileMgmtRepository;
 import com.example.file_service.repository.FileRepository;
@@ -50,4 +51,10 @@ public class FileService {
 
         return new FileData(fileMgmt.getContentType(), resource);
     }
+
+    public FileMgmt getFileByOwnerId(String ownerId) {
+        return fileMgmtRepository.findByOwnerId(ownerId)
+                .orElseThrow(() -> new AppException(ErrorCode.FILE_NOT_FOUND));
+    }
+
 }

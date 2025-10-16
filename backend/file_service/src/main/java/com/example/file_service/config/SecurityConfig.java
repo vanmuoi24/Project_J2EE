@@ -19,7 +19,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final String[] PUBLIC_URLS = {
-            "/media/download/**"
+            "/media/download/**",
+            "/owner/**",
 
     };
 

@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.auth_service.dto.FileInfo;
 import com.example.auth_service.dto.request.AuthenticationRequest;
 import com.example.auth_service.dto.request.ChangePasswordRequest;
 import com.example.auth_service.dto.request.IntrospectRequest;
@@ -25,6 +26,7 @@ import com.example.auth_service.exception.ErrorCode;
 import com.example.auth_service.mapper.UserMapper;
 import com.example.auth_service.repository.InvalidatedTokenRepository;
 import com.example.auth_service.repository.UserRepository;
+import com.example.auth_service.repository.httpclient.FileServiceClient;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -50,7 +52,7 @@ public class AuthService {
     InvalidatedTokenRepository invalidatedTokenRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
-
+    FileServiceClient fileServiceClient;
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
@@ -69,10 +71,18 @@ public class AuthService {
         var user = userRepository
                 .findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        var userResponse = userMapper.toUserResponse(user);
+        try {
+            FileInfo fileInfo = fileServiceClient.getFileByOwnerId(String.valueOf(user.getId()));
+            if (fileInfo != null && fileInfo.getUrl() != null) {
+                userResponse.setAvatar(fileInfo.getUrl());
+            }
+        } catch (Exception e) {
+            userResponse.setAvatar(null);
+        }
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + VALID_DURATION);
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
-        var userResponse = userMapper.toUserResponse(user);
         if (!authenticated)
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         var token = generateToken(user);
@@ -83,7 +93,7 @@ public class AuthService {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getEmail())
+                .subject(String.valueOf(user.getId()))
                 .issuer("tour.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
