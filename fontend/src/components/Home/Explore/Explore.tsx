@@ -1,109 +1,85 @@
-import Container from "@/components/Share/Container";
-import Slider from "react-slick";
+import Container from '@/components/Share/Container';
+import Slider, { type Settings } from 'react-slick';
 
-const Explore = () => {
-  const settings = {
+const VouchersSlider: React.FC = () => {
+  const settings: Settings = {
     dots: true,
     infinite: true,
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: false,
+    responsive: [
+      { breakpoint: 1024, settings: { slidesToShow: 2 } },
+      { breakpoint: 768, settings: { slidesToShow: 1 } },
+    ],
   };
 
   const destinations = [
-    { id: 1, name: "Đà Nẵng", img: "" },
-    { id: 2, name: "Hội An", img: "" },
-    { id: 3, name: "Nha Trang", img: "" },
-    { id: 4, name: "Phú Quốc", img: "" },
-    { id: 5, name: "Hạ Long", img: "" },
+    {
+      id: 1,
+      name: 'Đà Nẵng',
+      img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800',
+    },
+    {
+      id: 2,
+      name: 'Hội An',
+      img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800',
+    },
+    {
+      id: 3,
+      name: 'Nha Trang',
+      img: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800',
+    },
+    {
+      id: 4,
+      name: 'Phú Quốc',
+      img: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=800',
+    },
+    {
+      id: 5,
+      name: 'Hạ Long',
+      img: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=800',
+    },
   ];
 
   return (
-    <div style={{marginBottom: 80}} >
+    <div className="py-10 bg-gray-50 !mb-20">
       <Container>
-         {/* Title */}
-         <div style={{ marginBottom: 12 }}>
-         <h2
-            style={{
-               fontSize: 32,
-               fontWeight: 700,
-               color: "#0b5da7",
-               marginBottom: 8,
-               textTransform: 'uppercase'
-            }}
-         >
+        {/* Title */}
+        <div className="!mb-3">
+          <h2 className="text-[32px] font-bold text-[#0b5da7] mb-2 uppercase">
             Discover Amazing Adventures with Vietravel
-         </h2>
-         <div
-            style={{
-               width: 60,
-               height: 4,
-               backgroundColor: "#0b5da7",
-               borderRadius: 2,
-            }}
-         />
-         </div>
+          </h2>
+          <div className="w-[60px] h-1 bg-[#0b5da7] rounded"></div>
+        </div>
 
-         {/* Description */}
-         <p style={{
-            fontSize: 20,         
-            lineHeight: 1.6,      
-            color: "#444",
-            marginBottom: 24,
-            maxWidth: 720
-         }}>
-         Embark on a Journey of a Lifetime – Create Unforgettable Memories Around the World!
-         </p>
+        {/* Description */}
+        <p className="text-[20px] leading-relaxed text-[#444] mb-6 max-w-[720px]">
+          Embark on a Journey of a Lifetime – Create Unforgettable Memories Around the World!
+        </p>
 
-         {/* Slider */}
-         <Slider {...settings}>
-         {destinations.map((item) => (
-            <div key={item.id} style={{ padding: "0 8px" }}>
-               <div
-               style={{
-                  width: '97%',
-                  borderRadius: 8,
-                  overflow: "hidden",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  background: "#fff",
-                  position: 'relative'
-               }}
-               >
-                  <img
-                     src={item.img}
-                     alt={item.name}
-                     style={{
-                        width: "100%",
-                        height: 200,
-                        objectFit: "cover",
-                     }}
-                  />
-                  <div
-                     style={{
-                        margin: 0,
-                        padding: "12px",
-                        fontSize: 18,
-                        fontWeight: 600,
-                        color: "#fff",
-                        textAlign: 'center',
-                        display: 'block',
-                        width: '100%',
-                        position: 'absolute',
-                        bottom: 0,
-                        textTransform: 'uppercase',
-                        background: 'linear-gradient(0deg, rgba(0, 0, 0, .85), transparent);'
-                     }}
-                  >
-                     {item.name}
-                  </div>
-               </div>
+        <Slider {...settings} className="w-full">
+          {destinations.map((dest, index) => (
+            <div key={index} className="!px-[10px]">
+              <div className="relative w-full h-[240px] rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+                <img
+                  src={dest.img}
+                  alt={`Voucher ${index + 1}`}
+                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                />
+                <div className="absolute bottom-0 left-0 w-full text-center text-white text-[18px] font-semibold uppercase !p-3 bg-gradient-to-t from-[rgba(0,0,0,0.85)] to-transparent">
+                  {dest.name}
+                </div>
+              </div>
             </div>
-         ))}
-         </Slider>
+          ))}
+        </Slider>
       </Container>
-
     </div>
   );
 };
 
-export default Explore;
+export default VouchersSlider;

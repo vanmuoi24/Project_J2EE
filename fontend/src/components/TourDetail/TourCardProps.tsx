@@ -29,7 +29,6 @@ export default function TourCard({ tour }: TourCardProps) {
     return (
         <Card
             style={{
-                width: 300,
                 borderRadius: 12,
                 overflow: "hidden",
                 position: "relative",

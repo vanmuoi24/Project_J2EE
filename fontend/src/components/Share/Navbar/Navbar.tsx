@@ -1,17 +1,12 @@
-import { Link } from "react-router-dom";
-import { Menu } from "antd";
-import { MenuOutlined } from "@ant-design/icons";
-import brand from "@/assets/images/brand.jpg";
-import Container from "@/components/Share/Container";
-import { useState } from "react";
-import TabsMore from "./TabsMore";
-import TabsDest from "./TabsDest";
+import { Link } from 'react-router-dom';
+import { Menu } from 'antd';
+import brand from '@/assets/images/brand.jpg';
+import Container from '@/components/Share/Container';
+import { useState } from 'react';
+import TabsDest from './TabsDest';
 
 const Navbar: React.FC = () => {
-  
-
   const [isOpenDest, setIsOpenDest] = useState<boolean>(false);
-  const [isOpenMore, setIsOpenMore] = useState<boolean>(false);
 
   return (
     <div className="bg-white shadow-sm">
@@ -19,11 +14,7 @@ const Navbar: React.FC = () => {
         {/* Logo */}
         <div className="flex-1">
           <Link to="/" className="w-[200px] h-[60px] block">
-            <img
-              src={brand}
-              alt="brand"
-              className="w-full h-full object-contain"
-            />
+            <img src={brand} alt="brand" className="w-full h-full object-contain" />
           </Link>
         </div>
 
@@ -32,27 +23,15 @@ const Navbar: React.FC = () => {
           <Menu
             mode="horizontal"
             selectable={false}
-            className="flex-1 border-none h-[60px]"
+            className="flex-1 border-none h-[60px] flex items-center"
             items={[
               {
-                key: "home",
-                label: (
-                  <Link
-                    to="/"
-                    className="text-black text-[16px] font-[700] text-base hover:text-blue-500 transition"
-                  >
-                    Home
-                  </Link>
-                ),
-              },
-              {
-                key: "dest",
+                key: 'dest',
                 label: (
                   <span
-                    className="block text-black text-[16px] font-[700] text-base hover:text-blue-500 transition"
+                    className=" text-black text-[16px] font-[700] text-base hover:text-blue-500 transition"
                     onClick={() => {
-                      setIsOpenDest(!isOpenDest)
-                      setIsOpenMore(false)
+                      setIsOpenDest(!isOpenDest);
                     }}
                   >
                     Điểm đến
@@ -60,34 +39,32 @@ const Navbar: React.FC = () => {
                 ),
               },
               {
-                key: "tours",
+                key: 'tours',
                 label: (
                   <Link
                     to="/tours"
                     className="text-black text-[16px] font-[700] text-base hover:text-blue-500 transition"
                   >
-                    Tours
+                    Chuyến đi phổ biến
+                  </Link>
+                ),
+              },
+              {
+                key: 'promotion',
+                label: (
+                  <Link
+                    to="/promotion"
+                    className="text-black text-[16px] font-[700] text-base hover:text-blue-500 transition"
+                  >
+                    Ưu đãi đặc biệt
                   </Link>
                 ),
               },
             ]}
           />
-
-          <button
-            onClick={() => {
-               setIsOpenMore(!isOpenMore)
-               setIsOpenDest(false)
-            }}
-            className="text-black font-bold cursor-pointer p-[4px] bg-[#fff] border-none"
-          >
-            <MenuOutlined  className="text-[20px]"/>
-          </button>
         </div>
 
-        <TabsMore isOpen={isOpenMore} setIsOpen={setIsOpenMore} />
         <TabsDest isOpen={isOpenDest} setIsOpen={setIsOpenDest} />
-        
-      
       </Container>
     </div>
   );

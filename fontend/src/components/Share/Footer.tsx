@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   FacebookFilled,
   TwitterSquareFilled,
@@ -7,58 +7,112 @@ import {
   MailOutlined,
   PhoneOutlined,
   EnvironmentOutlined,
-} from "@ant-design/icons";
-import Container from "@/components/Share/Container";
-import "./Footer.css";
+  CreditCardOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
+import Container from '@/components/Share/Container';
+import momo from '@/assets/images/momo.png';
+import certificate from '@/assets/images/certificate.webp';
 
 export const Footer = () => {
   return (
-    <footer className="footer">
+    <footer className="bg-gray-800 text-white !pt-16 !pb-6">
       <Container>
-        <div className="footer-grid">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* 1. Logo + Intro */}
-          <div className="footer-col">
-            <h2 className="footer-logo">TravelVN</h2>
-            <p>
-              Explore Vietnam and beyond with our carefully curated tours,
-              last-minute deals, and unforgettable experiences.
+          <div>
+            <h2 className="text-2xl font-bold !mb-4">SGUTour</h2>
+            <p className="text-gray-300">
+              Explore Vietnam and beyond with our carefully curated tours, last-minute deals, and
+              unforgettable experiences.
             </p>
           </div>
 
           {/* 2. Quick Links */}
-          <div className="footer-col">
-            <h4>Quick Links</h4>
-            <ul>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Destinations</a></li>
-              <li><a href="#">Tours</a></li>
-              <li><a href="#">Blog</a></li>
-              <li><a href="#">Contact</a></li>
+          <div>
+            <h4 className="font-semibold text-lg !mb-4">Quick Links</h4>
+            <ul className="!space-y-2">
+              <li>
+                <a href="#" className="hover:text-blue-400 transition">
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-blue-400 transition">
+                  Destinations
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-blue-400 transition">
+                  Tours
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-blue-400 transition">
+                  Blog
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-blue-400 transition">
+                  Contact
+                </a>
+              </li>
             </ul>
           </div>
 
           {/* 3. Contact Info */}
-          <div className="footer-col">
-            <h4>Contact</h4>
-            <p><EnvironmentOutlined /> 123 Nguyễn Huệ, Quận 1, TP.HCM</p>
-            <p><PhoneOutlined /> +84 123 456 789</p>
-            <p><MailOutlined /> support@travelvn.com</p>
+          <div>
+            <h4 className="font-semibold text-lg !mb-4">Contact</h4>
+            <p className="flex items-center gap-2 !mb-2">
+              <EnvironmentOutlined /> 123 Nguyễn Huệ, Quận 1, TP.HCM
+            </p>
+            <p className="flex items-center gap-2 !mb-2">
+              <PhoneOutlined /> +84 123 456 789
+            </p>
+            <p className="flex items-center gap-2 !mb-2">
+              <MailOutlined /> support@travelvn.com
+            </p>
+
+            {/* Payment */}
+            <h4 className="font-semibold text-lg !mt-6 !mb-2">Payment</h4>
+            <div className="flex gap-4">
+              <CreditCardOutlined style={{ fontSize: 24 }} title="Bank" />
+              <img src={momo} alt="Momo" className="h-6" />
+              <img src="/icons/zalopay.png" alt="ZaloPay" className="h-6" />
+            </div>
           </div>
 
-          {/* 4. Social */}
-          <div className="footer-col">
-            <h4>Follow Us</h4>
-            <div className="social-icons">
-              <a href="#"><FacebookFilled /></a>
-              <a href="#"><TwitterSquareFilled /></a>
-              <a href="#"><InstagramFilled /></a>
-              <a href="#"><YoutubeFilled /></a>
+          {/* 4. Social + Certificate */}
+          <div>
+            <h4 className="font-semibold text-lg !mb-2">Follow Us</h4>
+            <div className="flex gap-3 !mb-6 text-2xl">
+              <a href="#" className="hover:text-blue-400 transition">
+                <FacebookFilled />
+              </a>
+              <a href="#" className="hover:text-blue-400 transition">
+                <TwitterSquareFilled />
+              </a>
+              <a href="#" className="hover:text-blue-400 transition">
+                <InstagramFilled />
+              </a>
+              <a href="#" className="hover:text-blue-400 transition">
+                <YoutubeFilled />
+              </a>
+            </div>
+
+            <h4 className="font-semibold text-lg !mb-2">Certificate</h4>
+            {/* <div className="flex items-center gap-2">
+              <SafetyCertificateOutlined style={{ fontSize: 28 }} />
+              <span className="text-gray-300">Trusted Travel Agency</span>
+            </div> */}
+            <div className="!mt-3">
+              <img src={certificate} alt="Certificate" className="w-[120px]" />
             </div>
           </div>
         </div>
 
-        <div className="footer-bottom">
-                   PhathociT Design ©{new Date().getFullYear()} Created by Ant UED
+        <div className="border-t border-gray-700 !mt-10 !pt-4 text-center text-gray-400 text-sm">
+          PhathociT Design ©{new Date().getFullYear()} Created by Ant UED
         </div>
       </Container>
     </footer>
