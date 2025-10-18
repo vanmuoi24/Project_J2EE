@@ -1,23 +1,23 @@
-import { Route, BrowserRouter, Routes } from "react-router-dom";
-import MainLayout from "@layouts/MainLayout";
-import Home from "@pages/Home/page";
-import About from "@pages/About";
-import NotFound from "@pages/NotFound";
-import DashboardLayout from "@/layouts/DashboardLayout";
-import DashboardPage from "@/pages/Dashboard";
-import ProfilePage from "@/pages/Profile";
-import LoginPage from "@/pages/Auth/LoginPage";
-import RegisterPage from "@/pages/Auth/RegisterPage";
-import Tours from "@/pages/Tours/page";
-import RouteGuard from "./RouteGuard";
-import LayoutAdmin from "../pages/Admin/LayoutAdmin";
-import ManagerUser from "../components/Admin/ManagerUser/ManagerUser";
-import ManagerTour from "../components/Admin/ManagerTour/ManagerTour";
-import ManagerBooking from "../components/Admin/ManagerBooking/ManagerBooking";
-import ManagerPromotion from "../components/Admin/ManagerPomt/ManagerPomt";
-import ManagerSchedule from "../components/Admin/ManagerTour/ManagerSchedule";
-import ManagerDestination from "../components/Admin/ManagerTour/ManagerDestination";
-import TourDetail from "@/layouts/TourDetail";
+import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import MainLayout from '@layouts/MainLayout';
+import Home from '@pages/Home/page';
+import About from '@pages/About';
+import NotFound from '@pages/NotFound';
+import DashboardLayout from '@/layouts/DashboardLayout';
+import DashboardPage from '@/pages/Dashboard';
+import ProfilePage from '@/pages/Profile';
+import LoginPage from '@/pages/Auth/LoginPage';
+import RegisterPage from '@/pages/Auth/RegisterPage';
+import Tours from '@/pages/Tours/page';
+import RouteGuard from './RouteGuard';
+import LayoutAdmin from '../pages/Admin/LayoutAdmin';
+import ManagerUser from '../components/Admin/ManagerUser/ManagerUser';
+import ManagerTour from '../components/Admin/ManagerTour/ManagerTour';
+import ManagerBooking from '../components/Admin/ManagerBooking/ManagerBooking';
+import ManagerPromotion from '../components/Admin/ManagerPomt/ManagerPomt';
+import ManagerSchedule from '../components/Admin/ManagerTour/ManagerSchedule';
+import ManagerDestination from '../components/Admin/ManagerTour/ManagerDestination';
+import TourDetail from '@/layouts/TourDetail';
 
 export default function AppRoutes() {
   return (
@@ -26,10 +26,10 @@ export default function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
-          <Route path="/tours/*" element={<Tours />} />
-          <Route path="/detail/:id" element={<TourDetail />}/>
+          <Route path="/tours" element={<Tours />} />
+          <Route path="/tours/detail/:id" element={<TourDetail />} />
           <Route element={<RouteGuard isPrivate />}>
-            <Route path="/profile" element={<ProfilePage />}/>
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
 
@@ -51,18 +51,9 @@ export default function AppRoutes() {
           <Route path="/admin/managerUser" element={<ManagerUser />} />
           <Route path="/admin/managerTour/list" element={<ManagerTour />} />
           <Route path="/admin/managerBooking" element={<ManagerBooking />} />
-          <Route
-            path="/admin/managerPromotion"
-            element={<ManagerPromotion />}
-          />
-          <Route
-            path="/admin/managerTour/itinerary"
-            element={<ManagerSchedule />}
-          />
-          <Route
-            path="/admin/managerTour/destination"
-            element={<ManagerDestination />}
-          />
+          <Route path="/admin/managerPromotion" element={<ManagerPromotion />} />
+          <Route path="/admin/managerTour/itinerary" element={<ManagerSchedule />} />
+          <Route path="/admin/managerTour/destination" element={<ManagerDestination />} />
         </Route>
       </Routes>
     </BrowserRouter>
