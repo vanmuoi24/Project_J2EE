@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -22,5 +21,4 @@ public class TourRequest {
     BigDecimal basePrice;
     String vehicleId;
     Long tourPriceId;
-    List<String> imageIds;
 }

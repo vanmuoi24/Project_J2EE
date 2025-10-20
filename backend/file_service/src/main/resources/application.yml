@@ -24,3 +24,7 @@ app:
   file:
     storage-dir: C:/upload
     download-prefix: http://localhost:8888/api/v1/file/media/download/
+cloudinary:
+  cloud-name: dmxflropu
+  api-key: 446771791415384
+  api-secret: 5ZNw3WZJx0ulBiik2ggcUdMwPYg

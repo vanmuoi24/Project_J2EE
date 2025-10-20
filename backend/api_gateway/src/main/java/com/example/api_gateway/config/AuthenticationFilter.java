@@ -41,7 +41,12 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/auth/users/refresh",
             "/auth/users/introspect",
             "/notification/email/send",
-            "/file/media/download/.*"
+            "/file/media/download/.*",
+            "/pricing/prices/.*",
+            "/tour/tours/.*",
+            "/tour/tour-departures/tour/.*",
+            "/tour/tour-departures/.*",
+            "/tour/itineraries/tour/.*"
     };
 
     @Value("${app.api-prefix}")
@@ -84,19 +89,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isPublicEndpoint(ServerHttpRequest request) {
-        String path = request.getURI().getPath();
         return Arrays.stream(publicEndpoints)
-                .anyMatch(pattern -> {
-                    // Nếu pattern là regex thì .matches(), còn không thì so sánh startsWith
-                    if (pattern.contains(".*")) {
-                        return path.matches(apiPrefix + pattern);
-                    } else if (pattern.endsWith("/**")) {
-                        String base = pattern.substring(0, pattern.length() - 3);
-                        return path.startsWith(apiPrefix + base);
-                    } else {
-                        return path.equals(apiPrefix + pattern);
-                    }
-                });
+                .anyMatch(s -> request.getURI().getPath().matches(apiPrefix + s));
     }
 
     Mono<Void> unauthenticated(ServerHttpResponse response) {

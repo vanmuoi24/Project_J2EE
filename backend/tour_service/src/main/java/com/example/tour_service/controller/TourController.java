@@ -1,6 +1,6 @@
 package com.example.tour_service.controller;
 
-import com.example.tour_service.dto.response.ApiResponse;
+import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourRequest;
 import com.example.tour_service.dto.response.TourResponse;
 import com.example.tour_service.service.TourService;
@@ -18,13 +18,13 @@ public class TourController {
 
     @GetMapping("/{id}")
     public ApiResponse<TourResponse> getTourById(@PathVariable Integer id) {
-        return ApiResponse.<TourResponse>builder()
+        return ApiResponse. <TourResponse>builder()
                 .result(tourService.getTourById(id))
                 .message("Got successfully")
                 .build();
     }
 
-    @GetMapping
+    @GetMapping("/list")
     public ApiResponse<List<TourResponse>> getAll() {
         return ApiResponse.<List<TourResponse>>builder()
                 .result(tourService.getAllTours())

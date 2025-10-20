@@ -17,6 +17,7 @@ import { getAllTours } from '@/services/tourServices';
 import type { ITour } from '@/types/Tour';
 import dayjs from 'dayjs';
 import { formatCurrencyVND } from '@/utils';
+import { useNavigate } from 'react-router-dom';
 
 const NextArrow = (props: React.ComponentPropsWithoutRef<'div'> & { onClick?: () => void }) => {
   const { onClick } = props;
@@ -89,7 +90,7 @@ const LastHouse = () => {
     prevArrow: <PrevArrow />,
   };
   const [tours, setTours] = useState<ITour[]>([]);
-
+  const nava = useNavigate();
   // const [timeLeft, setTimeLeft] = useState<{ [key: string]: string }>({});
   const getTours = async () => {
     const res = await getAllTours();
@@ -102,6 +103,10 @@ const LastHouse = () => {
   useEffect(() => {
     getTours();
   }, []);
+
+  const handleBooking = (id: number) => {
+    nava(`/detail/${id}`);
+  };
   // Countdown xử lý
   // useEffect(() => {
   //   const interval = setInterval(() => {
@@ -243,7 +248,9 @@ const LastHouse = () => {
                       >
                         {formatCurrencyVND(tour.basePrice)}
                       </span>
-                      <Button type="primary">Booking</Button>
+                      <Button type="primary" onClick={() => handleBooking(tour.id)}>
+                        Booking
+                      </Button>
                     </div>
                   </div>
                 </div>

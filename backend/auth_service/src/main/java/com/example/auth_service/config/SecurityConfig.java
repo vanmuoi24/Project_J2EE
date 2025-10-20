@@ -21,7 +21,8 @@ public class SecurityConfig {
     private final String[] PUBLIC_URLS = {
             "users/login",
             "users/register",
-            "users/introspect"
+            "users/introspect",
+            "users/refresh"
     };
 
     private final CustomJwtDecoder customJwtDecoder;
