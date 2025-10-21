@@ -68,18 +68,13 @@ const List = () => {
 
   return (
     <div className="bg-gray-50 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="!p-4">
         <Title level={2} className="text-center mb-8">
           Danh sách Tour nổi bật
         </Title>
-        <div className="flex flex-col gap-5 max-h-[600px] overflow-y-auto !pr-4">
+        <div className="flex flex-col gap-5 max-h-[800px] overflow-y-auto !pr-4">
           {paginatedTours.map((tour) => (
-            <Card
-              key={tour.id}
-              hoverable
-              className="shadow-lg rounded-lg overflow-hidden"
-              bodyStyle={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}
-            >
+            <Card key={tour.id} className="rounded-lg overflow-hidden flex-shrink-0">
               <div className="flex flex-row gap-4">
                 <div className="w-1/3 flex-shrink-0 rounded-lg overflow-hidden">
                   <img

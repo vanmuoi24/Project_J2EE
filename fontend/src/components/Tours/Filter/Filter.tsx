@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select, Radio, DatePicker, Button, Checkbox, Space, Typography } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
+import { getAllDepartures, getAllDestinations, getAllVehicles } from '@/services/tourServices';
+import type { IDeparture, IDestination } from '@/types/Tour';
 
 // Cấu hình tiếng Việt cho Dayjs
 dayjs.locale('vi');
@@ -29,8 +31,8 @@ const transportations = ['Xe', 'Máy bay'];
 const Filter = () => {
   // State để lưu trữ các giá trị của bộ lọc
   const [budget, setBudget] = useState<number | null>(null);
-  const [departure, setDeparture] = useState('all');
-  const [destination, setDestination] = useState('thailand');
+  const [departure, setDeparture] = useState<IDeparture[] | null>(null);
+  const [destination, setDestination] = useState<IDestination[] | null>();
   const [departureDate, setDepartureDate] = useState<Dayjs | null>(dayjs('2025-10-17'));
   const [selectedTransports, setSelectedTransports] = useState([]);
 
@@ -45,6 +47,40 @@ const Filter = () => {
     };
     console.log('Đã áp dụng các bộ lọc:', filters);
   };
+
+  const getAllData = async () => {
+    /**
+     * Gọi đồng thời cả 3 API và chờ tất cả hoàn thành.
+     */
+    const [departures, destinations, vehicles] = await Promise.all([
+      getAllDepartures(),
+      getAllDestinations(),
+      getAllVehicles(),
+    ]);
+
+    return { departures, destinations, vehicles };
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('Bắt đầu tải dữ liệu...');
+        const data = await getAllData();
+
+        setDeparture(data.departures);
+        setDestination(data.destinations);
+        setSelectedTransports(data.vehicles);
+
+        console.log('Tải dữ liệu thành công:', data);
+      } catch (error) {
+        // Đừng quên xử lý lỗi
+        console.error('Đã xảy ra lỗi khi tải dữ liệu:', error);
+      }
+    };
+
+    // Gọi hàm vừa tạo
+    fetchData();
+  }, []);
 
   return (
     <div className="!p-6 bg-white rounded-lg shadow-md max-w-4xl mx-auto">
@@ -76,11 +112,11 @@ const Filter = () => {
               Điểm khởi hành
             </Text>
             <Select
-              className="w-full mt-2"
-              defaultValue="all"
+              className="w-full !mt-2 "
               value={departure}
               onChange={(value) => setDeparture(value)}
               options={departureLocations}
+              fieldNames={{ label: 'city', value: 'id' }}
             />
           </div>
           <div className="flex flex-col">
@@ -89,10 +125,10 @@ const Filter = () => {
             </Text>
             <Select
               className="w-full mt-2"
-              defaultValue="thailand"
               value={destination}
               onChange={(value) => setDestination(value)}
               options={destinations}
+              fieldNames={{ label: 'city', value: 'id' }}
             />
           </div>
           {/* Ngày đi */}
