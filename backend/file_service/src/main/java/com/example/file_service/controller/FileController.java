@@ -1,6 +1,7 @@
 package com.example.file_service.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.file_service.dto.reponse.FileResponse;
+import com.example.file_service.dto.reponse.TourFileResponse;
 import com.example.file_service.dto.request.ApiResponse;
 import com.example.file_service.entity.FileMgmt;
 import com.example.file_service.service.FileService;
@@ -31,7 +33,7 @@ public class FileController {
     FileService fileService;
 
     @PostMapping(value = "/media/upload")
-    public ResponseEntity<FileResponse>  uploadMedia(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<FileResponse> uploadMedia(@RequestPart("file") MultipartFile file) throws IOException {
         System.out.println("📂 Nhận file: " + file.getOriginalFilename());
         return ResponseEntity.ok(fileService.uploadFile(file));
     }
@@ -49,6 +51,18 @@ public class FileController {
     public ResponseEntity<FileMgmt> getFileByOwner(@PathVariable String ownerId) {
         return ResponseEntity.ok(fileService.getFileByOwnerId(ownerId));
 
+    }
+
+    @GetMapping("/media/tours")
+    public ResponseEntity<List<TourFileResponse>> getAllMedia() {
+        return ResponseEntity.ok(fileService.getAllTourIdsAndUrls());
+    }
+
+    @PostMapping("/media/uploadTour/{tourId}")
+    public ResponseEntity<List<FileResponse>> uploadMultipleFiles(
+            @PathVariable("tourId") String tourId,
+            @RequestPart("files") List<MultipartFile> files) throws IOException {
+        return ResponseEntity.ok(fileService.uploadImageTour(tourId, files));
     }
 
 }

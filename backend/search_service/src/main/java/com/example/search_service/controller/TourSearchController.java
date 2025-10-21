@@ -29,6 +29,8 @@ public class TourSearchController {
                 .build();
     }
 
+    
+
     @GetMapping("/search")
     public ApiResponse<List<TourDocument>> filterTours(
             @RequestParam String destinationLocation,

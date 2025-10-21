@@ -1,5 +1,6 @@
 package com.example.file_service.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,6 @@ import com.example.file_service.entity.FileMgmt;
 @Repository
 public interface FileMgmtRepository extends JpaRepository<FileMgmt, String> {
     Optional<FileMgmt> findByOwnerId(String ownerId);
+    List<FileMgmt> findAll();
+List<FileMgmt> findByTourId(String tourId);
 }

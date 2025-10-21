@@ -21,6 +21,7 @@ public class SecurityConfig {
     private final String[] PUBLIC_URLS = {
             "/media/download/**",
             "/owner/**",
+            "/media/tours"
 
     };
 

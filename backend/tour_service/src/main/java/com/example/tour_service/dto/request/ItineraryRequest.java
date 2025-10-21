@@ -1,16 +1,16 @@
 package com.example.tour_service.dto.request;
 
-import com.example.tour_service.enums.LocationType;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LocationRequest {
-    String city;
-     LocationType type;
+public class ItineraryRequest {
+    String title;
+    String description;
+    String meal;
+    int tourId;
 }
