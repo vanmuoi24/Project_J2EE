@@ -19,8 +19,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final String[] PUBLIC_URLS = {
-
-
+        "/tours",
+        "/tours/search"
     };
 
     private final CustomJwtDecoder customJwtDecoder;
@@ -30,9 +30,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST,
-                PUBLIC_URLS)
-                .permitAll()
+        httpSecurity.authorizeHttpRequests(request -> request
+                .requestMatchers(HttpMethod.GET, PUBLIC_URLS).permitAll()
+                .requestMatchers(HttpMethod.POST, PUBLIC_URLS).permitAll()
                 .anyRequest()
                 .authenticated());
 
