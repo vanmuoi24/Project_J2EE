@@ -1,16 +1,12 @@
 package com.example.auth_service.dto.request;
 
-import java.time.LocalDate;
-
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.validation.constraints.Email; 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-
-
-
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -18,15 +14,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserCreationRequest {
-
+public class UserUpdate {
     String username;
-
-    String password;
-
-    String email;
     MultipartFile file;
     String phone;
     String address;
-    
 }

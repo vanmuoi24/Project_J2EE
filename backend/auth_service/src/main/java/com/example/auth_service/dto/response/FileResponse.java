@@ -1,21 +1,14 @@
 package com.example.auth_service.dto.response;
 
-import java.util.Set;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
-    String id;
-    String username;
-    String email;
-    String avatar;
-    String phone;
-    String address;
-
+public class FileResponse {
+    String originalFileName;
+    String url;
 }

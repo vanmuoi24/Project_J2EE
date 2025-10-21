@@ -17,11 +17,14 @@ spring:
     show-sql: true
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQLDialect
+  servlet:
+    multipart:
+      enabled: true
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
-<<<<<<< HEAD
-  valid-duration: 500000 # in second
-=======
   valid-duration: 15000 # in second
->>>>>>> 36b0d30dd64d1d5fd9385dabe168388c1f72f378
   refreshable-duration: 36000 # in seconds
+logging:
+  level:
+    com.example.auth_service.repository.httpclient.FileServiceClient: DEBUG
+    feign: DEBUG

@@ -5,6 +5,9 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -21,4 +24,5 @@ public class TourRequest {
     BigDecimal basePrice;
     String vehicleId;
     Long tourPriceId;
+     List<MultipartFile> files;
 }

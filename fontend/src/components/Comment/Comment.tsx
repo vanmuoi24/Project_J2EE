@@ -5,21 +5,7 @@ import { useParams } from 'react-router-dom';
 import { createComent, getListComentByTour } from '@/services/authServices';
 import socket from '@/api/socket'; // ✅ dùng alias @ thay vì đường dẫn tương đối
 import { sessionService } from '@/services/sessionServices';
-
-interface UserResponse {
-  id: number;
-  name: string;
-  avatar?: string;
-}
-
-interface ReviewResponse {
-  id: number;
-  tourId: number;
-  user: UserResponse;
-  content: string;
-  rating: number;
-  createdAt: string;
-}
+import type { ReviewResponse } from '@/types/comment';
 
 const CommentTour: React.FC = () => {
   const [comments, setComments] = useState<ReviewResponse[]>([]);
@@ -141,11 +127,11 @@ const CommentTour: React.FC = () => {
           <List.Item className="border-b last:border-none pb-4">
             <List.Item.Meta
               avatar={
-                <Avatar src={item.user.avatar} icon={<UserOutlined />} alt={item.user.name} />
+                <Avatar src={item.user.avatar} icon={<UserOutlined />} alt={item.user.username} />
               }
               title={
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">{item.user.name}</span>
+                  <span className="font-medium">{item.user.username}</span>
                   <Tooltip title={item.createdAt}>
                     <span className="text-xs text-gray-500">
                       {new Date(item.createdAt).toLocaleString()}

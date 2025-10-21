@@ -75,3 +75,8 @@ type TourDeparturesResponse = AxiosResponse<ITourDeparture[]>;
 type TourDepartureResponse = AxiosResponse<ITourDeparture>;
 
 type ItineraryResponse = AxiosResponse<IItinerary[]>;
+export interface ITourDepartureResponse {
+  code: number;
+  message?: string;
+  result: ITourDeparture;
+}

@@ -46,7 +46,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/tour/tours/.*",
             "/tour/tour-departures/tour/.*",
             "/tour/tour-departures/.*",
-            "/tour/itineraries/tour/.*"
+            "/tour/itineraries/tour/.*",
+            "/file/media/tours"
     };
 
     @Value("${app.api-prefix}")

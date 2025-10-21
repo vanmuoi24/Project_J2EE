@@ -1,7 +1,10 @@
 export interface UserResponse {
   id: number;
-  name: string;
+  username: string;
   avatar?: string;
+  address: string;
+  email: string;
+  phone: string;
 }
 
 export interface ReviewResponse {
@@ -22,4 +25,3 @@ export interface CreateCommentRequest {
   rating: number;
   userId: number;
 }
-
