@@ -3,7 +3,11 @@ package com.example.search_service.service;
 import com.example.search_service.document.TourDocument;
 import com.example.search_service.repository.TourSearchRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
@@ -12,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -26,38 +31,47 @@ public class TourSearchService {
     // Lưu tour và xóa cache liên quan
     public TourDocument save(TourDocument doc) {
         TourDocument saved = repo.save(doc);
-
         redisTemplate.delete("allTours");
-        // Xóa tất cả filter cache liên quan đến destination này
-        redisTemplate.keys("filter:" + doc.getDestinationLocation() + ":*")
-                .forEach(redisTemplate::delete);
+        // Xóa tất cả filter cache liên quan
+        Set<String> keys = redisTemplate.keys("filter:*");
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
 
         return saved;
     }
 
-    public List<TourDocument> findAll() {
+    public Page<TourDocument> findAll(int page, int size) {
         String cacheKey = "allTours";
         Object cached = redisTemplate.opsForValue().get(cacheKey);
 
         if (cached != null) {
             System.out.println("Cache hit: " + cacheKey);
-            return (List<TourDocument>) cached;
+            return (Page<TourDocument>) cached;
         }
 
         Iterable<TourDocument> toursIterable = repo.findAll();
         List<TourDocument> tours = StreamSupport.stream(toursIterable.spliterator(), false)
                 .collect(Collectors.toList());
+        long totalHits =  tours.size();
+        Page<TourDocument> tourDocument = new PageImpl<>(tours, PageRequest.of(page, size), totalHits);
         redisTemplate.opsForValue().set(cacheKey, tours, 10, TimeUnit.MINUTES);
-        return tours;
+        return tourDocument;
     }
 
-    public List<TourDocument> filterByDestinationAndPriceAndDate(String destinationLocation, String priceRange, String startDate) {
-        String cacheKey = "filter:" + destinationLocation + ":" + priceRange + ":" + startDate;
+    public Page<TourDocument> filterByDestinationAndPriceAndDate(
+            String destinationLocation,
+            String priceRange,
+            String departureDate,
+            int page,
+            int size
+    ) {
+        String cacheKey = "filter:" + destinationLocation + ":" + priceRange + ":" + departureDate + ":page" + page + ":size" + size;
         Object cached = redisTemplate.opsForValue().get(cacheKey);
 
         if (cached != null) {
             System.out.println("Cache hit: " + cacheKey);
-            return (List<TourDocument>) cached;
+            return (Page<TourDocument>) cached;
         } else {
             System.out.println("Cache miss: " + cacheKey);
         }
@@ -65,20 +79,25 @@ public class TourSearchService {
         double minPrice = 0;
         double maxPrice = Double.MAX_VALUE;
 
-        switch (priceRange) {
-            case "under5" -> maxPrice = 5_000_000;
-            case "5to10" -> { minPrice = 5_000_000; maxPrice = 10_000_000; }
-            case "10to20" -> { minPrice = 10_000_000; maxPrice = 20_000_000; }
-            case "over20" -> minPrice = 20_000_000;
+        if (priceRange != null && !priceRange.isEmpty()) {
+            switch (priceRange) {
+                case "under5" -> maxPrice = 5_000_000;
+                case "5to10" -> { minPrice = 5_000_000; maxPrice = 10_000_000; }
+                case "10to20" -> { minPrice = 10_000_000; maxPrice = 20_000_000; }
+                case "over20" -> minPrice = 20_000_000;
+            }
         }
 
         Criteria criteria = new Criteria("basePrice")
                 .greaterThanEqual(minPrice)
-                .lessThanEqual(maxPrice)
-                .and(new Criteria("destinationLocation").is(destinationLocation.trim()));
+                .lessThanEqual(maxPrice);
 
-        if (startDate != null && !startDate.isEmpty()) {
-            criteria = criteria.and(new Criteria("departureDates").is(startDate));
+        if (destinationLocation != null && !destinationLocation.isEmpty()) {
+            criteria = criteria.and(new Criteria("destinationLocation").is(destinationLocation.trim()));
+        }
+
+        if (departureDate != null && !departureDate.isEmpty()) {
+            criteria = criteria.and(new Criteria("departureDates").is(departureDate));
         }
 
         Query query = new CriteriaQuery(criteria);
@@ -86,10 +105,13 @@ public class TourSearchService {
 
         List<TourDocument> result = hits.getSearchHits()
                 .stream()
-                .map(hit -> hit.getContent())
+                .map(SearchHit::getContent)
                 .collect(Collectors.toList());
 
-        redisTemplate.opsForValue().set(cacheKey, result, 10, TimeUnit.MINUTES);
-        return result;
+        long totalHits = hits.getTotalHits();
+        Page<TourDocument> tourPage = new PageImpl<>(result, PageRequest.of(page, size), totalHits);
+
+        redisTemplate.opsForValue().set(cacheKey, tourPage, 10, TimeUnit.MINUTES);
+        return tourPage;
     }
 }
