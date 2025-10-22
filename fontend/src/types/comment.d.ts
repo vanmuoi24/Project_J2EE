@@ -1,7 +1,10 @@
 export interface UserResponse {
   id: number;
-  name: string;
+  username: string;
   avatar?: string;
+  address: string;
+  email: string;
+  phone: string;
 }
 
 export interface ReviewResponse {
@@ -13,12 +16,8 @@ export interface ReviewResponse {
   createdAt: string;
 }
 interface AxiosResponse<T = any> {
-  result: T; // dữ liệu trả về từ server
-  code: number; // mã HTTP status (200, 404, 500, ...)
-  statusText: string; // ví dụ: "OK"
-  headers: any;
-  config: AxiosRequestConfig;
-  request?: any;
+  result: T;
+  code: number;
 }
 export interface CreateCommentRequest {
   tourId: number;
@@ -26,4 +25,3 @@ export interface CreateCommentRequest {
   rating: number;
   userId: number;
 }
-

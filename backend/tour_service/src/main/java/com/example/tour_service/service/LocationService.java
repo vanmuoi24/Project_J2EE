@@ -23,7 +23,6 @@ public class LocationService {
     public LocationResponse createLocation(LocationRequest request) {
         Location location = Location.builder()
                 .city(request.getCity())
-                .type(request.getType())
                 .build();
         Location saved = locationRepository.save(location);
 
@@ -65,7 +64,6 @@ public class LocationService {
     private LocationResponse toResponse(Location location) {
         return LocationResponse.builder()
                 .city(location.getCity())
-                .type(location.getType())
                 .build();
     }
 }

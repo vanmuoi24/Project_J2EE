@@ -1,6 +1,7 @@
 package com.example.tour_service.entity;
 
 import com.example.tour_service.enums.LocationType;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +18,6 @@ public class Location {
 
     @Column(nullable = false)
     private String city;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LocationType type;

@@ -15,14 +15,15 @@ import lombok.experimental.FieldDefaults;
 public class FileMgmt {
 
     @Id
-    // Use the stored file name (UUID with extension) as the primary key so
-    // we don't try to convert it to a numeric type. The repository expects
-    // a String id and MapStruct maps FileInfo.name -> id.
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     String id;
 
     @Column(name = "owner_id", nullable = false)
     String ownerId;
 
+    @Column(name = "tour_id", nullable = false)
+    String tourId;
     @Column(name = "content_type")
     String contentType;
 

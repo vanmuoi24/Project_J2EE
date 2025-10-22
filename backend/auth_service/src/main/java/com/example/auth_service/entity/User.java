@@ -25,4 +25,15 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column
+    private String avatar;
+
+    @Column
+    private String phone;
+
+    @Column
+    private String address;
+    
+
+
 }

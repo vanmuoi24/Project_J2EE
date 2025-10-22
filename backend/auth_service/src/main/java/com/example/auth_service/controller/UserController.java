@@ -1,15 +1,12 @@
 package com.example.auth_service.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.access.method.P;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.auth_service.dto.request.ApiResponse;
 import com.example.auth_service.dto.request.UserCreationRequest;
+import com.example.auth_service.dto.request.UserUpdate;
 import com.example.auth_service.dto.response.PageResponse;
 import com.example.auth_service.dto.response.UserResponse;
 import com.example.auth_service.entity.User;
@@ -38,7 +35,6 @@ public class UserController {
     }
 
     @GetMapping("/list")
-
     public ApiResponse<UserResponse> listUser(){
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getAllUser())
@@ -52,6 +48,23 @@ public class UserController {
     //             .result(userService.getAllUser(page, size))
     //             .build();
     // }
+
+    @GetMapping("/{id}")
+    public ApiResponse<UserResponse> getUserById(@PathVariable Long id) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getUserById(id))
+                .build();
+    }
+
+    @PostMapping("/UpdateUser/{id}")
+    public ApiResponse<UserResponse> updateUser(
+            @PathVariable Long id,
+            @ModelAttribute UserUpdate request) {
+                System.out.println(request);
+        return ApiResponse.<UserResponse>builder().result(userService.updateUser(id, request))
+                .build();
+    }
+
 
 
     

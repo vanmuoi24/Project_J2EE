@@ -31,13 +31,13 @@ public class ItineraryController {
                 .build();
     }
 
-//    @GetMapping
-//    public ApiResponse<List<ItineraryResponse>> getAll() {
-//        return ApiResponse.<List<ItineraryResponse>>builder()
-//                .result(itineraryService.getAll())
-//                .message("Fetched successfully")
-//                .build();
-//    }
+    // @GetMapping
+    // public ApiResponse<List<ItineraryResponse>> getAll() {
+    // return ApiResponse.<List<ItineraryResponse>>builder()
+    // .result(itineraryService.getAll())
+    // .message("Fetched successfully")
+    // .build();
+    // }
 
     @PostMapping
     public ApiResponse<ItineraryResponse> create(@RequestBody ItineraryRequest request) {

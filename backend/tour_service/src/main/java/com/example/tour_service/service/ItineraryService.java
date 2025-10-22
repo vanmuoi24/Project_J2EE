@@ -32,11 +32,11 @@ public class ItineraryService {
                 .collect(Collectors.toList());
     }
 
-//    public List<ItineraryResponse> getAll() {
-//        return itineraryRepository.findAll().stream()
-//                .map(this::toResponse)
-//                .collect(Collectors.toList());
-//    }
+    // public List<ItineraryResponse> getAll() {
+    // return itineraryRepository.findAll().stream()
+    // .map(this::toResponse)
+    // .collect(Collectors.toList());
+    // }
 
     public ItineraryResponse create(ItineraryRequest request) {
         Tour tour = tourRepository.findById(request.getTourId())

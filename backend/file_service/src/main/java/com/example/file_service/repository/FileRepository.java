@@ -45,4 +45,6 @@ public class FileRepository {
         byte[] data = new java.net.URL(fileMgmt.getUrl()).openStream().readAllBytes();
         return new ByteArrayResource(data);
     }
+
+    
 }

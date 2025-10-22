@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface ItineraryRepository extends JpaRepository<Itinerary, Integer> {
     List<Itinerary> findByTourId(int tourId);
+
     Itinerary findTopByTourIdOrderByDayNumberDesc(int tourId);
 }
