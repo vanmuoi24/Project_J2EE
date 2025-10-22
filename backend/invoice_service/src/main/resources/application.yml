@@ -17,6 +17,10 @@ spring:
     show-sql: true
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQLDialect
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:backend/file_service/src/main/resources/application.yml
+>>>>>>> d3fdc808e040ae78e1954bf50f62a626bcf5237c
   servlet:
     multipart:
       max-file-size: 5MB
@@ -29,3 +33,12 @@ cloudinary:
   cloud-name: dmxflropu
   api-key: 446771791415384
   api-secret: 5ZNw3WZJx0ulBiik2ggcUdMwPYg
+<<<<<<< HEAD
+=======
+=======
+jwt:
+  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
+  valid-duration: 15000 # in second
+  refreshable-duration: 36000 # in seconds
+>>>>>>> 36b0d30dd64d1d5fd9385dabe168388c1f72f378:backend/invoice_service/src/main/resources/application.yml
+>>>>>>> d3fdc808e040ae78e1954bf50f62a626bcf5237c

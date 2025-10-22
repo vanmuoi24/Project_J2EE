@@ -1,5 +1,7 @@
 package com.example.tour_service.dto.response;
 
+
+
 import com.example.tour_service.enums.LocationType;
 
 import lombok.*;

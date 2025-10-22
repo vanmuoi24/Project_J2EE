@@ -59,9 +59,16 @@ spring:
             - Path=${app.api-prefix}/file/**
           filters:
             - StripPrefix=2
+<<<<<<< HEAD
         - id: search-service
           uri: http://localhost:8088
           predicates:
             - Path=${app.api-prefix}/search/**
+=======
+        - id: file-service
+          uri: http://localhost:8088
+          predicates:
+            - Path=${app.api-prefix}/invoice/**
+>>>>>>> d3fdc808e040ae78e1954bf50f62a626bcf5237c
           filters:
             - StripPrefix=2

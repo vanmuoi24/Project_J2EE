@@ -21,6 +21,7 @@ public enum ErrorCode {
     INVALID_TOKEN(1010, "Invalid token", HttpStatus.UNAUTHORIZED),
     EXPIRED_TOKEN(1011, "Token is expired", HttpStatus.UNAUTHORIZED),
     PASSWORD_NOT_MATCH(1012, "Password not match", HttpStatus.BAD_REQUEST),
+    FILE_UPLOAD_FAILED(2001, "File upload failed", HttpStatus.INTERNAL_SERVER_ERROR)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

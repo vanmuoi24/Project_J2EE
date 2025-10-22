@@ -1,4 +1,4 @@
-import type { AxiosResponse } from "./comment";
+import type { AxiosResponse } from './comment';
 
 export interface ICity {
   city: string;
@@ -49,6 +49,7 @@ export interface ITourResponse {
 }
 
 export interface ITourDeparture {
+<<<<<<< HEAD
 	id: string;
     tourCode: string;
     departureDate: string;
@@ -74,6 +75,18 @@ export interface ITourDeparture {
     tourPrice: ITourPrice;
 }
 
+=======
+  id: int;
+  id: string;
+  tourCode: string;
+  departureDate: string;
+  returnDate: string;
+  availableSeats: string;
+  tourId: string;
+  tourPrice: ITourPrice;
+}
+
+>>>>>>> d3fdc808e040ae78e1954bf50f62a626bcf5237c
 type ToursResponse = AxiosResponse<ITour[]>;
 
 type TourResponse = AxiosResponse<ITour>;
@@ -82,4 +95,13 @@ type TourDeparturesResponse = AxiosResponse<ITourDeparture[]>;
 
 type TourDepartureResponse = AxiosResponse<ITourDeparture>;
 
+<<<<<<< HEAD
 type ItineraryResponse = AxiosResponse<IItinerary[]>;
+=======
+type ItineraryResponse = AxiosResponse<IItinerary[]>;
+export interface ITourDepartureResponse {
+  code: number;
+  message?: string;
+  result: ITourDeparture;
+}
+>>>>>>> d3fdc808e040ae78e1954bf50f62a626bcf5237c

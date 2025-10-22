@@ -32,8 +32,8 @@ public class TourController {
                 .build();
     }
 
-    @PostMapping
-    public ApiResponse<TourResponse> createTour(@RequestBody TourRequest request) {
+    @PostMapping()
+    public ApiResponse<TourResponse> createTour(@ModelAttribute TourRequest request) {
         return ApiResponse.<TourResponse>builder()
                 .result(tourService.createTour(request))
                 .message("Created successfully")
