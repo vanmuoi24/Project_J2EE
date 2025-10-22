@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Input, DatePicker, Select, Table } from 'antd';
+import { Input, DatePicker, Select, Table, Modal, Button, Descriptions } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 
 const { RangePicker } = DatePicker;
@@ -12,11 +13,8 @@ interface Booking {
   tourName: string;
 }
 
-const mockData: Booking[] = [
-  { id: 'BK001', date: '2025-10-01', status: 'Xác nhận', tourName: 'Tour Nhật Bản' },
-  { id: 'BK002', date: '2025-10-05', status: 'Chưa xác nhận', tourName: 'Tour Hàn Quốc' },
-  { id: 'BK003', date: '2025-10-07', status: 'Đã hủy', tourName: 'Tour Thái Lan' },
-];
+import MOCK_BOOKINGS from '@/mocks/bookings';
+const mockData: Booking[] = MOCK_BOOKINGS;
 
 const History: React.FC = () => {
   const [searchId, setSearchId] = useState('');
@@ -55,7 +53,36 @@ const History: React.FC = () => {
         );
       },
     },
+    {
+      title: 'Hành động',
+      key: 'action',
+      width: '15%',
+      render: (_: any, record: Booking) => (
+        <Button type="link" onClick={() => showDetail(record)}>
+          Chi tiết
+        </Button>
+      ),
+    },
   ];
+
+  const [visible, setVisible] = useState(false);
+  const [selected, setSelected] = useState<Booking | null>(null);
+  const navigate = useNavigate();
+
+  const showDetail = (b: Booking) => {
+    setSelected(b);
+    setVisible(true);
+  };
+
+  const handleClose = () => {
+    setVisible(false);
+    setSelected(null);
+  };
+
+  const handlePay = () => {
+    // navigate to invoice page with booking in state for payment
+    navigate('/invoice', { state: { booking: selected } });
+  };
 
   return (
     <div>
@@ -96,6 +123,32 @@ const History: React.FC = () => {
         scroll={{ y: 400 }}
         pagination={{ pageSize: 10 }}
       />
+
+      <Modal
+        title="Chi tiết booking"
+        open={visible}
+        onCancel={handleClose}
+        footer={null}
+      >
+        {selected && (
+          <Descriptions column={1} bordered size="small">
+            <Descriptions.Item label="Mã đơn">{selected.id}</Descriptions.Item>
+            <Descriptions.Item label="Tên tour">{selected.tourName}</Descriptions.Item>
+            <Descriptions.Item label="Ngày đặt">{selected.date}</Descriptions.Item>
+            <Descriptions.Item label="Trạng thái">{selected.status}</Descriptions.Item>
+          </Descriptions>
+        )}
+
+        <div style={{ marginTop: 12, textAlign: 'right' }}>
+          {selected?.status === 'Chưa xác nhận' ? (
+            <Button type="primary" onClick={handlePay}>
+              Thanh toán
+            </Button>
+          ) : (
+            <Button onClick={handleClose}>Đóng</Button>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };

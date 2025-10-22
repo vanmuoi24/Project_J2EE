@@ -1,4 +1,5 @@
 import { Card, Typography, Table, Select, Form, Button, message, Modal } from "antd";
+import { useNavigate } from 'react-router-dom';
 import { formatCurrencyVND } from "@/utils";
 
 const { Title, Text } = Typography;
@@ -22,6 +23,7 @@ type InvoiceFormProps = {
 
 export default function InvoiceForm({ account, customers, onCreate }: InvoiceFormProps) {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const columns = [
     { title: "Tên khách hàng", dataIndex: "name", key: "name" },
@@ -95,6 +97,12 @@ export default function InvoiceForm({ account, customers, onCreate }: InvoiceFor
         <Form.Item>
           <Button type="primary" htmlType="submit" block size="large">
             Thanh toán
+          </Button>
+        </Form.Item>
+        
+        <Form.Item>
+          <Button type="text" block size="large" onClick={() => navigate('/') }>
+            Quay về trang chủ
           </Button>
         </Form.Item>
       </Form>

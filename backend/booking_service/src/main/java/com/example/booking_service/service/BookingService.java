@@ -13,14 +13,12 @@ import com.example.booking_service.exception.ErrorCode;
 import com.example.booking_service.mapper.BookingMapper;
 import com.example.booking_service.mapper.CustomerMapper;
 import com.example.booking_service.repository.BookingRepository;
-import com.example.booking_service.repository.CustomerBookingRepository;
 import com.example.booking_service.repository.CustomerRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Book;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -33,7 +31,6 @@ public class BookingService {
     private final TourDepartureClient tourDepartureClient;
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
-    private final CustomerBookingRepository customerBookingRepository;
     private final BookingMapper bookingMapper;
     private final CustomerMapper customerMapper;
 

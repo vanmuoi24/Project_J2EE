@@ -1,7 +1,7 @@
 import { Card, Typography, Row, Col, Button, Modal, message } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
-import { getTourDepartureId } from '@/services/tourServices';
+import { getTourDepartureById } from '@/services/tourServices';
 import { formatCurrencyVND } from '@/utils/index'
 
 const { Title, Text } = Typography;
@@ -36,7 +36,7 @@ export default function BookingExpense({
       if (!tourDepartureId) return;
       try {
         const id = typeof tourDepartureId === 'string' ? Number(tourDepartureId) : tourDepartureId;
-        const resp = await getTourDepartureId(Number(id));
+        const resp = await getTourDepartureById(Number(id));
         setTourPrice(resp.result?.tourPrice || null);
       } catch (err) {
         console.error('Failed to load tour departure', err);
@@ -130,7 +130,9 @@ export default function BookingExpense({
         </Row>
       </div>
       <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
-        <Button onClick={() => navigate('/booking/history')}>Mở trang lịch sử</Button>
+        <Button type="link" block size="large" onClick={() => navigate('/booking/history')}>
+          Lịch sử đặt tour
+        </Button>
         <Button type="primary" block size="large" onClick={handleConfirm}>
           Xác nhận đặt tour
         </Button>
