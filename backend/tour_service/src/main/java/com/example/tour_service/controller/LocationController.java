@@ -1,19 +1,14 @@
 package com.example.tour_service.controller;
 
-import com.example.tour_service.dto.response.ApiResponse;
+import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.LocationRequest;
 import com.example.tour_service.dto.response.LocationResponse;
+import com.example.tour_service.repository.LocationRepository;
 import com.example.tour_service.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-<<<<<<< HEAD
-
-import java.util.List;
-
-=======
 import java.util.List;
 import javax.xml.stream.Location;
->>>>>>> d3fdc808e040ae78e1954bf50f62a626bcf5237c
 @RestController
 @RequestMapping("locations")
 @RequiredArgsConstructor
