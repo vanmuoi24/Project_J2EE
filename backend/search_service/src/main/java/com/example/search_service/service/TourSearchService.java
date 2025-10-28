@@ -30,11 +30,21 @@ public class TourSearchService {
     private final ElasticsearchOperations elasticsearchOperations;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    // Lưu tour và xóa cache liên quan
     public TourDocument save(TourDocument doc) {
+        // Nếu doc có id và đã tồn tại trong Elasticsearch → update
+        if (repo.existsById(doc.getId())) {
+            TourDocument existing = repo.findById(doc.getId()).orElse(null);
+            if (existing != null) {
+                existing.setDepartureDates(doc.getDepartureDates());
+                doc = existing;
+            }
+        }
+
+        // Lưu (create hoặc update đều dùng save)
         TourDocument saved = repo.save(doc);
+
+        // Xóa cache Redis liên quan
         redisTemplate.delete("allTours");
-        // Xóa tất cả filter cache liên quan
         Set<String> keys = redisTemplate.keys("filter:*");
         if (keys != null && !keys.isEmpty()) {
             redisTemplate.delete(keys);
@@ -42,6 +52,7 @@ public class TourSearchService {
 
         return saved;
     }
+
 
     public Page<TourDocument> findAll(int page, int size) {
         redisTemplate.getConnectionFactory().getConnection().flushAll();
@@ -70,7 +81,6 @@ public class TourSearchService {
 
         List<TourDocument> pagedList = new ArrayList<>();
         if (fromIndex < toIndex) {
-            // ✅ FIXED: Convert subList to real ArrayList
             pagedList = new ArrayList<>(tours.subList(fromIndex, toIndex));
         }
 
