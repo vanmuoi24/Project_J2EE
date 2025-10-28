@@ -22,5 +22,4 @@ public class TourDocument {
     private String destinationLocation;
     private String vehicle;
     private List<String> departureDates;
-
 }
