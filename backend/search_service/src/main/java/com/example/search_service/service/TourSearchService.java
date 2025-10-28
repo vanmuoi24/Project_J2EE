@@ -1,6 +1,7 @@
 package com.example.search_service.service;
 
 import com.example.search_service.document.TourDocument;
+import com.example.search_service.dto.CachedPage;
 import com.example.search_service.repository.TourSearchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -42,21 +44,42 @@ public class TourSearchService {
     }
 
     public Page<TourDocument> findAll(int page, int size) {
+        redisTemplate.getConnectionFactory().getConnection().flushAll();
+
         String cacheKey = "allTours";
         Object cached = redisTemplate.opsForValue().get(cacheKey);
 
         if (cached != null) {
             System.out.println("Cache hit: " + cacheKey);
-            return (Page<TourDocument>) cached;
+            CachedPage<TourDocument> cachedPage = (CachedPage<TourDocument>) cached;
+            return new PageImpl<>(
+                    cachedPage.getContent(),
+                    PageRequest.of(cachedPage.getPage(), cachedPage.getSize()),
+                    cachedPage.getTotal()
+            );
         }
 
+        System.out.println("Cache miss: " + cacheKey);
         Iterable<TourDocument> toursIterable = repo.findAll();
         List<TourDocument> tours = StreamSupport.stream(toursIterable.spliterator(), false)
                 .collect(Collectors.toList());
-        long totalHits =  tours.size();
-        Page<TourDocument> tourDocument = new PageImpl<>(tours, PageRequest.of(page, size), totalHits);
-        redisTemplate.opsForValue().set(cacheKey, tours, 10, TimeUnit.MINUTES);
-        return tourDocument;
+
+        long totalHits = tours.size();
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, tours.size());
+
+        List<TourDocument> pagedList = new ArrayList<>();
+        if (fromIndex < toIndex) {
+            // ✅ FIXED: Convert subList to real ArrayList
+            pagedList = new ArrayList<>(tours.subList(fromIndex, toIndex));
+        }
+
+        Page<TourDocument> pageResult = new PageImpl<>(pagedList, PageRequest.of(page, size), totalHits);
+
+        CachedPage<TourDocument> cachedPage = new CachedPage<>(pagedList, page, size, totalHits);
+        redisTemplate.opsForValue().set(cacheKey, cachedPage, 10, TimeUnit.MINUTES);
+
+        return pageResult;
     }
 
     public Page<TourDocument> filterByDestinationAndPriceAndDate(
@@ -100,7 +123,9 @@ public class TourSearchService {
             criteria = criteria.and(new Criteria("departureDates").is(departureDate));
         }
 
-        Query query = new CriteriaQuery(criteria);
+        Query query = new CriteriaQuery(criteria)
+                .setPageable(PageRequest.of(page, size));
+
         SearchHits<TourDocument> hits = elasticsearchOperations.search(query, TourDocument.class);
 
         List<TourDocument> result = hits.getSearchHits()
@@ -108,10 +133,10 @@ public class TourSearchService {
                 .map(SearchHit::getContent)
                 .collect(Collectors.toList());
 
-        long totalHits = hits.getTotalHits();
-        Page<TourDocument> tourPage = new PageImpl<>(result, PageRequest.of(page, size), totalHits);
+        Page<TourDocument> tourPage = new PageImpl<>(result, PageRequest.of(page, size), hits.getTotalHits());
 
         redisTemplate.opsForValue().set(cacheKey, tourPage, 10, TimeUnit.MINUTES);
         return tourPage;
+
     }
 }
