@@ -5,6 +5,10 @@ import com.example.auth_service.config.CustomJwtDecoder;
 import com.example.auth_service.config.SecurityConfig;
 import com.example.auth_service.dto.request.AuthenticationRequest;
 import com.example.auth_service.dto.response.AuthenticationResponse;
+import com.example.auth_service.dto.response.UserResponse;
+import com.example.auth_service.exception.AppException;
+import com.example.auth_service.exception.ErrorCode;
+import com.example.auth_service.exception.GlobalExceptionHandler;
 import com.example.auth_service.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -15,6 +19,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Date;
+
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.hamcrest.CoreMatchers.is;
 
 @WebMvcTest(AuthController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, GlobalExceptionHandler.class})
 public class AuthControllerTest {
 
     /**
@@ -53,15 +61,26 @@ public class AuthControllerTest {
     private CustomJwtDecoder customJwtDecoder;
 
     @Test
-    void login_whenValidRequest_thenReturnsToken() throws Exception {
+    void login_whenValidRequest_thenReturnsResponse() throws Exception {
         // Tạo một đối tượng request mà client sẽ gửi lên
-        AuthenticationRequest request = new AuthenticationRequest();
-        request.setEmail("abc123@gmail.com");
-        request.setPassword("123");
+        AuthenticationRequest authRequest = new AuthenticationRequest();
+        authRequest.setEmail("email1@gmail.com");
+        authRequest.setPassword("123");
+
+        // Tạo 1 UserResponse
+        UserResponse user = new UserResponse();
+        user.setId("#1");
+        user.setUsername("usr1");
+        user.setAvatar("avatar1");
+        user.setAddress("address1");
+        user.setPhone("phone1");
+        user.setEmail("email1@gmail.com");
 
         // Tạo một đối tượng response "giả" mà ta mong đợi Service trả về
-        AuthenticationResponse serviceResponse = AuthenticationResponse.builder()
-                .token("day-la-mot-mocked-token-12345")
+        AuthenticationResponse authResponse = AuthenticationResponse.builder()
+                .token("mock-jwt-token-123")
+                .expiryTime(new Date()) // Khởi tạo một Date bất kỳ
+                .user(user)
                 .build();
 
         // "Dạy" cho Mock Service:
@@ -69,20 +88,54 @@ public class AuthControllerTest {
         // đối tượng AuthenticationRequest nào, THÌ (then)
         // hãy trả về (Return) đối tượng 'serviceResponse' ở trên."
         when(authService.authenticated(any(AuthenticationRequest.class)))
-                .thenReturn(serviceResponse);
+                .thenReturn(authResponse);
 
 
         // Thực hiện gọi API POST /users/login
         mockMvc.perform(post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON) // Đặt Header Content-Type
-                        .content(objectMapper.writeValueAsString(request))) // Chuyển object -> JSON string
+                        .content(objectMapper.writeValueAsString(authRequest))) // Chuyển object -> JSON string
 
                 // Mong đợi HTTP Status Code là 200 (OK)
                 .andExpect(status().isOk())
 
                 // Dùng JSONPath để "đào" vào nội dung JSON trả về
-                // Cấu trúc response của bạn là: { "result": { "token": "..." } }
                 // Ký tự $ đại diện cho root (toàn bộ response)
-                .andExpect(jsonPath("$.result.token", is("day-la-mot-mocked-token-12345")));
+                .andExpect(jsonPath("$.code", is(1000))) // Kiểm tra code 1000 mặc định
+                .andExpect(jsonPath("$.result.token", is("mock-jwt-token-123"))) // Kiểm tra token
+                .andExpect(jsonPath("$.result.expiryTime", is(notNullValue()))) // Kiểm tra expiryTime tồn tại
+                .andExpect(jsonPath("$.result.user.email", is("email1@gmail.com"))); // Kiểm tra user lồng
+    }
+
+
+    @Test
+    void login_whenInvalidCredentials_thenReturnsAppException() throws Exception {
+        // ARRANGE
+
+        // 1. Chuẩn bị request
+        AuthenticationRequest loginRequest = AuthenticationRequest.builder()
+                .email("email1@gmail.com")
+                .password("wrongpassword")
+                .build();
+
+        // 2. Chuẩn bị mã lỗi (ví dụ: lỗi unauthorized từ enum)
+        ErrorCode unauthorizedError = ErrorCode.UNAUTHENTICATED;
+
+        // 3. "Dạy" service ném ra AppException
+        when(authService.authenticated(any(AuthenticationRequest.class)))
+                // Dùng chính xác constructor: new AppException(ErrorCode)
+                .thenThrow(new AppException(unauthorizedError));
+
+        // ACT & ASSERT
+        mockMvc.perform(post("/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+
+                // Mong đợi status (ví dụ: 401)
+                .andExpect(status().is(unauthorizedError.getStatusCode().value()))
+                // Mong đợi code lỗi (ví dụ: 1006)
+                .andExpect(jsonPath("$.code", is(unauthorizedError.getCode())))
+                // Mong đợi message lỗi
+                .andExpect(jsonPath("$.message", is(unauthorizedError.getMessage())));
     }
 }
