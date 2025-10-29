@@ -24,5 +24,5 @@ public class TourRequest {
     BigDecimal basePrice;
     String vehicleId;
     Long tourPriceId;
-     List<MultipartFile> files;
+    List<MultipartFile> files;
 }
