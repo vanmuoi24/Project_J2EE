@@ -87,6 +87,7 @@ public class TourService {
                             .destinationLocation(destination)
                             .vehicle(vehicle)
                             .tourPriceId(request.getTourPriceId())
+                            .departureDate(request.getDepartureDate())
                             .build();
 
             TourDocument document = TourDocument.builder()
@@ -137,6 +138,7 @@ public class TourService {
         existingTour.setDestinationLocation(existingDestinationLocation);
         existingTour.setVehicle(existingVehicle);
         existingTour.setTourPriceId(request.getTourPriceId());
+        existingTour.setDepartureDate(request.getDepartureDate());
 
         Tour saved = tourRepository.save(existingTour);
         return toResponse(saved);
@@ -159,11 +161,13 @@ public class TourService {
                 .duration(tour.getDuration())
                 .departureCity(
                         LocationResponse.builder()
+                                .id(tour.getDepartureLocation().getId())
                                 .city(tour.getDepartureLocation().getCity())
                                 .build()
                 )
                 .destinationCity(
                         LocationResponse.builder()
+                                .id(tour.getDestinationLocation().getId())
                                 .city(tour.getDestinationLocation().getCity())
                                 .build()
                 )
@@ -174,6 +178,7 @@ public class TourService {
                                 .name(tour.getVehicle().getVehicleType())
                                 .build()
                 )
+                .departureDate(tour.getDepartureDate())
                 .build();
     }
 }

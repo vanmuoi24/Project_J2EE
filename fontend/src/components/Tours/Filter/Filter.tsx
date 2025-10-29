@@ -5,43 +5,29 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import { getAllDepartures, getAllDestinations, getAllVehicles } from '@/services/tourServices';
-import type { IDeparture, IDestination } from '@/types/Tour';
+import type { IDeparture, IDestination, ITour, IVehicle } from '@/types/Tour';
 
-// Cấu hình tiếng Việt cho Dayjs
 dayjs.locale('vi');
 
 const { Text } = Typography;
 
-const departureLocations = [
-  { id: 1, city: 'Tất cả' },
-  { id: 2, city: 'TP. Hồ Chí Minh' },
-  { id: 3, city: 'Hà Nội' },
-  { id: 4, city: 'Đà Nẵng' },
-];
-
-const destinations = [
-  { id: 1, city: 'Thái Lan' },
-  { id: 2, city: 'Singapore' },
-  { id: 3, city: 'Hàn Quốc' },
-  { id: 4, city: 'Nhật Bản' },
-];
-
-const transportations = ['Xe', 'Máy bay'];
-
-const Filter = () => {
+const Filter = (tours: { tours: ITour[] | null }) => {
   // State để lưu trữ các giá trị của bộ lọc
-  const [budget, setBudget] = useState<number | null>(null);
+  const [budget, setBudget] = useState<string | null>(null);
   const [departure, setDeparture] = useState<IDeparture[] | null>(null);
-  const [destination, setDestination] = useState<IDestination[] | null>();
-  const [departureDate, setDepartureDate] = useState<Dayjs | null>(dayjs('2025-10-17'));
-  const [selectedTransports, setSelectedTransports] = useState([]);
+  const [destination, setDestination] = useState<IDestination[] | null>(null);
+  const [vehicles, setVehicles] = useState<IVehicle[] | null>(null);
+  const [departureDate, setDepartureDate] = useState<Dayjs | null>(dayjs());
 
-  // Hàm xử lý khi nhấn nút "Áp dụng"
+  const [selectedTransports, setSelectedTransports] = useState<string[] | null>(null);
+  const [selectedDeparture, setSelectedDeparture] = useState<string | null>(null);
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
+
   const handleApplyFilters = () => {
     const filters = {
       budget,
-      departure,
-      destination,
+      selectedDeparture,
+      selectedDestination,
       departureDate: departureDate ? departureDate.format('YYYY-MM-DD') : null,
       transportation: selectedTransports,
     };
@@ -49,9 +35,6 @@ const Filter = () => {
   };
 
   const getAllData = async () => {
-    /**
-     * Gọi đồng thời cả 3 API và chờ tất cả hoàn thành.
-     */
     const [departures, destinations, vehicles] = await Promise.all([
       getAllDepartures(),
       getAllDestinations(),
@@ -64,12 +47,11 @@ const Filter = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('Bắt đầu tải dữ liệu...');
         const data = await getAllData();
 
-        setDeparture(data.departures);
-        setDestination(data.destinations);
-        setSelectedTransports(data.vehicles);
+        setDeparture(data.departures.result);
+        setDestination(data.destinations.result);
+        setVehicles(data.vehicles.result);
 
         console.log('Tải dữ liệu thành công:', data);
       } catch (error) {
@@ -85,9 +67,6 @@ const Filter = () => {
   return (
     <div className="!p-6 bg-white rounded-lg shadow-md max-w-4xl mx-auto">
       <Space direction="vertical" size="large" className="w-full">
-        {/* Ngân sách */}
-
-        {/* Điểm khởi hành & Điểm đến */}
         <div className="flex flex-col gap-6">
           <div className="flex flex-col">
             <Text strong className="!mb-2">
@@ -99,10 +78,11 @@ const Filter = () => {
               className="mt-2"
             >
               <Space direction="vertical">
-                <Radio value={1}>Dưới 5 triệu</Radio>
-                <Radio value={2}>Từ 5 - 10 triệu</Radio>
-                <Radio value={3}>Từ 10 - 20 triệu</Radio>
-                <Radio value={4}>Trên 20 triệu</Radio>
+                <Radio value={null}>Không giới hạn</Radio>
+                <Radio value="<5">Dưới 5 triệu</Radio>
+                <Radio value="5-10">Từ 5 - 10 triệu</Radio>
+                <Radio value="10-20">Từ 10 - 20 triệu</Radio>
+                <Radio value=">20">Trên 20 triệu</Radio>
               </Space>
             </Radio.Group>
           </div>
@@ -113,10 +93,12 @@ const Filter = () => {
             </Text>
             <Select
               className="w-full !mt-2 "
-              value={departure}
-              onChange={(value) => setDeparture(value)}
-              options={departureLocations}
-              fieldNames={{ label: 'city', value: 'id' }}
+              value={selectedDeparture}
+              onChange={(value) => setSelectedDeparture(value)}
+              options={departure ?? undefined}
+              fieldNames={{ label: 'city', value: 'city' }}
+              placeholder="Tất cả"
+              allowClear
             />
           </div>
           <div className="flex flex-col">
@@ -125,10 +107,14 @@ const Filter = () => {
             </Text>
             <Select
               className="w-full mt-2"
-              value={destination}
-              onChange={(value) => setDestination(value)}
-              options={destinations}
-              fieldNames={{ label: 'city', value: 'id' }}
+              value={selectedDestination}
+              onChange={(value) => {
+                setSelectedDestination(value);
+              }}
+              options={destination ?? undefined}
+              fieldNames={{ label: 'city', value: 'city' }}
+              placeholder="Tất cả"
+              allowClear
             />
           </div>
           {/* Ngày đi */}
@@ -150,9 +136,14 @@ const Filter = () => {
               Phương tiện
             </Text>
             <Checkbox.Group
-              options={transportations}
-              value={selectedTransports}
-              onChange={(checkedValues) => setSelectedTransports(checkedValues)}
+              options={vehicles?.map((vehicle) => ({
+                label: vehicle.name,
+                value: vehicle.id,
+              }))}
+              value={selectedTransports ?? undefined}
+              onChange={(checkedValues) => {
+                setSelectedTransports(checkedValues as string[]);
+              }}
               className="mt-2"
             />
           </div>

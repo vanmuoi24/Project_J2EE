@@ -1,6 +1,13 @@
 import axiosClient from '@/api/axios';
 import type { AxiosResponse } from '@/types/comment';
-import type { IDeparture, IDestination, IItinerary, ITour, ITourDeparture } from '@/types/Tour';
+import type {
+  IDeparture,
+  IDestination,
+  IItinerary,
+  ITour,
+  ITourDeparture,
+  IVehicle,
+} from '@/types/Tour';
 
 export const getAllTours = (): Promise<AxiosResponse<ITour[]>> => {
   return axiosClient.get('/tour/tours/list');
@@ -23,13 +30,13 @@ export const getItineraryByTourId = (id: number): Promise<AxiosResponse<IItinera
 };
 
 export const getAllDepartures = (): Promise<AxiosResponse<IDeparture[]>> => {
-  return axiosClient.get(`/tour/location/departures`);
+  return axiosClient.get(`/tour/locations/departures`);
 };
 
 export const getAllDestinations = (): Promise<AxiosResponse<IDestination[]>> => {
-  return axiosClient.get(`/tour/location/destinations`);
+  return axiosClient.get(`/tour/locations/destinations`);
 };
 
-export const getAllVehicles = (): Promise<AxiosResponse<IItinerary[]>> => {
-  return axiosClient.get(`/tour/location/destinations`);
+export const getAllVehicles = (): Promise<AxiosResponse<IVehicle[]>> => {
+  return axiosClient.get(`/tour/vehicles/list`);
 };

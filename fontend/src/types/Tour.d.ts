@@ -2,7 +2,7 @@ import type { AxiosResponse } from './comment';
 
 export interface ICity {
   city: string;
-  type: string;
+  type: string | null;
 }
 
 export interface ITourPrice {
@@ -33,6 +33,7 @@ export interface ITour {
   tourProgram: string;
   description: string;
   duration: number;
+  departureDate: string;
   basePrice: number;
   imageIds: string[];
   itineraries?: IItinerary[];

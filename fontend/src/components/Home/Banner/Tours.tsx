@@ -2,22 +2,59 @@ import { SearchOutlined } from '@ant-design/icons';
 import { Button, DatePicker, Divider, Flex, Input, Select, type SelectProps } from 'antd';
 import type { DatePickerProps } from 'antd/lib';
 import dayjs from 'dayjs';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Tours = () => {
+  const [destination, setDestination] = useState('');
+  const [departureDate, setDepartureDate] = useState(dayjs());
+  const [priceRange, setPriceRange] = useState('under5'); // Lưu giá trị của Select
+
+  const navigate = useNavigate();
+
+  const onChangeDestination = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDestination(e.target.value);
+  };
+
   const onChangeDate: DatePickerProps['onChange'] = (date, dateString) => {
     console.log('onChangeDate: ', date, dateString);
+    if (date) {
+      setDepartureDate(date);
+    }
   };
 
   const onChangePrice: SelectProps['onChange'] = (value) => {
     console.log('onChangePrice: ', value);
+    setPriceRange(value);
   };
 
   const dataRangePrices = [
-    { value: '<5', label: 'Dưới 5 triệu' },
-    { value: '5-10', label: 'Từ 5 đến 10 triệu' },
-    { value: '10-20', label: 'Từ 10 đến 20 triệu' },
-    { value: '>20', label: 'Trên 20 triệu' },
+    { value: 'under5', label: 'Dưới 5 triệu' },
+    { value: '5to10', label: 'Từ 5 đến 10 triệu' },
+    { value: '10to20', label: 'Từ 10 đến 20 triệu' },
+    { value: 'over20', label: 'Trên 20 triệu' },
   ];
+
+  const handleSearch = async () => {
+    const params = new URLSearchParams();
+
+    if (destination) {
+      params.append('destinationLocation', destination);
+    }
+
+    if (departureDate) {
+      params.append('departureDate', departureDate.format('YYYY-MM-DD'));
+    }
+
+    if (priceRange) {
+      params.append('priceRange', priceRange);
+    }
+
+    params.append('page', '0'); // Bắt đầu từ trang 0
+    params.append('size', '10'); // Lấy 10 kết quả
+
+    navigate(`/tours?${params.toString()}`);
+  };
 
   return (
     <div>
@@ -29,6 +66,8 @@ const Tours = () => {
             <span className="text-red-500">*</span>
           </p>
           <Input
+            value={destination} // <-- Kết nối
+            onChange={onChangeDestination} // <-- Kết nối
             allowClear
             placeholder="e.g. Da Nang, Phu Quoc, Japan, South Korea, United States"
             variant="borderless"
@@ -47,7 +86,8 @@ const Tours = () => {
             className="!p-0 text-[18px] font-medium"
             suffixIcon=""
             itemScope
-            onChange={onChangeDate}
+            value={departureDate} // <-- Kết nối
+            onChange={onChangeDate} // <-- Kết nối
             defaultValue={dayjs()}
             inputReadOnly
           />
@@ -62,12 +102,13 @@ const Tours = () => {
             <Select
               defaultValue="<5"
               variant="borderless"
-              onChange={onChangePrice}
+              value={priceRange} // <-- Kết nối
+              onChange={onChangePrice} // <-- Kết nối
               options={dataRangePrices}
               className="!w-[180px]"
             />
           </div>
-          <Button className="!h-full">
+          <Button className="!h-full" onClick={handleSearch}>
             <SearchOutlined className="text-[20px] px-[6px]" />
           </Button>
         </div>
