@@ -1,4 +1,4 @@
-package com.example.tour_service.client;
+package com.example.tour_service.repository.httpClient;
 
 import com.example.tour_service.config.FeignAuthConfig;
 import com.example.tour_service.dto.request.ApiResponse;

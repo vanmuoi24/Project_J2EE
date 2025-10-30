@@ -2,7 +2,7 @@ import type { AxiosResponse } from './comment';
 
 export interface ICity {
   city: string;
-  type: string;
+  type: string | null;
 }
 
 export interface ITourPrice {
@@ -33,6 +33,7 @@ export interface ITour {
   tourProgram: string;
   description: string;
   duration: number;
+  departureDate: string;
   basePrice: number;
   imageIds: string[];
   itineraries?: IItinerary[];
@@ -49,7 +50,6 @@ export interface ITourResponse {
 }
 
 export interface ITourDeparture {
-  id: int;
   id: string;
   tourCode: string;
   departureDate: string;
@@ -59,6 +59,14 @@ export interface ITourDeparture {
   tourPrice: ITourPrice;
 }
 
+export interface IDestination {
+  city: string;
+  type: number;
+}
+export interface IDeparture {
+  city: string;
+  type: number;
+}
 type ToursResponse = AxiosResponse<ITour[]>;
 
 type TourResponse = AxiosResponse<ITour>;

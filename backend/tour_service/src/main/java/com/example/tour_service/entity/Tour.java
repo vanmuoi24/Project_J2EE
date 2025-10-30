@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -51,5 +52,8 @@ public class Tour {
     @ElementCollection
     @Column(name = "image_id")
     private List<String> imageIds;
+
+    @Column(nullable = false, name = "departure_date")
+    private LocalDate departureDate;
 
 }

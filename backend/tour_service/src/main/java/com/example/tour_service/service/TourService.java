@@ -1,6 +1,7 @@
 package com.example.tour_service.service;
 
-import com.example.tour_service.client.PricingClient;
+import com.example.tour_service.dto.request.TourDocument;
+import com.example.tour_service.repository.httpClient.PricingClient;
 import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourRequest;
 import com.example.tour_service.dto.response.LocationResponse;
@@ -18,6 +19,7 @@ import com.example.tour_service.repository.TourRepository;
 import com.example.tour_service.repository.VehicleRepository;
 import com.example.tour_service.repository.httpClient.FileClient;
 
+import com.example.tour_service.repository.httpClient.SearchClient;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,8 @@ public class TourService {
     private final LocationRepository locationRepository; // cần thêm repo cho Location
     private final VehicleRepository vehicleRepository;
     private final PricingClient pricingClient;
-        private final FileClient fileClient;
+    private final FileClient fileClient;
+    private final SearchClient searchClient;
     public TourResponse getTourById(int id) {
         Tour tour = tourRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
@@ -66,7 +69,6 @@ public class TourService {
                             .collect(Collectors.toList());
     }
 
-    @Transactional
     public TourResponse createTour(TourRequest request) {
             Location departure = locationRepository.findById(request.getDepartureLocationId())
                             .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
@@ -85,7 +87,19 @@ public class TourService {
                             .destinationLocation(destination)
                             .vehicle(vehicle)
                             .tourPriceId(request.getTourPriceId())
+                            .departureDate(request.getDepartureDate())
                             .build();
+
+            TourDocument document = TourDocument.builder()
+                            .id(tour.getId())
+                            .tourProgram(tour.getTourProgram())
+                            .tourTitle(tour.getTourTitle())
+                            .basePrice(tour.getBasePrice())
+                            .departureLocation(tour.getDepartureLocation().getCity())
+                            .destinationLocation(tour.getDestinationLocation().getCity())
+                            .vehicle(tour.getVehicle().getVehicleType())
+                            .build();
+            searchClient.saveTour(document);
 
             Tour saved = tourRepository.save(tour);
             if (request.getFiles() != null && !request.getFiles().isEmpty()) {
@@ -124,6 +138,7 @@ public class TourService {
         existingTour.setDestinationLocation(existingDestinationLocation);
         existingTour.setVehicle(existingVehicle);
         existingTour.setTourPriceId(request.getTourPriceId());
+        existingTour.setDepartureDate(request.getDepartureDate());
 
         Tour saved = tourRepository.save(existingTour);
         return toResponse(saved);
@@ -137,8 +152,6 @@ public class TourService {
         tourRepository.deleteById(id);
     }
 
-
-
     private TourResponse toResponse(Tour tour) {
         return TourResponse.builder()
                 .id(tour.getId())
@@ -148,11 +161,13 @@ public class TourService {
                 .duration(tour.getDuration())
                 .departureCity(
                         LocationResponse.builder()
+                                .id(tour.getDepartureLocation().getId())
                                 .city(tour.getDepartureLocation().getCity())
                                 .build()
                 )
                 .destinationCity(
                         LocationResponse.builder()
+                                .id(tour.getDestinationLocation().getId())
                                 .city(tour.getDestinationLocation().getCity())
                                 .build()
                 )
@@ -163,6 +178,7 @@ public class TourService {
                                 .name(tour.getVehicle().getVehicleType())
                                 .build()
                 )
+                .departureDate(tour.getDepartureDate())
                 .build();
     }
 }

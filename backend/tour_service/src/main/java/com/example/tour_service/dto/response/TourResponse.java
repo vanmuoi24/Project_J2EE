@@ -2,8 +2,10 @@ package com.example.tour_service.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -24,4 +26,7 @@ public class TourResponse {
     TourPriceResponse tourPrice;
     List<ItineraryResponse> itineraries;
     List<String> imageIds;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    LocalDate departureDate;
 }
