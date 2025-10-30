@@ -65,4 +65,15 @@ public class FileController {
         return ResponseEntity.ok(fileService.uploadImageTour(tourId, files));
     }
 
+  @PostMapping("/media/uploadAvt/{ownerId}")
+public ResponseEntity<FileResponse> uploadAvt(
+        @PathVariable("ownerId") String ownerId,
+        @RequestPart("file") MultipartFile file) throws IOException {
+
+    FileResponse response = fileService.uploadAvt(ownerId, file);
+    return ResponseEntity.ok(response);
+}
+
+
+        
 }

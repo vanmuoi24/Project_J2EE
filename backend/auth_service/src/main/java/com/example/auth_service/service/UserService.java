@@ -1,6 +1,9 @@
 package com.example.auth_service.service;
 
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.mapstruct.control.MappingControl;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -11,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.auth_service.dto.request.UserCreationRequest;
 import com.example.auth_service.dto.request.UserUpdate;
@@ -36,8 +40,13 @@ public class UserService {
     private final FileServiceClient fileServiceClient;
 
     public UserResponse createUser(UserCreationRequest request) {
+
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            throw new AppException(ErrorCode.User_name);
+        }
+
         User user = userMapper.toUser(request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword())); 
 
         try {
             user = userRepository.save(user);
@@ -47,18 +56,17 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    public UserResponse getAllUser() {
-        return userRepository.findAll().stream()
+    public List<UserResponse> getAllUser() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
                 .map(userMapper::toUserResponse)
-                .findFirst()
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
+                .collect(Collectors.toList());
     }
 
     public UserResponse getUserById(Long id) {
         return userRepository.findById(id)
                 .map(userMapper::toUserResponse)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.User_name));
 
     }
 
@@ -76,6 +84,19 @@ public class UserService {
         userMapper.updateUserFromRequest(req, user);
         userRepository.save(user);
         return userMapper.toUserResponse(user);
+    }
+
+    public FileResponse uploadAvatar(String userId, MultipartFile file) throws IOException {
+        // 1️⃣ Gọi qua Feign client
+        FileResponse fileResponse = fileServiceClient.uploadAvt(userId, file);
+
+        // 2️⃣ Cập nhật URL avatar cho user
+        var user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setAvatar(fileResponse.getUrl());
+        userRepository.save(user);
+
+        return fileResponse;
     }
 
 }
