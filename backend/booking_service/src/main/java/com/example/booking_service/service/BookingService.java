@@ -85,7 +85,7 @@ public class BookingService {
 
             // --- TẠO BOOKING ---
             Booking booking = bookingMapper.toBooking(bookingRequest);
-            booking.setStatus(BookingStatus.CONFIRMED);
+            booking.setStatus(BookingStatus.UNPAID);
             booking.setAccountId(Integer.parseInt(bookingRequest.getUserId()));
             booking.setCreatedAt(LocalDateTime.now());
             booking.setTourDepartureId(Integer.parseInt(bookingRequest.getTourDepartureId()));
@@ -146,6 +146,26 @@ public class BookingService {
         } catch (Exception e) {
             throw new RuntimeException("Lỗi khi lấy dữ liệu người dùng hoặc tour", e);
         }
+    }
+
+    public BookingResponse updateBookingStatus(Long id) {
+        // --- Lấy booking hiện tại ---
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
+
+        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setCreatedAt(LocalDateTime.now());
+
+        bookingRepository.save(booking);
+
+        // --- Ánh xạ dữ liệu phản hồi ---
+        return BookingResponse.builder()
+                .id(String.valueOf(booking.getId()))
+                .accountId(String.valueOf(booking.getAccountId()))
+                .status(String.valueOf(booking.getStatus()))
+                .createdAt(String.valueOf(booking.getCreatedAt()))
+                .message("Cập nhật trạng thái booking thành công.")
+                .build();
     }
 
 
