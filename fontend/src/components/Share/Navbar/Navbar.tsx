@@ -2,12 +2,8 @@ import { Link } from 'react-router-dom';
 import { Menu } from 'antd';
 import brand from '@/assets/images/brand.jpg';
 import Container from '@/components/Share/Container';
-import { useState } from 'react';
-import TabsDest from './TabsDest';
 
 const Navbar: React.FC = () => {
-  const [isOpenDest, setIsOpenDest] = useState<boolean>(false);
-
   return (
     <div className="bg-white shadow-sm">
       <Container className="flex items-center justify-between relative py-[10px]">
@@ -32,7 +28,18 @@ const Navbar: React.FC = () => {
                     to="/tours"
                     className="text-black text-[16px] font-[700] text-base hover:text-blue-500 transition"
                   >
-                    Chuyến đi phổ biến
+                    Chuyến đi
+                  </Link>
+                ),
+              },
+              {
+                key: 'rating',
+                label: (
+                  <Link
+                    to="/rating"
+                    className="text-black text-[16px] font-[700] text-base hover:text-blue-500 transition"
+                  >
+                    Đánh giá
                   </Link>
                 ),
               },
@@ -43,15 +50,13 @@ const Navbar: React.FC = () => {
                     to="/promotion"
                     className="text-black text-[16px] font-[700] text-base hover:text-blue-500 transition"
                   >
-                    Ưu đãi đặc biệt
+                    Ưu đãi
                   </Link>
                 ),
               },
             ]}
           />
         </div>
-
-        <TabsDest isOpen={isOpenDest} setIsOpen={setIsOpenDest} />
       </Container>
     </div>
   );

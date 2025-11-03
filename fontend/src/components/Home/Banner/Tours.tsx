@@ -1,19 +1,27 @@
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Divider, Flex, Input, Select, type SelectProps } from 'antd';
+import { AutoComplete, Button, DatePicker, Divider, Flex, Select, type SelectProps } from 'antd';
 import type { DatePickerProps } from 'antd/lib';
-import dayjs from 'dayjs';
-import { useState } from 'react';
+import { Dayjs } from 'dayjs';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import debounce from 'lodash.debounce';
+import { searchLocation } from '@/services/tourServices';
+
+interface DestinationOption {
+  value: string | number;
+  label: string;
+}
 
 const Tours = () => {
   const [destination, setDestination] = useState('');
-  const [departureDate, setDepartureDate] = useState(dayjs());
-  const [priceRange, setPriceRange] = useState('under5'); // Lưu giá trị của Select
+  const [departureDate, setDepartureDate] = useState<Dayjs | null>(null);
+  const [priceRange, setPriceRange] = useState(null); // Lưu giá trị của Select
+  const [options, setOptions] = useState<DestinationOption[]>([]); // <-- Dùng type đã định nghĩa
 
   const navigate = useNavigate();
 
-  const onChangeDestination = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDestination(e.target.value);
+  const onChangeDestination = (value: string) => {
+    setDestination(value);
   };
 
   const onChangeDate: DatePickerProps['onChange'] = (date, dateString) => {
@@ -39,22 +47,64 @@ const Tours = () => {
     const params = new URLSearchParams();
 
     if (destination) {
-      params.append('destinationLocation', destination);
+      params.append('dest', destination);
     }
 
     if (departureDate) {
-      params.append('departureDate', departureDate.format('YYYY-MM-DD'));
+      params.append('depD', departureDate.format('YYYY-MM-DD'));
     }
 
     if (priceRange) {
-      params.append('priceRange', priceRange);
+      switch (priceRange) {
+        case 'under5':
+          params.append('minP', '0');
+          params.append('maxP', '5000000');
+          break;
+        case '5to10':
+          params.append('minP', '5000000');
+          params.append('maxP', '10000000');
+          break;
+        case '10to20':
+          params.append('minP', '10000000');
+          params.append('maxP', '20000000');
+          break;
+        case 'over20':
+          params.append('minP', '20000000');
+          break;
+
+        default:
+          params.append('minP', '0');
+      }
     }
 
     params.append('page', '0'); // Bắt đầu từ trang 0
-    params.append('size', '10'); // Lấy 10 kết quả
+    params.append('size', import.meta.env.VITE_PAGE_SIZE || 5);
 
-    navigate(`/tours?${params.toString()}`);
+    navigate(`/tours/search?${params.toString()}`);
   };
+
+  const fetchSuggestions = async (searchText: string): Promise<void> => {
+    if (!searchText) {
+      setOptions([]);
+      return;
+    }
+
+    const res = await searchLocation(searchText, false);
+    if (res.code === 1000) {
+      const formattedOptions: DestinationOption[] = res.result.map((lo) => ({
+        value: lo.city, // Giá trị khi chọn
+        label: lo.city, // Văn bản hiển thị
+      }));
+
+      setOptions(formattedOptions);
+    }
+  };
+
+  // 6. Tạo hàm debounced để dùng trong 'onSearch'
+  const debouncedSearchHandler = useMemo(
+    () => debounce(fetchSuggestions, 300), // Chờ 300ms
+    []
+  );
 
   return (
     <div>
@@ -65,13 +115,18 @@ const Tours = () => {
             Where would you like to travel?
             <span className="text-red-500">*</span>
           </p>
-          <Input
-            value={destination} // <-- Kết nối
-            onChange={onChangeDestination} // <-- Kết nối
+          <AutoComplete
+            options={options} // Hiển thị các gợi ý
+            value={destination} // Vẫn kết nối với state của bạn
+            onChange={onChangeDestination}
+            onSearch={debouncedSearchHandler}
             allowClear
-            placeholder="e.g. Da Nang, Phu Quoc, Japan, South Korea, United States"
+            placeholder="Chọn địa điểm"
             variant="borderless"
-            className="!p-0 text-[16px] font-medium"
+            // Thêm w-full để nó lấp đầy container flex
+            className="!p-0 text-[16px] font-medium w-full"
+            // 2. Hiển thị nội dung khi không tìm thấy
+            notFoundContent={<div className="text-center p-2">Không có kết quả phù hợp</div>}
           />
         </div>
 
@@ -88,7 +143,7 @@ const Tours = () => {
             itemScope
             value={departureDate} // <-- Kết nối
             onChange={onChangeDate} // <-- Kết nối
-            defaultValue={dayjs()}
+            placeholder="Chọn ngày đi"
             inputReadOnly
           />
         </div>
@@ -100,9 +155,9 @@ const Tours = () => {
           <div>
             <p className="m-0 mb-1 text-[16px] font-medium pl-[11px]">Price range</p>
             <Select
-              defaultValue="<5"
+              placeholder="Chọn mức giá"
               variant="borderless"
-              value={priceRange} // <-- Kết nối
+              value={priceRange}
               onChange={onChangePrice} // <-- Kết nối
               options={dataRangePrices}
               className="!w-[180px]"
