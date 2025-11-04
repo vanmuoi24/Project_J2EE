@@ -2,7 +2,9 @@ package com.example.booking_service.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.OverridesAttribute;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -20,12 +22,15 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotNull(message = "Tên khách hàng không được để trống")
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
+    @NotNull(message = "Ngày sinh không được để trống")
     @Column(name = "birthdate", length = 20, nullable = false)
     private LocalDate dateOfBirth;
 
+    @NotNull(message = "Giới tính không được để trống")
     @Column(name = "gender", nullable = true)
     private Boolean gender;
 

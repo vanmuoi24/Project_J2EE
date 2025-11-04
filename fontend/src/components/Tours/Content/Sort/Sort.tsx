@@ -1,6 +1,7 @@
+import type { ITour } from '@/types/Tour';
 import { Select } from 'antd';
 
-const Sort = () => {
+const Sort = (tours: { tours: ITour[] | null }) => {
   return (
     <div className="flex gap-2 items-center justify-center">
       <p className="!mb-0 text-[16px] font-[600]">Sắp xếp theo: </p>

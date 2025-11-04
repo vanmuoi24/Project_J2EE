@@ -7,10 +7,9 @@ import com.example.tour_service.dto.response.TourResponse;
 import com.example.tour_service.dto.response.VehicleResponse;
 import com.example.tour_service.service.VehicleService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/vehicles")
@@ -24,5 +23,11 @@ public class VehicleController {
                 .result(vehicleService.createVehicle(request))
                 .message("Created Successfully")
                 .build();
+    }
+
+    @GetMapping("/list")
+    public ApiResponse<List<VehicleResponse>> getAllVehicles() {
+        return ApiResponse.<List<VehicleResponse>>builder().
+                result(vehicleService.getAllVehicles()).message("Get all vehicles successfully").build();
     }
 }

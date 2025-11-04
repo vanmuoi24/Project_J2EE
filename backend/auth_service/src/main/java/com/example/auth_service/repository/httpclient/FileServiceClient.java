@@ -26,4 +26,9 @@ public interface FileServiceClient {
      @PostMapping(value = "/file/media/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
    FileResponse uploadFile(@RequestPart("file") MultipartFile file);
 
+   @PostMapping(value = "/file/media/uploadAvt/{ownerId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+   FileResponse uploadAvt(
+                   @PathVariable("ownerId") String ownerId,
+                   @RequestPart("file") MultipartFile file);
+
 }

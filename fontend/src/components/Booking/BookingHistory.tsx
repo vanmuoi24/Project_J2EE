@@ -1,5 +1,7 @@
-import { Table, Button, Drawer, Descriptions, Tag } from "antd";
-import { useState } from "react";
+import { Table, Button, Drawer, Descriptions, Tag, message } from "antd";
+import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+import { getAllBooking } from '@/services/bookingServices';
 
 type Customer = {
     name: string;
@@ -27,7 +29,7 @@ const mockData: Booking[] = [
             { name: "Nguyễn Văn A", dob: "1990-01-01" },
             { name: "Trần Thị B", dob: "1995-05-12" },
         ],
-        status: "Đã thanh toán",
+        status: "Chưa thanh toán",
     },
     {
         id: 2,
@@ -45,6 +47,26 @@ const mockData: Booking[] = [
 export default function BookingHistory() {
     const [open, setOpen] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+    const [bookings, setBookings] = useState<Booking[]>(mockData);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const res = await getAllBooking();
+                const list = (res as any).result || (res as any).data?.result || (res as any).data || [];
+                if (Array.isArray(list) && list.length > 0) {
+                    setBookings(list);
+                } else {
+                    setBookings(mockData);
+                }
+            } catch (err: any) {
+                message.error(err?.message || 'Không thể load lịch sử booking');
+                setBookings(mockData);
+            }
+        };
+        load();
+    }, []);
 
     const handleViewDetail = (record: Booking) => {
         setSelectedBooking(record);
@@ -68,6 +90,11 @@ export default function BookingHistory() {
             key: "departureDate",
         },
         {
+            title: "Ngày đặt tour",
+            dataIndex: "bookingDate",
+            key: "bookingDate",
+        },
+        {
             title: "Ngày thanh toán",
             dataIndex: "paymentDate",
             key: "paymentDate",
@@ -81,7 +108,11 @@ export default function BookingHistory() {
             title: "Trạng thái",
             dataIndex: "status",
             key: "status",
-            render: () => <Tag color="green">Đã thanh toán</Tag>,
+            render: (status: string) => (
+                <Tag color={status === 'Chưa thanh toán' ? 'orange' : 'green'}>
+                    {status}
+                </Tag>
+            ),
         },
         {
             title: "Hành động",
@@ -99,8 +130,8 @@ export default function BookingHistory() {
             <h2>Lịch sử đặt tour</h2>
             <Table
                 columns={columns}
-                dataSource={mockData}
-                rowKey="id"
+                dataSource={bookings}
+                rowKey={(r: any) => r.id || r.bookingId}
                 pagination={false}
                 style={{ marginTop: "16px" }}
             />
@@ -112,6 +143,7 @@ export default function BookingHistory() {
                 width={500}
             >
                 {selectedBooking && (
+                    <>
                     <Descriptions column={1} bordered size="small">
                         <Descriptions.Item label="Tên tour">
                             {selectedBooking.tourName}
@@ -123,7 +155,7 @@ export default function BookingHistory() {
                             {selectedBooking.paymentDate}
                         </Descriptions.Item>
                         <Descriptions.Item label="Trạng thái">
-                            <Tag color="green">Đã thanh toán</Tag>
+                            <Tag color={selectedBooking.status === 'Chưa thanh toán' ? 'orange' : 'green'}>{selectedBooking.status}</Tag>
                         </Descriptions.Item>
                         <Descriptions.Item label="Danh sách khách hàng">
                             {selectedBooking.customers.map((c, idx) => (
@@ -133,6 +165,17 @@ export default function BookingHistory() {
                             ))}
                         </Descriptions.Item>
                     </Descriptions>
+
+                    <div style={{ marginTop: 12, textAlign: 'right' }}>
+                        {selectedBooking.status === 'Chưa thanh toán' ? (
+                            <Button type="primary" onClick={() => { setOpen(false); navigate('/invoice', { state: { booking: selectedBooking } }); }}>
+                                Thanh toán
+                            </Button>
+                        ) : (
+                            <Button onClick={() => setOpen(false)}>Đóng</Button>
+                        )}
+                    </div>
+                    </>
                 )}
             </Drawer>
         </div>

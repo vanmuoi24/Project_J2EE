@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class TourService {
 
     private final TourRepository tourRepository;
-    private final LocationRepository locationRepository;
+    private final LocationRepository locationRepository; // cần thêm repo cho Location
     private final VehicleRepository vehicleRepository;
     private final PricingClient pricingClient;
     private final FileClient fileClient;
@@ -146,12 +146,14 @@ public class TourService {
                 .duration(tour.getDuration())
                 .departureCity(
                         LocationResponse.builder()
+                                .id(tour.getDepartureLocation().getId())
                                 .city(tour.getDepartureLocation().getCity())
                                 .type(tour.getDepartureLocation().getType())
                                 .build()
                 )
                 .destinationCity(
                         LocationResponse.builder()
+                                .id(tour.getDestinationLocation().getId())
                                 .city(tour.getDestinationLocation().getCity())
                                 .type(tour.getDestinationLocation().getType())
                                 .build()

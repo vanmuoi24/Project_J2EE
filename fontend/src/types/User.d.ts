@@ -6,3 +6,10 @@ export type User = {
   email: string;
   phone: string;
 };
+
+export interface IUserUpdate {
+  username?: string;
+  file?: File;
+  phone?: string;
+  address?: string;
+}

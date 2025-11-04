@@ -26,19 +26,6 @@ const Navbar: React.FC = () => {
             className="flex-1 border-none h-[60px] flex items-center"
             items={[
               {
-                key: 'dest',
-                label: (
-                  <span
-                    className=" text-black text-[16px] font-[700] text-base hover:text-blue-500 transition"
-                    onClick={() => {
-                      setIsOpenDest(!isOpenDest);
-                    }}
-                  >
-                    Điểm đến
-                  </span>
-                ),
-              },
-              {
                 key: 'tours',
                 label: (
                   <Link

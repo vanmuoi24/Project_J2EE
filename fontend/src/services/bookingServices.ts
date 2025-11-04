@@ -34,7 +34,7 @@ export const createBooking = async (
  * Get booking history for the current user
  * GET /booking/bookings
  */
-export const getBookingHistory = async (): Promise<BookingResponse> => {
+export const getAllBooking = async (): Promise<BookingResponse> => {
 	try {
 		const res: BookingResponse = await axiosClient.get('/booking/book/all');
 		if (res.code !== 1000) {
@@ -80,6 +80,6 @@ export const getBookingById = async (id: string): Promise<BookingResponse> => {
 
 export default {
 	createBooking,
-	getBookingHistory,
+	getAllBooking,
 	getBookingById,
 };
