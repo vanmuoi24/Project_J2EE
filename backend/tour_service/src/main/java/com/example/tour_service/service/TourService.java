@@ -42,6 +42,16 @@ public class TourService {
 
         response.setTourPrice(priceResp.getResult());
         response.setDepartures(departures);
+
+        List<TourFileResponse> fileResponses = fileClient.getAllMedia();
+        List<String> tourImages = fileResponses.stream()
+                .filter(f -> String.valueOf(id).equals(f.getTourId()))
+                .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
+                .map(TourFileResponse::getUrl)
+                .collect(Collectors.toList());
+
+        response.setImageIds(tourImages);
+
         return response;
     }
 
