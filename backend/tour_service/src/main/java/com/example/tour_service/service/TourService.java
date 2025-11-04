@@ -1,14 +1,9 @@
 package com.example.tour_service.service;
 
-import com.example.tour_service.dto.request.TourDocument;
+import com.example.tour_service.dto.response.*;
 import com.example.tour_service.repository.httpClient.PricingClient;
 import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourRequest;
-import com.example.tour_service.dto.response.LocationResponse;
-import com.example.tour_service.dto.response.TourFileResponse;
-import com.example.tour_service.dto.response.TourPriceResponse;
-import com.example.tour_service.dto.response.TourResponse;
-import com.example.tour_service.dto.response.VehicleResponse;
 import com.example.tour_service.entity.Location;
 import com.example.tour_service.entity.Tour;
 import com.example.tour_service.entity.Vehicle;
@@ -19,8 +14,6 @@ import com.example.tour_service.repository.TourRepository;
 import com.example.tour_service.repository.VehicleRepository;
 import com.example.tour_service.repository.httpClient.FileClient;
 
-import com.example.tour_service.repository.httpClient.SearchClient;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,19 +26,22 @@ import java.util.stream.Collectors;
 public class TourService {
 
     private final TourRepository tourRepository;
-    private final LocationRepository locationRepository; // cần thêm repo cho Location
+    private final LocationRepository locationRepository;
     private final VehicleRepository vehicleRepository;
     private final PricingClient pricingClient;
     private final FileClient fileClient;
-    private final SearchClient searchClient;
+    private final TourDepartureService tourDepartureService;
+
     public TourResponse getTourById(int id) {
         Tour tour = tourRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
 
         TourResponse response = toResponse(tour);
         ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
-        response.setTourPrice(priceResp.getResult());
+        List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(id);
 
+        response.setTourPrice(priceResp.getResult());
+        response.setDepartures(departures);
         return response;
     }
 
@@ -89,18 +85,9 @@ public class TourService {
                             .tourPriceId(request.getTourPriceId())
                             .build();
 
-            TourDocument document = TourDocument.builder()
-                            .id(tour.getId())
-                            .tourProgram(tour.getTourProgram())
-                            .tourTitle(tour.getTourTitle())
-                            .basePrice(tour.getBasePrice())
-                            .departureLocation(tour.getDepartureLocation().getCity())
-                            .destinationLocation(tour.getDestinationLocation().getCity())
-                            .vehicle(tour.getVehicle().getVehicleType())
-                            .build();
-            searchClient.saveTour(document);
 
             Tour saved = tourRepository.save(tour);
+
             if (request.getFiles() != null && !request.getFiles().isEmpty()) {
                     try {
                             fileClient.uploadMultipleFiles(
@@ -160,11 +147,13 @@ public class TourService {
                 .departureCity(
                         LocationResponse.builder()
                                 .city(tour.getDepartureLocation().getCity())
+                                .type(tour.getDepartureLocation().getType())
                                 .build()
                 )
                 .destinationCity(
                         LocationResponse.builder()
                                 .city(tour.getDestinationLocation().getCity())
+                                .type(tour.getDestinationLocation().getType())
                                 .build()
                 )
                 .basePrice(tour.getBasePrice())
