@@ -37,10 +37,11 @@ public class TourService {
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
 
         TourResponse response = toResponse(tour);
-        ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
-        List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(id);
 
+        ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
         response.setTourPrice(priceResp.getResult());
+
+        List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(id);
         response.setDepartures(departures);
 
         List<TourFileResponse> fileResponses = fileClient.getAllMedia();
@@ -67,6 +68,8 @@ public class TourService {
                                     TourResponse response = toResponse(tour);
                                     ApiResponse<TourPriceResponse> priceResp = pricingClient
                                                     .getPriceById(tour.getTourPriceId());
+                                    List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(tour.getId());
+                                    response.setDepartures(departures);
                                     response.setTourPrice(priceResp.getResult());
                                     List<String> urls = tourImagesMap.get(String.valueOf(tour.getId()));
                                     response.setImageIds(urls != null ? urls : List.of());
