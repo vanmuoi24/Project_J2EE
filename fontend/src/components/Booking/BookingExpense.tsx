@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 import { Card, Typography, Row, Col, Button, Modal, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { getTourDepartureById } from '@/services/tourServices';
 import { formatCurrencyVND } from '@/utils/index';
+=======
+import { Card, Typography, Row, Col, Button, Modal, message } from "antd";
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { getTourDepartureById } from '@/services/tourServices';
+import { formatCurrencyVND } from '@/utils/index'
+>>>>>>> c14ef71faf2bb31c30afa9c58d3ca7cd60f43c50
 
 const { Title, Text } = Typography;
 
@@ -26,6 +34,7 @@ export default function BookingExpense({
   onConfirm,
   tourDepartureId,
 }: BookingExpenseProps) {
+  const navigate = useNavigate();
   const [tourPrice, setTourPrice] = useState<any | null>(null);
   const [calculatedTotal, setCalculatedTotal] = useState<number>(total || 0);
 
@@ -135,7 +144,10 @@ export default function BookingExpense({
           </Col>
         </Row>
       </div>
-      <div style={{ marginTop: 16 }}>
+      <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
+        <Button type="link" block size="large" onClick={() => navigate('/booking/history')}>
+          Lịch sử đặt tour
+        </Button>
         <Button type="primary" block size="large" onClick={handleConfirm}>
           Xác nhận đặt tour
         </Button>

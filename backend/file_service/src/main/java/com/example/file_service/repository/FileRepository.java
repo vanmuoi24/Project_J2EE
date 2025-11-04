@@ -46,6 +46,7 @@ public class FileRepository {
         return new ByteArrayResource(data);
     }
 
+
     public void delete(FileMgmt fileMgmt) {
         try {
             String publicId = extractPublicId(fileMgmt.getUrl());
@@ -62,4 +63,5 @@ public class FileRepository {
         String publicIdPart = parts[1];
         return publicIdPart.substring(0, publicIdPart.lastIndexOf('.')); // bỏ phần đuôi .jpg/.png
     }
+
 }

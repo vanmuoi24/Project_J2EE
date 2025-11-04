@@ -44,4 +44,11 @@ public class BookingController {
                 .build();
     }
 
+    @PutMapping("/{id}/status")
+    public ApiResponse<BookingResponse> updateBookingStatus(@PathVariable Long id) {
+        return ApiResponse.<BookingResponse>builder()
+                .result(bookingService.updateBookingStatus(id))
+                .message("Updated booking status successfully")
+                .build();
+    }
 }

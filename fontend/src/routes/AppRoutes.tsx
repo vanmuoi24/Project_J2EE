@@ -18,8 +18,9 @@ import ManagerPromotion from '../components/Admin/ManagerPomt/ManagerPomt';
 import ManagerSchedule from '../components/Admin/ManagerTour/ManagerSchedule';
 import ManagerDestination from '../components/Admin/ManagerTour/ManagerDestination';
 import TourDetail from '@/layouts/TourDetail';
-import Booking from '@/pages/Booking/index';
-import Invoice from '@/pages/Invoice/index';
+import Booking from '@/pages/Booking/BookingPage';
+import BookingHistory from '@/pages/Booking/HistoryPage';
+import Invoice from '@/pages/Invoice/InvoicePage';
 
 export default function AppRoutes() {
   return (
@@ -31,6 +32,7 @@ export default function AppRoutes() {
           <Route path="/tours/*" element={<Tours />} />
 
           <Route path="/booking" element={<Booking />} />
+          <Route path="/booking/history" element={<BookingHistory />} />
           {/* <Route path="/invoice/user/:userId/booking/:bookingId" element={<Invoice />} /> */}
           <Route path="/invoice" element={<Invoice />} />
           <Route path="/tours" element={<Tours />} />

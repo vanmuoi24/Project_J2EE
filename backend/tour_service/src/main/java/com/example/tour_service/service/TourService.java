@@ -87,19 +87,10 @@ public class TourService {
                             .destinationLocation(destination)
                             .vehicle(vehicle)
                             .tourPriceId(request.getTourPriceId())
-                            .departureDate(request.getDepartureDate())
+                        //     .departureDate(request.getDepartureDate())
                             .build();
 
-            TourDocument document = TourDocument.builder()
-                            .id(tour.getId())
-                            .tourProgram(tour.getTourProgram())
-                            .tourTitle(tour.getTourTitle())
-                            .basePrice(tour.getBasePrice())
-                            .departureLocation(tour.getDepartureLocation().getCity())
-                            .destinationLocation(tour.getDestinationLocation().getCity())
-                            .vehicle(tour.getVehicle().getVehicleType())
-                            .build();
-            searchClient.saveTour(document);
+
 
             Tour saved = tourRepository.save(tour);
             if (request.getFiles() != null && !request.getFiles().isEmpty()) {
@@ -138,8 +129,7 @@ public class TourService {
         existingTour.setDestinationLocation(existingDestinationLocation);
         existingTour.setVehicle(existingVehicle);
         existingTour.setTourPriceId(request.getTourPriceId());
-        existingTour.setDepartureDate(request.getDepartureDate());
-
+        // existingTour.setDepartureDate(request.getDepartureDate());
         Tour saved = tourRepository.save(existingTour);
         return toResponse(saved);
     }
@@ -178,7 +168,7 @@ public class TourService {
                                 .name(tour.getVehicle().getVehicleType())
                                 .build()
                 )
-                .departureDate(tour.getDepartureDate())
+      
                 .build();
     }
 }

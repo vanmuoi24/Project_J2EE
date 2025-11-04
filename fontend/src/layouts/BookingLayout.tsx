@@ -90,19 +90,16 @@ export default function BookingLayout() {
 
       Modal.success({ title: 'Đặt tour thành công', content: res.message || 'Booking created' });
 
-      // After successful booking creation, navigate to invoice detail if id returned
-      const bookingId = (res as any)?.result?.id || undefined;
-      const userId = (res as any)?.result?.accountId || undefined;
-      sessionStorage.setItem("invoice", JSON.stringify(res.result));
-
-      console.log(res)
-
-      if (bookingId && userId) {
-        // navigate(`/invoice/user/${userId}/booking/${bookingId}`);
-        navigate(`/invoice`);
-      } else {
-        navigate('/invoice');
+      // After successful booking creation, navigate to booking history and pass new booking
+      const newBooking = (res as any).result || (res as any).data?.result || (res as any).data || res;
+      try {
+        // persist new booking locally as fallback
+        const stored = JSON.parse(sessionStorage.getItem('bookingHistoryCache') || '[]');
+        sessionStorage.setItem('bookingHistoryCache', JSON.stringify([newBooking, ...stored]));
+      } catch (e) {
+        // ignore
       }
+      navigate('/booking/history', { state: { newBooking } });
 
     } catch (err: any) {
       Modal.error({ title: 'Lỗi', content: err?.message || 'Đã xảy ra lỗi' });
@@ -119,7 +116,6 @@ export default function BookingLayout() {
   useEffect(() => {
     const current = customersFormRef.current?.getFieldValue('customers') || [];
     setExpenseItems(computeItemsFromCustomers(current));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

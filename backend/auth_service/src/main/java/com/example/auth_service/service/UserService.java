@@ -41,6 +41,7 @@ public class UserService {
 
     public UserResponse createUser(UserCreationRequest request) {
 
+        System.out.println("uerservice check check");
         if (request.getUsername() == null || request.getUsername().isBlank()) {
             throw new AppException(ErrorCode.User_name);
         }

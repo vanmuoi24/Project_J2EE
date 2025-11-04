@@ -35,7 +35,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/register")
-        ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
+        ApiResponse<UserResponse> createUser(@RequestBody UserCreationRequest request) {
             System.err.println(request);
         return ApiResponse.<UserResponse>builder()
                 .result(userService.createUser(request))
@@ -79,11 +79,6 @@ public class UserController {
             @RequestPart("file") MultipartFile file) throws IOException{
                  FileResponse response = userService.uploadAvatar(id, file);
         return ResponseEntity.ok(response);
-
-            
     }
-
-
-
-    
+ 
 }

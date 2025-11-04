@@ -1,10 +1,9 @@
 package com.example.tour_service.controller;
-import com.example.tour_service.dto.request.ApiResponse;
+
+import com.example.tour_service.dto.response.ApiResponse;
 import com.example.tour_service.dto.request.TourDepartureRequest;
-import com.example.tour_service.dto.response.ItineraryResponse;
-import com.example.tour_service.dto.request.TourRequest;
+
 import com.example.tour_service.dto.response.TourDepartureResponse;
-import com.example.tour_service.dto.response.TourResponse;
 import com.example.tour_service.service.TourDepartureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
