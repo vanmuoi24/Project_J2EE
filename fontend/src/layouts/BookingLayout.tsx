@@ -6,7 +6,7 @@ import TourDetailCard from "@/components/TourDetail/TourDetailCard";
 import Itinerary from "@/components/TourDetail/Itinerary";
 import ImportantInfo from "@/components/TourDetail/ImportantInfo";
 import BookingExpense from "@/components/Booking/BookingExpense";
-import { createBooking } from '@/services/bookingServices';
+import bookingServices, { createBooking } from '@/services/bookingServices';
 import { sessionService } from '@/services/sessionServices';
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
@@ -71,6 +71,9 @@ export default function BookingLayout() {
 
       // build booking request
       const user = sessionService.getUser();
+      const bookings = bookingServices.getAllBooking();
+      sessionStorage.setItem('bookingHistoryCache', JSON.stringify(bookings));
+
       const bookingRequest = {
         userId: user?.id?.toString() || '',
         tourDepartureId: tourDepartureId || "1",
@@ -88,18 +91,16 @@ export default function BookingLayout() {
       // Gọi Booking API
       const res = await createBooking(bookingRequest as any);
 
-      Modal.success({ title: 'Đặt tour thành công', content: res.message || 'Booking created' });
+      Modal.success({ title: 'Message', content: 'Booking created' });
 
       // After successful booking creation, navigate to booking history and pass new booking
-      const newBooking = (res as any).result || (res as any).data?.result || (res as any).data || res;
-      try {
-        // persist new booking locally as fallback
-        const stored = JSON.parse(sessionStorage.getItem('bookingHistoryCache') || '[]');
-        sessionStorage.setItem('bookingHistoryCache', JSON.stringify([newBooking, ...stored]));
-      } catch (e) {
-        // ignore
-      }
-      navigate('/booking/history', { state: { newBooking } });
+      // const newBooking = (res as any).result || (res as any).data?.result || (res as any).data || res;
+
+      // const stored = JSON.parse(sessionStorage.getItem('bookingHistoryCache') || '[]');
+      // sessionStorage.setItem('bookingHistoryCache', JSON.stringify([newBooking, ...stored]));
+
+      // navigate(`/invoice/user/${user?.id}`);
+      navigate(`/invoice`)
 
     } catch (err: any) {
       Modal.error({ title: 'Lỗi', content: err?.message || 'Đã xảy ra lỗi' });

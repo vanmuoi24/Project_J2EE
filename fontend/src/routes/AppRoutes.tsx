@@ -19,8 +19,8 @@ import ManagerSchedule from '../components/Admin/ManagerTour/ManagerSchedule';
 import ManagerDestination from '../components/Admin/ManagerTour/ManagerDestination';
 import TourDetail from '@/layouts/TourDetail';
 import Booking from '@/pages/Booking/BookingPage';
-import BookingHistory from '@/pages/Booking/HistoryPage';
 import Invoice from '@/pages/Invoice/InvoicePage';
+import MoMoQRPage from '@/pages/Payment/MoMoQRPage';
 
 export default function AppRoutes() {
   return (
@@ -32,9 +32,10 @@ export default function AppRoutes() {
           <Route path="/tours/*" element={<Tours />} />
 
           <Route path="/booking" element={<Booking />} />
-          <Route path="/booking/history" element={<BookingHistory />} />
-          {/* <Route path="/invoice/user/:userId/booking/:bookingId" element={<Invoice />} /> */}
+          {/* <Route path="/invoice/user/:userId" element={<Invoice />} /> */}
           <Route path="/invoice" element={<Invoice />} />
+          <Route path="/payment/momo" element={<MoMoQRPage />} />
+          {/* <Route path="/payment/momo/:id" element={<MoMoQRPage />} /> */}
           <Route path="/tours" element={<Tours />} />
           <Route path="/tours/detail/:id" element={<TourDetail />} />
           <Route element={<RouteGuard isPrivate />}>

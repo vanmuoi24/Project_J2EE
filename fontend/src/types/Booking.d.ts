@@ -16,14 +16,10 @@ export type BookingRequest = {
 };
 
 export type BookingResponse = {
-	code: number;
-	message?: string;
-	result?: {
-		id: string;
-		accountId?: string;
-		tourDepartureId?: string;
-		createAt?: string;
-		status?: string;
-		listOfCustomers?: Customer[];
-	};
+	id: string;
+	accountId?: string;
+	tourDepartureId?: string;
+	createdAt?: string;
+	status?: string;
+	listOfCustomers?: Customer[];
 };

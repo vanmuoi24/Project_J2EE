@@ -134,7 +134,7 @@ export default function BookingExpense({
           Lịch sử đặt tour
         </Button>
         <Button type="primary" block size="large" onClick={handleConfirm}>
-          Xác nhận đặt tour
+          Thanh toán
         </Button>
       </div>
     </>

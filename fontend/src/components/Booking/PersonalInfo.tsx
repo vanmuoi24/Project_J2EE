@@ -1,4 +1,4 @@
-import { Form, Input } from "antd";
+import { Form, Input, Select } from "antd";
 import { useEffect } from "react";
 
 export default function PersonalInfo({ onFormReady }: { onFormReady?: (form: any) => void }) {
@@ -37,13 +37,24 @@ export default function PersonalInfo({ onFormReady }: { onFormReady?: (form: any
               validator: (_: any, value: any) => {
                 const num = Number(value);
                 if (Number.isNaN(num)) return Promise.reject(new Error("Tuổi không hợp lệ"));
-                if (num < 18) return Promise.reject(new Error("Tuổi phải lớn hơn hoặc bằng 18"));
+                if (num < 18 || num >= 80) return Promise.reject(new Error("Tuổi phải lớn hơn hoặc bằng 18 và nhỏ hơn 70"));
                 return Promise.resolve();
               },
             },
           ]}
         >
           <Input type="number" placeholder="Nhập tuổi" />
+        </Form.Item>
+
+        <Form.Item
+          label="Giới tính"
+          name="gender"
+          rules={[{ required: true, message: "Vui lòng chọn giới tính!" }]}
+        >
+          <Select placeholder="Chọn giới tính">
+            <Select.Option value="male">Nam</Select.Option>
+            <Select.Option value="female">Nữ</Select.Option>
+          </Select>
         </Form.Item>
 
         <Form.Item

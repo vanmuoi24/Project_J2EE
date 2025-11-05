@@ -36,6 +36,7 @@ public class BookingService {
 
     public List<BookingResponse> getAllBookings() {
         List<Booking> bookings = bookingRepository.findAll();
+        System.out.println(bookings);
         return bookingMapper.toBookingResponseList(bookings);
     }
 
@@ -85,7 +86,7 @@ public class BookingService {
 
             // --- TẠO BOOKING ---
             Booking booking = bookingMapper.toBooking(bookingRequest);
-            booking.setStatus(BookingStatus.UNPAID);
+            booking.setStatus(BookingStatus.UNCONFIRMED);
             booking.setAccountId(Integer.parseInt(bookingRequest.getUserId()));
             booking.setCreatedAt(LocalDateTime.now());
             booking.setTourDepartureId(Integer.parseInt(bookingRequest.getTourDepartureId()));

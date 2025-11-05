@@ -10,14 +10,32 @@ export type InvoiceRequest = {
   items: InvoiceItem[];
 };
 
+export type CustomerResponse = {
+  id?: string;
+  fullName?: string;
+  birthdate?: string;
+  gender?: string;
+  address?: string;
+};
+
 export type InvoiceResponse = {
-  code: number;
+  id: string;
+  userId?: string;
+  bookingId?: string;
+  dateOfTransaction?: string;
+  paymentMethodId?: string;
+  status?: string;
   message?: string;
-  result?: {
-    id: string;
-    bookingId?: string;
-    amount?: number;
-    paymentMethod?: string;
-    createdAt?: string;
-  } | null;
+  totalCountOfAdult?: string;
+  totalCountOfChildren?: string;
+  totalCountOfToddler?: string;
+  totalCountOfInfant?: string;
+  totalChargeOfAdult?: string;
+  totalChargeOfChildren?: string;
+  totalChargeOfToddler?: string;
+  totalChargeOfInfant?: string;
+  totalExtraFee?: string;
+  totalBookingTourExpense?: string;
+  paymentUrl?: string;
+  customerResponseList?: CustomerResponse[];
 };

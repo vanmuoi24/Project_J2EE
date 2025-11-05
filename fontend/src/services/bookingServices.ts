@@ -1,21 +1,21 @@
 import axiosClient from '@/api/axios';
 import type { BookingRequest, BookingResponse } from '@/types/Booking';
 import axios from 'axios';
-
+import type { AxiosResponse } from '@/types/comment';
 /**
  * Create a new booking
  * POST /booking/bookings
  */
 export const createBooking = async (
 	data: BookingRequest
-): Promise<BookingResponse> => {
+): Promise<AxiosResponse<BookingResponse>> => {
 	try {
-		const res: BookingResponse = await axiosClient.post(
+		const res: AxiosResponse<BookingResponse> = await axiosClient.post(
 			'/booking/book/create',
 			data
 		);
 		if (res.code !== 1000) {
-			throw new Error(res?.message || 'Create booking failed');
+			throw new Error('Create booking failed');
 		}
 		return res;
 	} catch (err: unknown) {
@@ -34,11 +34,11 @@ export const createBooking = async (
  * Get booking history for the current user
  * GET /booking/bookings
  */
-export const getAllBooking = async (): Promise<BookingResponse> => {
+export const getAllBooking = async (): Promise<AxiosResponse<BookingResponse>> => {
 	try {
-		const res: BookingResponse = await axiosClient.get('/booking/book/all');
+		const res: AxiosResponse<BookingResponse> = await axiosClient.get('/booking/book/all');
 		if (res.code !== 1000) {
-			throw new Error(res?.message || 'Get booking history failed');
+			throw new Error('Get booking history failed');
 		}
 		return res;
 	} catch (err: unknown) {
@@ -57,13 +57,13 @@ export const getAllBooking = async (): Promise<BookingResponse> => {
  * Get a single booking by id
  * GET /booking/bookings/:id
  */
-export const getBookingById = async (id: string): Promise<BookingResponse> => {
+export const getBookingById = async (id: string): Promise<AxiosResponse<BookingResponse>> => {
 	try {
-		const res: BookingResponse = await axiosClient.get(
+		const res: AxiosResponse<BookingResponse> = await axiosClient.get(
 			`/booking/book/${id}`
 		);
 		if (res.code !== 1000) {
-			throw new Error(res?.message || 'Get booking failed');
+			throw new Error('Get booking failed');
 		}
 		return res;
 	} catch (err: unknown) {

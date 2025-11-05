@@ -1,13 +1,13 @@
 import { Row, Col, Card, Spin, Alert, Modal } from 'antd';
 import InvoiceForm from '@/components/Invoice/InvoiceForm';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { createInvoice, getInvoiceById } from '@/services/invoiceServices';
+import MoMoQR from '@/components/Payment/MoMoQR';
 
 export default function InvoiceLayout() {
   const { id } = useParams();
-  const { bookingId } = useParams();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [invoiceData, setInvoiceData] = useState<any | null>(null);
@@ -19,7 +19,7 @@ export default function InvoiceLayout() {
       setError(null);
       try {
         const res = await getInvoiceById(id as string);
-        setInvoiceData(res.result || null);
+        setInvoiceData(res || null);
       } catch (err: any) {
         setError(err?.message || 'Failed to load invoice');
       } finally {
@@ -46,7 +46,23 @@ export default function InvoiceLayout() {
 
 
       const res = await createInvoice(payload as any);
-      Modal.success({ title: 'Tạo hóa đơn thành công', content: res.message || 'Invoice created' });
+
+      // Show success modal and, if payment info returned, show MoMo QR modal
+      Modal.success({ title: 'Tạo hóa đơn thành công', content: 'Invoice created' });
+
+      const paymentInfo = ((res as any).result || {}) as any;
+      const paymentQrBase64 = paymentInfo?.paymentQrBase64 as string | undefined;
+      const paymentUrl = paymentInfo?.paymentUrl as string | undefined;
+
+      if (paymentQrBase64 || paymentUrl) {
+        Modal.info({
+          title: 'Hoàn tất thanh toán',
+          content: <MoMoQR paymentQrBase64={paymentQrBase64} paymentUrl={paymentUrl} onClose={() => Modal.destroyAll()} />,
+          width: 420,
+          okText: 'Đóng',
+          onOk: () => Modal.destroyAll(),
+        });
+      }
 
       // const newInvoiceId = (res as any)?.result?.id || undefined;
       // console.log(res)
@@ -78,8 +94,8 @@ export default function InvoiceLayout() {
             {error && <Alert type="error" message={error} />}
             {!id && (
               <InvoiceForm
-                account={{ fullName: 'Khách hàng', email: 'guest@example.com', phone: '0123456789'}}
-                customers={[{ name: 'Nguyễn Văn A', dob: '1990-01-01', price: 1000000}]}
+                account={{ fullName: 'Khách hàng', email: 'guest@example.com', phone: '0123456789' }}
+                customers={[{ name: 'Nguyễn Văn A', dob: '1990-01-01', price: 1000000 }]}
                 onCreate={handleCreateInvoice}
               />
             )}

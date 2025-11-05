@@ -1,14 +1,15 @@
 import axiosClient from '@/api/axios';
 import type { InvoiceRequest, InvoiceResponse } from '@/types/Invoice';
 import axios from 'axios';
+import type { AxiosResponse } from '@/types/comment';
 
 export const createInvoice = async (
 	data: InvoiceRequest
-): Promise<InvoiceResponse> => {
+): Promise<AxiosResponse<InvoiceResponse>> => {
 	try {
-		const res: InvoiceResponse = await axiosClient.post('/invoice/invoices', data);
+		const res: AxiosResponse<InvoiceResponse> = await axiosClient.post('/invoice/create', data);
 		if (res.code !== 1000) {
-			throw new Error(res?.message || 'Create invoice failed');
+			throw new Error('Create invoice failed');
 		}
 		return res;
 	} catch (err: unknown) {
@@ -23,11 +24,11 @@ export const createInvoice = async (
 	}
 };
 
-export const getInvoiceHistory = async (): Promise<InvoiceResponse> => {
+export const getAllInvoices = async (): Promise<AxiosResponse<InvoiceResponse>> => {
 	try {
-		const res: InvoiceResponse = await axiosClient.get('/invoice/invoices');
+		const res: AxiosResponse<InvoiceResponse> = await axiosClient.get('/invoice/direct/all');
 		if (res.code !== 1000) {
-			throw new Error(res?.message || 'Get invoice history failed');
+			throw new Error('Get all invoices failed');
 		}
 		return res;
 	} catch (err: unknown) {
@@ -42,11 +43,11 @@ export const getInvoiceHistory = async (): Promise<InvoiceResponse> => {
 	}
 };
 
-export const getInvoiceById = async (id: string): Promise<InvoiceResponse> => {
+export const getInvoiceById = async (id: string): Promise<AxiosResponse<InvoiceResponse>> => {
 	try {
-		const res: InvoiceResponse = await axiosClient.get(`/invoice/invoices/${id}`);
+		const res: AxiosResponse<InvoiceResponse> = await axiosClient.get(`/invoice/invoices/${id}`);
 		if (res.code !== 1000) {
-			throw new Error(res?.message || 'Get invoice failed');
+			throw new Error('Get invoice failed');
 		}
 		return res;
 	} catch (err: unknown) {
@@ -61,8 +62,28 @@ export const getInvoiceById = async (id: string): Promise<InvoiceResponse> => {
 	}
 };
 
+export const getInvoiceByBookingId = async (bookingId: string): Promise<AxiosResponse<InvoiceResponse>> => {
+	try {
+		const res: AxiosResponse<InvoiceResponse> = await axiosClient.get(`/invoice/direct/booking/${bookingId}`);	
+		if (res.code !== 1000) {
+			throw new Error('Get invoice failed');
+		}
+		return res;
+	} catch (err: unknown) {
+		if (axios.isAxiosError(err)) {
+			const serverError = err.response?.data as { message?: string };
+			throw new Error(serverError?.message || 'Get invoice failed');
+		}
+		if (err instanceof Error) {
+			throw err;
+		}
+		throw new Error('Unexpected error');
+	}
+}
+
 export default {
 	createInvoice,
-	getInvoiceHistory,
+	getAllInvoices,
 	getInvoiceById,
+	getInvoiceByBookingId
 };

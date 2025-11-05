@@ -1,4 +1,5 @@
-package com.example.invoice_service.config;
+package com.example.file_service.config;
+
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
