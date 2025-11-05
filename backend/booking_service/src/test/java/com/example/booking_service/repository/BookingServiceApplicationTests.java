@@ -1,4 +1,4 @@
-package com.example.booking_service.booking_repository;
+package com.example.booking_service.repository;
 
 import com.example.booking_service.entity.*;
 import com.example.booking_service.repository.BookingRepository;

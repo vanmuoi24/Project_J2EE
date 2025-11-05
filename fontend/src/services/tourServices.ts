@@ -1,31 +1,16 @@
 import axiosClient from '@/api/axios';
 import type { AxiosResponse } from '@/types/comment';
 import type {
+  IDeparture,
+  IDestination,
   IItinerary,
   ITour,
   ITourDeparture,
-  ITourDepartureResponse,
-  ITourResponse,
+  IVehicle,
 } from '@/types/Tour';
-import axios from 'axios';
 
-export const getAllTours = async () => {
-  try {
-    const res: ITourResponse = await axiosClient.get('/tour/tours/list');
-    if (res.code !== 1000) {
-      throw new Error(res?.message || 'Get all tours failed');
-    }
-    return res;
-  } catch (err: unknown) {
-    if (axios.isAxiosError(err)) {
-      const serverError = err.response?.data as { message?: string };
-      throw new Error(serverError?.message || 'Get all tours failed');
-    }
-    if (err instanceof Error) {
-      throw err;
-    }
-    throw new Error('Unexpected error');
-  }
+export const getAllTours = (): Promise<AxiosResponse<ITour[]>> => {
+  return axiosClient.get('/tour/tours/list');
 };
 
 export const getTourById = (id: number): Promise<AxiosResponse<ITour>> => {
@@ -44,21 +29,14 @@ export const getItineraryByTourId = (id: number): Promise<AxiosResponse<IItinera
   return axiosClient.get(`/tour/itineraries/tour/${id}`);
 };
 
-export const getTourDepartureId = async (id: number) => {
-  try {
-    const res: ITourDepartureResponse = await axiosClient.get(`/tour/tour-departures/${id}`);
-    if (res.code !== 1000) {
-      throw new Error(res?.message || 'Get all tours failed');
-    }
-    return res;
-  } catch (err: unknown) {
-    if (axios.isAxiosError(err)) {
-      const serverError = err.response?.data as { message?: string };
-      throw new Error(serverError?.message || 'Get all tours failed');
-    }
-    if (err instanceof Error) {
-      throw err;
-    }
-    throw new Error('Unexpected error');
-  }
+export const getAllDepartures = (): Promise<AxiosResponse<IDeparture[]>> => {
+  return axiosClient.get(`/tour/locations/departures`);
+};
+
+export const getAllDestinations = (): Promise<AxiosResponse<IDestination[]>> => {
+  return axiosClient.get(`/tour/locations/destinations`);
+};
+
+export const getAllVehicles = (): Promise<AxiosResponse<IVehicle[]>> => {
+  return axiosClient.get(`/tour/vehicles/list`);
 };

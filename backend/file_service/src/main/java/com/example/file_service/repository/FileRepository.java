@@ -45,4 +45,23 @@ public class FileRepository {
         byte[] data = new java.net.URL(fileMgmt.getUrl()).openStream().readAllBytes();
         return new ByteArrayResource(data);
     }
+
+
+    public void delete(FileMgmt fileMgmt) {
+        try {
+            String publicId = extractPublicId(fileMgmt.getUrl());
+            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+        } catch (IOException e) {
+            throw new RuntimeException("Không thể xóa file khỏi Cloudinary", e);
+        }
+    }
+    
+    private String extractPublicId(String url) {
+        if (url == null || !url.contains("/upload/"))
+            return null;
+        String[] parts = url.split("/upload/");
+        String publicIdPart = parts[1];
+        return publicIdPart.substring(0, publicIdPart.lastIndexOf('.')); // bỏ phần đuôi .jpg/.png
+    }
+
 }

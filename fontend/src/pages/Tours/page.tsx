@@ -3,8 +3,16 @@ import Filter from '@/components/Tours/Filter/Filter';
 import Sort from '@/components/Tours/Content/Sort/Sort';
 import List from '@/components/Tours/Content/List/List';
 import { Divider } from 'antd/lib';
+import { useState } from 'react';
+import type { ITour } from '@/types/Tour';
+import { Pagination } from 'antd';
 
 const ToursPage = () => {
+  const [tours, setTours] = useState<ITour[] | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const totalTours = 20;
+  const PAGE_SIZE = 10;
+
   return (
     <div className="">
       <Container>
@@ -25,17 +33,26 @@ const ToursPage = () => {
                 Kết quả có <strong className="text-blue-400 text-2xl">12</strong> chương trình tour
                 cho quý khách
               </div>
-              <Sort />
+              <Sort tours={tours} />
             </div>
             <Divider className="!mt-4 !mb-6" />
           </div>
         </div>
         <div className="flex flex-row gap-6">
           <div className="flex-3">
-            <Filter />
+            <Filter tours={tours} />
           </div>
           <div className="flex-11">
-            <List />
+            <List tours={tours} />
+            <div className="flex justify-center !mt-8 !mb-[80px]">
+              <Pagination
+                current={currentPage}
+                pageSize={PAGE_SIZE}
+                total={totalTours}
+                onChange={(page) => setCurrentPage(page)}
+                showSizeChanger={false}
+              />
+            </div>
           </div>
         </div>
       </Container>

@@ -1,8 +1,15 @@
+<<<<<<< HEAD
+import { Card, Typography, Row, Col, Button, Modal, message } from 'antd';
+import { useEffect, useState } from 'react';
+import { getTourDepartureById } from '@/services/tourServices';
+import { formatCurrencyVND } from '@/utils/index';
+=======
 import { Card, Typography, Row, Col, Button, Modal, message } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { getTourDepartureById } from '@/services/tourServices';
 import { formatCurrencyVND } from '@/utils/index'
+>>>>>>> c14ef71faf2bb31c30afa9c58d3ca7cd60f43c50
 
 const { Title, Text } = Typography;
 
@@ -49,9 +56,12 @@ export default function BookingExpense({
     const priceFromLabel = (label: string, defaultPrice: number) => {
       if (!tourPrice) return defaultPrice;
       const l = label.toLowerCase();
-      if (l.includes('người lớn') || l.includes('nguoi lon') || l.includes('adult')) return tourPrice.adultPrice;
-      if (l.includes('trẻ em') || l.includes('tre em') || l.includes('child')) return tourPrice.childPrice;
-      if (l.includes('em bé') || l.includes('em be') || l.includes('infant') || l.includes('baby')) return tourPrice.infantPrice ?? defaultPrice;
+      if (l.includes('người lớn') || l.includes('nguoi lon') || l.includes('adult'))
+        return tourPrice.adultPrice;
+      if (l.includes('trẻ em') || l.includes('tre em') || l.includes('child'))
+        return tourPrice.childPrice;
+      if (l.includes('em bé') || l.includes('em be') || l.includes('infant') || l.includes('baby'))
+        return tourPrice.infantPrice ?? defaultPrice;
       return defaultPrice;
     };
 
@@ -61,7 +71,6 @@ export default function BookingExpense({
     }, 0);
 
     setCalculatedTotal(itemsTotal + (singleRoomSurcharge || 0));
-  
   }, [tourPrice, items, singleRoomSurcharge]);
 
   const handleConfirm = () => {
@@ -77,7 +86,7 @@ export default function BookingExpense({
           message.error(err?.message || 'Đặt tour thất bại');
           throw err;
         }
-      }
+      },
     });
   };
 
@@ -85,29 +94,35 @@ export default function BookingExpense({
     <>
       <Row justify="space-between" align="middle">
         <Col>
-          <Title level={5}>
-            KHÁCH HÀNG + PHỤ THU
-          </Title>
+          <Title level={5}>KHÁCH HÀNG + PHỤ THU</Title>
         </Col>
         <Col>
-          <Title level={4} style={{ color: "red", margin: 0 }}>
+          <Title level={4} style={{ color: 'red', margin: 0 }}>
             {formatCurrencyVND(calculatedTotal)}
           </Title>
         </Col>
       </Row>
 
-      <div style={{ marginTop: "12px" }}>
+      <div style={{ marginTop: '12px' }}>
         {items.map((item, index) => {
           const unitPrice = ((): number => {
             if (!tourPrice) return item.price;
             const l = item.label.toLowerCase();
-            if (l.includes('người lớn') || l.includes('nguoi lon') || l.includes('adult')) return tourPrice.adultPrice;
-            if (l.includes('trẻ em') || l.includes('tre em') || l.includes('child')) return tourPrice.childPrice;
-            if (l.includes('em bé') || l.includes('em be') || l.includes('infant') || l.includes('baby')) return tourPrice.infantPrice ?? item.price;
+            if (l.includes('người lớn') || l.includes('nguoi lon') || l.includes('adult'))
+              return tourPrice.adultPrice;
+            if (l.includes('trẻ em') || l.includes('tre em') || l.includes('child'))
+              return tourPrice.childPrice;
+            if (
+              l.includes('em bé') ||
+              l.includes('em be') ||
+              l.includes('infant') ||
+              l.includes('baby')
+            )
+              return tourPrice.infantPrice ?? item.price;
             return item.price;
           })();
           return (
-            <Row key={index} justify="space-between" style={{ marginBottom: "6px" }}>
+            <Row key={index} justify="space-between" style={{ marginBottom: '6px' }}>
               <Col>
                 <Text>{item.label}</Text>
               </Col>

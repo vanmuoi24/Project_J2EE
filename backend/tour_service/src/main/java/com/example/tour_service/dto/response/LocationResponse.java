@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE) 
 
 public class LocationResponse {
+    int id;
     String city;
-    private LocationType type; 
+    LocationType type;
 }

@@ -1,13 +1,9 @@
 package com.example.tour_service.service;
 
-import com.example.tour_service.client.PricingClient;
+import com.example.tour_service.dto.response.*;
+import com.example.tour_service.repository.httpClient.PricingClient;
 import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourRequest;
-import com.example.tour_service.dto.response.LocationResponse;
-import com.example.tour_service.dto.response.TourFileResponse;
-import com.example.tour_service.dto.response.TourPriceResponse;
-import com.example.tour_service.dto.response.TourResponse;
-import com.example.tour_service.dto.response.VehicleResponse;
 import com.example.tour_service.entity.Location;
 import com.example.tour_service.entity.Tour;
 import com.example.tour_service.entity.Vehicle;
@@ -18,7 +14,6 @@ import com.example.tour_service.repository.TourRepository;
 import com.example.tour_service.repository.VehicleRepository;
 import com.example.tour_service.repository.httpClient.FileClient;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,14 +29,29 @@ public class TourService {
     private final LocationRepository locationRepository; // cần thêm repo cho Location
     private final VehicleRepository vehicleRepository;
     private final PricingClient pricingClient;
-        private final FileClient fileClient;
+    private final FileClient fileClient;
+    private final TourDepartureService tourDepartureService;
+
     public TourResponse getTourById(int id) {
         Tour tour = tourRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
 
         TourResponse response = toResponse(tour);
+
         ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
         response.setTourPrice(priceResp.getResult());
+
+        List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(id);
+        response.setDepartures(departures);
+
+        List<TourFileResponse> fileResponses = fileClient.getAllMedia();
+        List<String> tourImages = fileResponses.stream()
+                .filter(f -> String.valueOf(id).equals(f.getTourId()))
+                .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
+                .map(TourFileResponse::getUrl)
+                .collect(Collectors.toList());
+
+        response.setImageIds(tourImages);
 
         return response;
     }
@@ -58,6 +68,8 @@ public class TourService {
                                     TourResponse response = toResponse(tour);
                                     ApiResponse<TourPriceResponse> priceResp = pricingClient
                                                     .getPriceById(tour.getTourPriceId());
+                                    List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(tour.getId());
+                                    response.setDepartures(departures);
                                     response.setTourPrice(priceResp.getResult());
                                     List<String> urls = tourImagesMap.get(String.valueOf(tour.getId()));
                                     response.setImageIds(urls != null ? urls : List.of());
@@ -66,7 +78,6 @@ public class TourService {
                             .collect(Collectors.toList());
     }
 
-    @Transactional
     public TourResponse createTour(TourRequest request) {
             Location departure = locationRepository.findById(request.getDepartureLocationId())
                             .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
@@ -87,7 +98,9 @@ public class TourService {
                             .tourPriceId(request.getTourPriceId())
                             .build();
 
+
             Tour saved = tourRepository.save(tour);
+
             if (request.getFiles() != null && !request.getFiles().isEmpty()) {
                     try {
                             fileClient.uploadMultipleFiles(
@@ -137,8 +150,6 @@ public class TourService {
         tourRepository.deleteById(id);
     }
 
-
-
     private TourResponse toResponse(Tour tour) {
         return TourResponse.builder()
                 .id(tour.getId())
@@ -148,12 +159,16 @@ public class TourService {
                 .duration(tour.getDuration())
                 .departureCity(
                         LocationResponse.builder()
+                                .id(tour.getDepartureLocation().getId())
                                 .city(tour.getDepartureLocation().getCity())
+                                .type(tour.getDepartureLocation().getType())
                                 .build()
                 )
                 .destinationCity(
                         LocationResponse.builder()
+                                .id(tour.getDestinationLocation().getId())
                                 .city(tour.getDestinationLocation().getCity())
+                                .type(tour.getDestinationLocation().getType())
                                 .build()
                 )
                 .basePrice(tour.getBasePrice())

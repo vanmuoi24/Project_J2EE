@@ -18,6 +18,7 @@ public class Location {
 
     @Column(nullable = false)
     private String city;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LocationType type;

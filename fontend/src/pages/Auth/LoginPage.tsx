@@ -1,121 +1,92 @@
-  import { useAppDispatch, useAppSelector } from "@/store/hooks";
-  import { loginUser } from "@/store/slices/authSlice";
-  import { LockOutlined, UserOutlined } from "@ant-design/icons"
-  import { Button, Form, Input, Card, Typography, message, Divider, Space, Alert } from "antd"
-  import {  Navigate, useNavigate } from "react-router-dom";
-  import logo from '@/assets/images/logo.png'
-  import SubNavbar from "@/components/Share/SubNavbar";
-import { GoogleLogin } from "@react-oauth/google";
-import { sessionService } from "@/services/sessionServices";
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { loginUser } from '@/store/slices/authSlice';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Card, Typography, message, Divider, Space, Alert } from 'antd';
+import { Navigate, useNavigate } from 'react-router-dom';
+import logo from '@/assets/images/logo.png';
+import SubNavbar from '@/components/Share/SubNavbar';
+import { GoogleLogin } from '@react-oauth/google';
+import { sessionService } from '@/services/sessionServices';
 
-  export default function LoginPage() {
-    const navigate = useNavigate()
-    const dispatch = useAppDispatch();
-    const {loading, error, isAuth} = useAppSelector(state => state.auth)
+export default function LoginPage() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { loading, error, isAuth } = useAppSelector((state) => state.auth);
 
-    const onFinish = async (values: { email: string; password: string }) => {
-        const res = await dispatch(loginUser(values)).unwrap();
-        if (res.code === 1000) {
-          sessionService.setSession(
-            res.result.token,
-            res.result.user
-          );
-          message.success("Đăng nhập thành công!", 3);
-          navigate("/admin")
-        }
+  const onFinish = async (values: { email: string; password: string }) => {
+    const res = await dispatch(loginUser(values)).unwrap();
+    if (res.code === 1000) {
+      sessionService.setSession(res.result.token, res.result.user);
+      message.success('Đăng nhập thành công!', 3);
+      navigate('/admin');
     }
+  };
 
-    if (isAuth) {
-      return <Navigate to="/admin" replace />
-    }
+  if (isAuth) {
+    return <Navigate to="/admin" replace />;
+  }
 
-    return (
-      <>
-      <SubNavbar/>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: 'column',
-            minHeight: "100vh",
-            background: "#f5f5f5",
-          }}
-        >
-          <img
-            src={logo}
-            alt="Logo"
-            style={{
-              width: 400,
-              height: 80,
-              objectFit: "contain",
-              margin: "30px 16px",
-              display: "block",
-            }}
-          />
-          <Card style={{ width: 450,  boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
-            <Typography.Title level={3} style={{ textAlign: "center" }}>
-              Đăng nhập
-            </Typography.Title>
+  return (
+    <>
+      <div className="flex justify-center items-center flex-col min-h-[100vh] bg-[#f5f5f5]">
+        <img
+          src={logo}
+          alt="Logo"
+          className="w-[400px] h-[80px] object-contain !my-[30px] !mx-[16px] block"
+        />
+        <Card className="w-[450px] shadow-2xl">
+          <Typography.Title level={3} className="text-center">
+            Đăng nhập
+          </Typography.Title>
 
-            {error && (
-              <Alert
-                message={error}
-                type="error"
-                showIcon
-                style={{ marginBottom: 16 }}
-              />
-            )}
+          {error && <Alert message={error} type="error" showIcon className="!mb-[16px]" />}
 
-            <Form
-              name="login_form"
-              initialValues={{ remember: true }}
-              onFinish={onFinish}
-              layout="vertical"
+          <Form
+            name="login_form"
+            initialValues={{ remember: true }}
+            onFinish={onFinish}
+            layout="vertical"
+          >
+            <Form.Item
+              name="email"
+              label="Email"
+              rules={[{ required: true, message: 'Nhập email!' }]}
             >
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[{ required: true, message: "Nhập email!" }]}
+              <Input prefix={<UserOutlined />} placeholder="Nhập email" />
+            </Form.Item>
+
+            <Form.Item
+              name="password"
+              label="Mật khẩu"
+              rules={[{ required: true, message: 'Nhập mật khẩu!' }]}
+            >
+              <Input.Password prefix={<LockOutlined />} placeholder="Nhập password" />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="w-full !mb-[8px]"
+                loading={loading}
               >
-                <Input prefix={<UserOutlined />} placeholder="Nhập email" />
-              </Form.Item>
+                Đăng nhập
+              </Button>
 
-              <Form.Item
-                name="password"
-                label="Mật khẩu"
-                rules={[{ required: true, message: "Nhập mật khẩu!" }]}
-              >
-                <Input.Password prefix={<LockOutlined />} placeholder="Nhập password" />
-              </Form.Item>
+              <Divider plain>hoặc</Divider>
 
-            
-
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  style={{ width: "100%", marginBottom: 8 }}
-                  loading={loading}
-                >
-                  Đăng nhập
-                </Button>
-
-
-                  <Divider plain>hoặc</Divider>
-
-                  <Space direction="vertical" style={{ width: "100%" }}>
-                    <GoogleLogin
-                       onSuccess={(credentialResponse) => {
-                          console.log("Google Login Success:", credentialResponse);
-                          // credentialResponse.credential = JWT token
-                          // gửi về backend để xác thực
-                        }}
-                        onError={() => {
-                          console.log("Login Failed");
-                        }}
-                    />
-                    {/* <FacebookLogin
+              <Space direction="vertical" className="w-full">
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    console.log('Google Login Success:', credentialResponse);
+                    // credentialResponse.credential = JWT token
+                    // gửi về backend để xác thực
+                  }}
+                  onError={() => {
+                    console.log('Login Failed');
+                  }}
+                />
+                {/* <FacebookLogin
                       appId="YOUR_FACEBOOK_APP_ID"
                       autoLoad={false}
                       fields="name,email,picture"
@@ -124,27 +95,25 @@ import { sessionService } from "@/services/sessionServices";
                       icon={<FacebookOutlined />}
                       cssClass="ant-btn ant-btn-default ant-btn-block"
                     /> */}
-                  </Space>
+              </Space>
 
-                  <Typography.Paragraph style={{ textAlign: "center", marginBottom: 0 }}>
-                    Chưa có thành viên?{" "}
-                    <Button type="link" onClick={() => navigate('/register')    } style={{ padding: 0 }}>
-                      Đăng kí ngay
-                    </Button>
-                  </Typography.Paragraph>
-                <Button
-                  type="link"
-                  onClick={() => navigate("/")}
-                  style={{display: 'block', margin: '0 auto'}}
-                >
-                  Về trang chủ
+              <Typography.Paragraph className="text-center !mb-0">
+                Chưa có thành viên?{' '}
+                <Button type="link" onClick={() => navigate('/register')} className="!p-0">
+                  Đăng kí ngay
                 </Button>
-              </Form.Item>
-            </Form>
-
-            
-          </Card>
-        </div>
-      </>
-    )
-  }
+              </Typography.Paragraph>
+              <Button
+                type="link"
+                onClick={() => navigate('/')}
+                className="w-full text-center !my-0 !mx-auto"
+              >
+                Về trang chủ
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </div>
+    </>
+  );
+}
