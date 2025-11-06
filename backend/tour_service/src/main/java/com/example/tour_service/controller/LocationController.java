@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import javax.xml.stream.Location;
 @RestController
-@RequestMapping("locations")
+@RequestMapping("/locations")
 @RequiredArgsConstructor
 public class LocationController {
     private final LocationService locationService;
@@ -52,6 +52,32 @@ public class LocationController {
         return ApiResponse.<List<LocationResponse>>builder()
                 .result(locationService.getAllDestinationLocations())
                 .message("Fetched All Destination Locations")
+                .build();
+    }
+
+    /**
+     * API tìm kiếm các điểm đi (departures) theo từ khóa.
+     * Ví dụ: GET /locations/departures/search?keyword=Hà
+     */
+    @GetMapping("/departures/search")
+    public ApiResponse<List<LocationResponse>> searchDepartureLocations(@RequestParam(name = "keyword") String keyword) {
+        return ApiResponse.<List<LocationResponse>>builder()
+                // 1. Bạn cần tạo phương thức này trong LocationService
+                .result(locationService.searchDepartureLocations(keyword))
+                .message("Searched departure locations successfully")
+                .build();
+    }
+
+    /**
+     * API tìm kiếm các điểm đến (destinations) theo từ khóa.
+     * Ví dụ: GET /locations/destinations/search?keyword=Đà
+     */
+    @GetMapping("/destinations/search")
+    public ApiResponse<List<LocationResponse>> searchDestinationLocations(@RequestParam(name = "keyword") String keyword) {
+        return ApiResponse.<List<LocationResponse>>builder()
+                // 2. Bạn cần tạo phương thức này trong LocationService
+                .result(locationService.searchDestinationLocations(keyword))
+                .message("Searched destination locations successfully")
                 .build();
     }
 }

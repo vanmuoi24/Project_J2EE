@@ -43,8 +43,21 @@ public class TourService {
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
 
         TourResponse response = toResponse(tour);
+
         ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
         response.setTourPrice(priceResp.getResult());
+
+        List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(id);
+        response.setDepartures(departures);
+
+        List<TourFileResponse> fileResponses = fileClient.getAllMedia();
+        List<String> tourImages = fileResponses.stream()
+                .filter(f -> String.valueOf(id).equals(f.getTourId()))
+                .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
+                .map(TourFileResponse::getUrl)
+                .collect(Collectors.toList());
+
+        response.setImageIds(tourImages);
 
         return response;
     }
@@ -61,6 +74,8 @@ public class TourService {
                                     TourResponse response = toResponse(tour);
                                     ApiResponse<TourPriceResponse> priceResp = pricingClient
                                                     .getPriceById(tour.getTourPriceId());
+                                    List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(tour.getId());
+                                    response.setDepartures(departures);
                                     response.setTourPrice(priceResp.getResult());
                                     List<String> urls = tourImagesMap.get(String.valueOf(tour.getId()));
                                     response.setImageIds(urls != null ? urls : List.of());
@@ -138,7 +153,7 @@ public class TourService {
         existingTour.setDestinationLocation(existingDestinationLocation);
         existingTour.setVehicle(existingVehicle);
         existingTour.setTourPriceId(request.getTourPriceId());
-        existingTour.setDepartureDate(request.getDepartureDate());
+
 
         Tour saved = tourRepository.save(existingTour);
         return toResponse(saved);
@@ -152,6 +167,56 @@ public class TourService {
         tourRepository.deleteById(id);
     }
 
+    // Phương thức mới cho tìm kiếm và phân trang
+    public Page<TourResponse> searchTours(TourSearchRequest request, Pageable pageable) {
+        // 1. Tạo specification từ request
+        Specification<Tour> spec = TourSpecification.build(request);
+
+        // 2. TẠO LOGIC SORT TỪ REQUEST (Giống như chúng ta đã làm)
+        String sortField = "createdAt"; // Mặc định
+        Sort.Direction direction = Sort.Direction.DESC; // Mặc định
+
+        String sortRequest = (request.getSort() != null && !request.getSort().isEmpty())
+                ? request.getSort()
+                : "newest";
+
+        switch (sortRequest) {
+            case "dateSoon":
+                sortField = "departureDate";
+                direction = Sort.Direction.ASC;
+                break;
+            case "priceLow":
+                sortField = "basePrice";
+                direction = Sort.Direction.ASC;
+                break;
+            case "priceHigh":
+                sortField = "basePrice";
+                direction = Sort.Direction.DESC;
+                break;
+            case "newest":
+            default:
+                sortField = "id"; // Hoặc "createAt"
+                direction = Sort.Direction.DESC;
+                break;
+        }
+        Sort sort = Sort.by(direction, sortField);
+
+        // 3. TẠO PAGEABLE MỚI KẾT HỢP LOGIC CŨ VÀ SORT MỚI
+        // Chúng ta lấy số trang và kích thước trang từ 'pageable' cũ,
+        // nhưng áp dụng 'sort' mới mà chúng ta vừa tạo.
+        Pageable newPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                sort
+        );
+
+        // 2. Gọi repository với cả spec và pageable
+        Page<Tour> toursPage = tourRepository.findAll(spec, newPageable);
+
+        // 3. Chuyển đổi Page<Tour> sang Page<TourResponse>
+        return toursPage.map(this::toResponse);
+    }
+
     private TourResponse toResponse(Tour tour) {
         return TourResponse.builder()
                 .id(tour.getId())
@@ -163,12 +228,14 @@ public class TourService {
                         LocationResponse.builder()
                                 .id(tour.getDepartureLocation().getId())
                                 .city(tour.getDepartureLocation().getCity())
+                                .type(tour.getDepartureLocation().getType())
                                 .build()
                 )
                 .destinationCity(
                         LocationResponse.builder()
                                 .id(tour.getDestinationLocation().getId())
                                 .city(tour.getDestinationLocation().getCity())
+                                .type(tour.getDestinationLocation().getType())
                                 .build()
                 )
                 .basePrice(tour.getBasePrice())
@@ -178,7 +245,7 @@ public class TourService {
                                 .name(tour.getVehicle().getVehicleType())
                                 .build()
                 )
-                .departureDate(tour.getDepartureDate())
+
                 .build();
     }
 }

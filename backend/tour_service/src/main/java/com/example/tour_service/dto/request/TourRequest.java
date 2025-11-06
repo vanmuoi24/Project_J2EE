@@ -1,6 +1,6 @@
 package com.example.tour_service.dto.request;
 
-import com.example.tour_service.dto.response.VehicleResponse;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -24,5 +24,6 @@ public class TourRequest {
     BigDecimal basePrice;
     String vehicleId;
     Long tourPriceId;
+    
     List<MultipartFile> files;
 }
