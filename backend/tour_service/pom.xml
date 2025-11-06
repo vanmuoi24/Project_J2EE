@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -71,6 +71,11 @@
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.5.5.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <version>1.5.5.Final</version>
             <scope>provided</scope>
@@ -113,39 +118,14 @@
     </dependencyManagement>
     <build>
         <plugins>
-            <!-- 1. PLUGIN SPRING BOOT (Đã xóa <importOrder> khỏi đây) -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-
-            <!-- 2. PLUGIN SPOTLESS (Thêm mới plugin này vào) -->
-            <plugin>
-                <groupId>com.diffplug.spotless</groupId>
-                <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.43.0</version>
-                <configuration>
-                    <java>
-                        <!-- ĐÂY LÀ VỊ TRÍ ĐÚNG CỦA <importOrder> -->
-                        <importOrder>
-                            <order>java,jakarta,org,com,com.diffplug</order>
-                        </importOrder>
-
-                        <!-- Spotless cần ít nhất 1 trình format, ví dụ: palantir -->
-                        <palantirJavaFormat />
-                    </java>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>spotless-check</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <importOrder>
+                    <!-- Specify either order or file, but not both -->
+                    <order>java,jakarta,org,com,com.diffplug,</order>
+                </importOrder>
             </plugin>
         </plugins>
     </build>
 </project>
-

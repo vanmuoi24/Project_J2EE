@@ -1,14 +1,9 @@
 package com.example.tour_service.service;
 
-import com.example.tour_service.dto.request.TourDocument;
+import com.example.tour_service.dto.response.*;
 import com.example.tour_service.repository.httpClient.PricingClient;
 import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourRequest;
-import com.example.tour_service.dto.response.LocationResponse;
-import com.example.tour_service.dto.response.TourFileResponse;
-import com.example.tour_service.dto.response.TourPriceResponse;
-import com.example.tour_service.dto.response.TourResponse;
-import com.example.tour_service.dto.response.VehicleResponse;
 import com.example.tour_service.entity.Location;
 import com.example.tour_service.entity.Tour;
 import com.example.tour_service.entity.Vehicle;
@@ -19,8 +14,6 @@ import com.example.tour_service.repository.TourRepository;
 import com.example.tour_service.repository.VehicleRepository;
 import com.example.tour_service.repository.httpClient.FileClient;
 
-import com.example.tour_service.repository.httpClient.SearchClient;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,14 +30,28 @@ public class TourService {
     private final VehicleRepository vehicleRepository;
     private final PricingClient pricingClient;
     private final FileClient fileClient;
-    private final SearchClient searchClient;
+    private final TourDepartureService tourDepartureService;
+
     public TourResponse getTourById(int id) {
         Tour tour = tourRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
 
         TourResponse response = toResponse(tour);
+
         ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
         response.setTourPrice(priceResp.getResult());
+
+        List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(id);
+        response.setDepartures(departures);
+
+        List<TourFileResponse> fileResponses = fileClient.getAllMedia();
+        List<String> tourImages = fileResponses.stream()
+                .filter(f -> String.valueOf(id).equals(f.getTourId()))
+                .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
+                .map(TourFileResponse::getUrl)
+                .collect(Collectors.toList());
+
+        response.setImageIds(tourImages);
 
         return response;
     }
@@ -61,6 +68,8 @@ public class TourService {
                                     TourResponse response = toResponse(tour);
                                     ApiResponse<TourPriceResponse> priceResp = pricingClient
                                                     .getPriceById(tour.getTourPriceId());
+                                    List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(tour.getId());
+                                    response.setDepartures(departures);
                                     response.setTourPrice(priceResp.getResult());
                                     List<String> urls = tourImagesMap.get(String.valueOf(tour.getId()));
                                     response.setImageIds(urls != null ? urls : List.of());
@@ -87,21 +96,11 @@ public class TourService {
                             .destinationLocation(destination)
                             .vehicle(vehicle)
                             .tourPriceId(request.getTourPriceId())
-                            .departureDate(request.getDepartureDate())
                             .build();
 
-            TourDocument document = TourDocument.builder()
-                            .id(tour.getId())
-                            .tourProgram(tour.getTourProgram())
-                            .tourTitle(tour.getTourTitle())
-                            .basePrice(tour.getBasePrice())
-                            .departureLocation(tour.getDepartureLocation().getCity())
-                            .destinationLocation(tour.getDestinationLocation().getCity())
-                            .vehicle(tour.getVehicle().getVehicleType())
-                            .build();
-            searchClient.saveTour(document);
 
             Tour saved = tourRepository.save(tour);
+
             if (request.getFiles() != null && !request.getFiles().isEmpty()) {
                     try {
                             fileClient.uploadMultipleFiles(
@@ -138,7 +137,6 @@ public class TourService {
         existingTour.setDestinationLocation(existingDestinationLocation);
         existingTour.setVehicle(existingVehicle);
         existingTour.setTourPriceId(request.getTourPriceId());
-        existingTour.setDepartureDate(request.getDepartureDate());
 
         Tour saved = tourRepository.save(existingTour);
         return toResponse(saved);
@@ -163,12 +161,14 @@ public class TourService {
                         LocationResponse.builder()
                                 .id(tour.getDepartureLocation().getId())
                                 .city(tour.getDepartureLocation().getCity())
+                                .type(tour.getDepartureLocation().getType())
                                 .build()
                 )
                 .destinationCity(
                         LocationResponse.builder()
                                 .id(tour.getDestinationLocation().getId())
                                 .city(tour.getDestinationLocation().getCity())
+                                .type(tour.getDestinationLocation().getType())
                                 .build()
                 )
                 .basePrice(tour.getBasePrice())
@@ -178,7 +178,6 @@ public class TourService {
                                 .name(tour.getVehicle().getVehicleType())
                                 .build()
                 )
-                .departureDate(tour.getDepartureDate())
                 .build();
     }
 }

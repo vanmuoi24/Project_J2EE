@@ -24,9 +24,6 @@ public class TourResponse {
     BigDecimal basePrice;
     VehicleResponse vehicle;
     TourPriceResponse tourPrice;
-    List<ItineraryResponse> itineraries;
+    List<TourDepartureResponse> departures;
     List<String> imageIds;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    LocalDate departureDate;
 }
