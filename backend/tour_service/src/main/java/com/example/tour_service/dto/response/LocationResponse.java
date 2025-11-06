@@ -16,5 +16,5 @@ import lombok.experimental.FieldDefaults;
 public class LocationResponse {
     int id;
     String city;
-    LocationType type;
+    private LocationType type; 
 }

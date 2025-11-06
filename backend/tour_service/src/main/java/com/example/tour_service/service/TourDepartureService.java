@@ -1,5 +1,6 @@
 package com.example.tour_service.service;
 
+import com.example.tour_service.dto.request.TourDocument;
 import com.example.tour_service.repository.httpClient.PricingClient;
 import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourDepartureRequest;
@@ -11,6 +12,7 @@ import com.example.tour_service.exception.AppException;
 import com.example.tour_service.exception.ErrorCode;
 import com.example.tour_service.repository.TourDepartureRepository;
 import com.example.tour_service.repository.TourRepository;
+import com.example.tour_service.repository.httpClient.SearchClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ public class TourDepartureService {
     private final TourDepartureRepository tourDepartureRepository;
     private final TourRepository tourRepository;
     private final PricingClient pricingClient;
+    private final SearchClient searchClient;
 
     public TourDepartureResponse getTourDepartureById(int id){
         TourDeparture tourDeparture = tourDepartureRepository.findById(id)
@@ -57,7 +60,6 @@ public class TourDepartureService {
                     TourDepartureResponse response = toResponse(tourDeparture);
                     ApiResponse<TourPriceResponse> priceResp =
                             pricingClient.getPriceById(tourDeparture.getTour().getTourPriceId());
-
                     response.setTourPrice(priceResp.getResult());
 
                     return response;
@@ -91,6 +93,14 @@ public class TourDepartureService {
                 .stream()
                 .map(td -> td.getDepartureDate().toString()) // có thể format lại nếu cần
                 .collect(Collectors.toList());
+
+        // Gọi sang search service để cập nhật document
+        TourDocument doc = TourDocument.builder()
+                .id(tour.getId())
+                .departureDates(departureDates)
+                .build();
+
+        searchClient.saveTour(doc);
 
         TourDeparture saved = tourDepartureRepository.save(tourDeparture);
         return toResponse(saved);

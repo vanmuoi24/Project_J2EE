@@ -74,7 +74,7 @@ public class FileService {
             // Map sang entity
             var fileMgmt = fileMgmtMapper.toFileMgmt(fileInfo);
             fileMgmt.setId(UUID.randomUUID().toString());
-            fileMgmt.setOwnerId(userId);
+            fileMgmt.setOwnerId("");
             fileMgmt.setTourId(tourId);
             fileMgmtRepository.save(fileMgmt);
             responses.add(FileResponse.builder()
@@ -84,6 +84,40 @@ public class FileService {
         }
 
         return responses;
+    }
+
+
+    public FileResponse uploadAvt(String ownerId, MultipartFile file) throws IOException {
+
+
+        // --- 2. Kiểm tra có avatar cũ không ---
+        var existingFileOpt = fileMgmtRepository.findByOwnerId(ownerId);
+        existingFileOpt.ifPresent(oldFile -> {
+            try {
+                // Xóa file cũ trong storage (Cloudinary/S3/Local)
+                fileRepository.delete(oldFile);
+                // Xóa record trong DB
+                fileMgmtRepository.delete(oldFile);
+            } catch (Exception e) {
+                throw new AppException(ErrorCode.FILE_NOT_FOUND);
+            }
+        });
+
+        // --- 3. Upload file mới ---
+        var fileInfo = fileRepository.store(file);
+
+        // --- 4. Lưu metadata ---
+        var fileMgmt = fileMgmtMapper.toFileMgmt(fileInfo);
+        fileMgmt.setId(UUID.randomUUID().toString());
+        fileMgmt.setOwnerId(ownerId);
+        fileMgmt.setTourId("null");
+        fileMgmtRepository.save(fileMgmt);
+
+        // --- 5. Trả về phản hồi ---
+        return FileResponse.builder()
+                .originalFileName(file.getOriginalFilename())
+                .url(fileInfo.getUrl())
+                .build();
     }
 
 }

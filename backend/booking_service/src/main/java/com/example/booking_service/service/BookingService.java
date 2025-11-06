@@ -13,14 +13,12 @@ import com.example.booking_service.exception.ErrorCode;
 import com.example.booking_service.mapper.BookingMapper;
 import com.example.booking_service.mapper.CustomerMapper;
 import com.example.booking_service.repository.BookingRepository;
-import com.example.booking_service.repository.CustomerBookingRepository;
 import com.example.booking_service.repository.CustomerRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Book;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -33,7 +31,6 @@ public class BookingService {
     private final TourDepartureClient tourDepartureClient;
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
-    private final CustomerBookingRepository customerBookingRepository;
     private final BookingMapper bookingMapper;
     private final CustomerMapper customerMapper;
 
@@ -88,7 +85,7 @@ public class BookingService {
 
             // --- TẠO BOOKING ---
             Booking booking = bookingMapper.toBooking(bookingRequest);
-            booking.setStatus(BookingStatus.CONFIRMED);
+            booking.setStatus(BookingStatus.UNPAID);
             booking.setAccountId(Integer.parseInt(bookingRequest.getUserId()));
             booking.setCreatedAt(LocalDateTime.now());
             booking.setTourDepartureId(Integer.parseInt(bookingRequest.getTourDepartureId()));
@@ -149,6 +146,26 @@ public class BookingService {
         } catch (Exception e) {
             throw new RuntimeException("Lỗi khi lấy dữ liệu người dùng hoặc tour", e);
         }
+    }
+
+    public BookingResponse updateBookingStatus(Long id) {
+        // --- Lấy booking hiện tại ---
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
+
+        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setCreatedAt(LocalDateTime.now());
+
+        bookingRepository.save(booking);
+
+        // --- Ánh xạ dữ liệu phản hồi ---
+        return BookingResponse.builder()
+                .id(String.valueOf(booking.getId()))
+                .accountId(String.valueOf(booking.getAccountId()))
+                .status(String.valueOf(booking.getStatus()))
+                .createdAt(String.valueOf(booking.getCreatedAt()))
+                .message("Cập nhật trạng thái booking thành công.")
+                .build();
     }
 
 

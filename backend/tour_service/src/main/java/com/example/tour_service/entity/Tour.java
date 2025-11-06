@@ -53,4 +53,7 @@ public class Tour {
     @Column(name = "image_id")
     private List<String> imageIds;
 
+    @Column(nullable = false, name = "departure_date")
+    private LocalDate departureDate;
+
 }

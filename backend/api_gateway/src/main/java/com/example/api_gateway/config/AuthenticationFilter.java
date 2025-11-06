@@ -44,6 +44,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/file/media/download/.*",
             "/pricing/prices/.*",
             "/tour/tours/.*",
+            "/tour/locations/.*",
+            "/tour/vehicles/.*",
             "/tour/tour-departures/tour/.*",
             "/tour/tour-departures/.*",
             "/tour/itineraries/tour/.*",

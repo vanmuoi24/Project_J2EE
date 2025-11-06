@@ -19,6 +19,18 @@ spring:
       hibernate.dialect: org.hibernate.dialect.MySQLDialect
   elasticsearch:
     uris: http://localhost:9200
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000
+      database: 0
+      client-type: lettuce
+logging:
+  level:
+    org.springframework.data.redis: DEBUG
+    io.lettuce.core: DEBUG
+
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
   valid-duration: 15 # in second

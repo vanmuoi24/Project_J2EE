@@ -45,6 +45,7 @@ public class TourSearchService {
 
         // Xóa cache Redis liên quan
         redisTemplate.delete("allTours");
+
         Set<String> keys = redisTemplate.keys("filter:*");
         if (keys != null && !keys.isEmpty()) {
             redisTemplate.delete(keys);

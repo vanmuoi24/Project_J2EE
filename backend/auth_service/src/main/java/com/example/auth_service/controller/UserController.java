@@ -1,12 +1,19 @@
 package com.example.auth_service.controller;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.method.P;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.auth_service.dto.request.ApiResponse;
 import com.example.auth_service.dto.request.UserCreationRequest;
 import com.example.auth_service.dto.request.UserUpdate;
+import com.example.auth_service.dto.response.FileResponse;
 import com.example.auth_service.dto.response.PageResponse;
 import com.example.auth_service.dto.response.UserResponse;
 import com.example.auth_service.entity.User;
@@ -20,6 +27,7 @@ import lombok.experimental.FieldDefaults;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Validated
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 
 public class UserController {
@@ -27,7 +35,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/register")
-        ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
+        ApiResponse<UserResponse> createUser(@RequestBody UserCreationRequest request) {
             System.err.println(request);
         return ApiResponse.<UserResponse>builder()
                 .result(userService.createUser(request))
@@ -35,8 +43,8 @@ public class UserController {
     }
 
     @GetMapping("/list")
-    public ApiResponse<UserResponse> listUser(){
-        return ApiResponse.<UserResponse>builder()
+    public ApiResponse<List<UserResponse>> listUser() {
+        return ApiResponse.<List<UserResponse>>builder()
                 .result(userService.getAllUser())
                 .build();
     }
@@ -66,6 +74,11 @@ public class UserController {
     }
 
 
-
-    
+    @PostMapping ("/updateAvtUser/{id}")
+    public ResponseEntity<FileResponse>  updateAvtUser( @PathVariable("id") String id,
+            @RequestPart("file") MultipartFile file) throws IOException{
+                 FileResponse response = userService.uploadAvatar(id, file);
+        return ResponseEntity.ok(response);
+    }
+ 
 }
