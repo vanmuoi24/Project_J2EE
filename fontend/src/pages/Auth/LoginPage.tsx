@@ -7,11 +7,12 @@ import logo from '@/assets/images/logo.png';
 import SubNavbar from '@/components/Share/SubNavbar';
 import { GoogleLogin } from '@react-oauth/google';
 import { sessionService } from '@/services/sessionServices';
+import type { RootState } from '@/store';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { loading, error, isAuth } = useAppSelector((state) => state.auth);
+  const { loading, error, isAuth } = useAppSelector((state: RootState) => state.auth);
 
   const onFinish = async (values: { email: string; password: string }) => {
     const res = await dispatch(loginUser(values)).unwrap();
@@ -29,13 +30,13 @@ export default function LoginPage() {
   return (
     <>
       <div className="flex justify-center items-center flex-col min-h-[100vh] bg-[#f5f5f5]">
-        <img
+        {/* <img
           src={logo}
           alt="Logo"
           className="w-[400px] h-[80px] object-contain !my-[30px] !mx-[16px] block"
-        />
+        /> */}
         <Card className="w-[450px] shadow-2xl">
-          <Typography.Title level={3} className="text-center">
+          <Typography.Title level={3} className="text-center !text-[#7BBCB0]">
             Đăng nhập
           </Typography.Title>
 
@@ -67,7 +68,7 @@ export default function LoginPage() {
               <Button
                 type="primary"
                 htmlType="submit"
-                className="w-full !mb-[8px]"
+                className="w-full !mb-[8px] !bg-[#7BBCB0]"
                 loading={loading}
               >
                 Đăng nhập
@@ -99,14 +100,18 @@ export default function LoginPage() {
 
               <Typography.Paragraph className="text-center !mb-0">
                 Chưa có thành viên?{' '}
-                <Button type="link" onClick={() => navigate('/register')} className="!p-0">
+                <Button
+                  type="link"
+                  onClick={() => navigate('/register')}
+                  className="!p-0 !text-[#7BBCB0]"
+                >
                   Đăng kí ngay
                 </Button>
               </Typography.Paragraph>
               <Button
                 type="link"
                 onClick={() => navigate('/')}
-                className="w-full text-center !my-0 !mx-auto"
+                className="w-full text-center !my-0 !mx-auto !text-[#7BBCB0]"
               >
                 Về trang chủ
               </Button>

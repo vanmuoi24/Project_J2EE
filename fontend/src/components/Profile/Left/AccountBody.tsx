@@ -28,7 +28,7 @@ const AccountBody = ({ activeMenu, setActiveMenu }: IProps) => {
           <FileTextOutlined className="!mr-2" />
           Đơn đặt chỗ
         </div>
-        <div
+        {/* <div
           onClick={() => setActiveMenu('reviews')}
           className={`!w-full text-left !px-3 !py-2 !rounded-lg !transition cursor-pointer ${
             activeMenu === 'reviews' ? 'bg-blue-100 font-semibold' : 'hover:bg-gray-200'
@@ -36,7 +36,7 @@ const AccountBody = ({ activeMenu, setActiveMenu }: IProps) => {
         >
           <UserOutlined className="!mr-2" />
           Đánh giá của quý khách
-        </div>
+        </div> */}
       </div>
     </Card>
   );

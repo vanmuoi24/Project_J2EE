@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import debounce from 'lodash.debounce';
 import { searchLocation } from '@/services/tourServices';
+import { Calendar, Car, LocationEdit, Ticket } from 'lucide-react';
 
 interface DestinationOption {
   value: string | number;
@@ -108,11 +109,12 @@ const Tours = () => {
 
   return (
     <div>
-      <Flex vertical={false} className="p-2 md:px-3">
+      <Flex vertical={false} className="!p-2 md:px-3">
         {/* Where to travel */}
         <div className="flex-[4]">
-          <p className="m-0 mb-1 text-[16px] font-medium">
-            Where would you like to travel?
+          <p className="!m-0 !mb-1 text-[16px] font-bold flex items-center gap-2 text-[#7BBCB0]">
+            <LocationEdit className="text-[12px]" />
+            Bạn muốn đi đâu?
             <span className="text-red-500">*</span>
           </p>
           <AutoComplete
@@ -124,7 +126,7 @@ const Tours = () => {
             placeholder="Chọn địa điểm"
             variant="borderless"
             // Thêm w-full để nó lấp đầy container flex
-            className="!p-0 text-[16px] font-medium w-full"
+            className="!p-0 text-[16px] font-medium w-full "
             // 2. Hiển thị nội dung khi không tìm thấy
             notFoundContent={<div className="text-center p-2">Không có kết quả phù hợp</div>}
           />
@@ -134,7 +136,10 @@ const Tours = () => {
 
         {/* Departure date */}
         <div className="flex-[3]">
-          <p className="m-0 mb-1 text-[16px] font-medium">Departure date</p>
+          <p className="m-0 mb-1 text-[16px] font-medium text-[#7BBCB0] flex items-center gap-2">
+            <Calendar />
+            Ngày đi
+          </p>
           <DatePicker
             format="dddd, DD/MM/YYYY"
             variant="borderless"
@@ -153,7 +158,10 @@ const Tours = () => {
         {/* Price range + button */}
         <div className="flex flex-[3] justify-between">
           <div>
-            <p className="m-0 mb-1 text-[16px] font-medium pl-[11px]">Price range</p>
+            <p className="m-0 mb-1 text-[16px] font-medium text-[#7BBCB0] flex items-center gap-2">
+              <Ticket />
+              Ngân sách
+            </p>
             <Select
               placeholder="Chọn mức giá"
               variant="borderless"
@@ -163,8 +171,8 @@ const Tours = () => {
               className="!w-[180px]"
             />
           </div>
-          <Button className="!h-full" onClick={handleSearch}>
-            <SearchOutlined className="text-[20px] px-[6px]" />
+          <Button className="!h-full !border-[#7BBCB0]" onClick={handleSearch}>
+            <SearchOutlined className="text-[20px] px-[6px] !text-[#7BBCB0]" />
           </Button>
         </div>
       </Flex>

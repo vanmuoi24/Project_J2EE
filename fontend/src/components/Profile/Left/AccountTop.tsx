@@ -82,7 +82,7 @@ const AccountTop = () => {
               className="border-2 border-gray-200"
             />
             {!loading && (
-              <div className="absolute  inset-0 bg-[#c1c1c1] bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute w-[50%] inset-0 bg-[#c1c1c1] bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <CameraOutlined className="!text-white text-2xl" />
               </div>
             )}

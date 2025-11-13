@@ -1,7 +1,6 @@
 import { Card } from 'antd';
 import Info from './Info';
-import Liked from './Liked';
-import Rate from './Rate';
+import History from './History';
 
 interface IProps {
   activeMenu: string;
@@ -12,12 +11,12 @@ const AccountContent = ({ activeMenu }: IProps) => {
     switch (activeMenu) {
       case 'info':
         return <Info />;
-      // case 'bookings':
-      //   return <History />;
+      case 'bookings':
+        return <History />;
       case 'favorites':
-        return <Liked />;
+      // return <Liked />;
       case 'reviews':
-        return <Rate />;
+      // return <Rate />;
       default:
         return <p>Không có dữ liệu !!!</p>;
     }

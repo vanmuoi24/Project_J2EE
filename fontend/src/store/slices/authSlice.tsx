@@ -44,7 +44,7 @@ export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
   'auth/logoutUser',
   async (_, { rejectWithValue }) => {
     try {
-      await logoutService(sessionService.getToken() || '');
+      await logoutService(sessionService.getToken() ?? '');
       sessionService.clearSession();
     } catch (err: unknown) {
       if (err instanceof Error) return rejectWithValue(err.message);
@@ -162,7 +162,6 @@ const authSlice = createSlice({
         state.error =
           typeof action.payload === 'string' ? action.payload : 'Cập nhật thông tin thất bại';
       })
-
       //
       .addCase(uploadAvatar.pending, (state) => {
         state.loading = true;
@@ -189,6 +188,7 @@ const authSlice = createSlice({
         state.error =
           typeof action.payload === 'string' ? action.payload : 'Upload avatar thất bại';
       });
+
     //
   },
 });

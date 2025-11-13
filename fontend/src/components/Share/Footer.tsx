@@ -23,13 +23,13 @@ export const Footer = () => {
           <div>
             <h2 className="text-2xl font-bold !mb-4">SGUTour</h2>
             <p className="text-gray-300">
-              Explore Vietnam and beyond with our carefully curated tours, last-minute deals, and
-              unforgettable experiences.
+              Khám phá Việt Nam và hơn thế nữa với các chuyến tham quan được tuyển chọn cẩn thận,
+              các ưu đãi vào phút chót và những trải nghiệm khó quên.
             </p>
           </div>
 
           {/* 2. Quick Links */}
-          <div>
+          {/* <div>
             <h4 className="font-semibold text-lg !mb-4">Quick Links</h4>
             <ul className="!space-y-2">
               <li>
@@ -58,11 +58,11 @@ export const Footer = () => {
                 </a>
               </li>
             </ul>
-          </div>
+          </div> */}
 
           {/* 3. Contact Info */}
           <div>
-            <h4 className="font-semibold text-lg !mb-4">Contact</h4>
+            <h4 className="font-semibold text-lg !mb-4">Liên hệ</h4>
             <p className="flex items-center gap-2 !mb-2">
               <EnvironmentOutlined /> 123 Nguyễn Huệ, Quận 1, TP.HCM
             </p>
@@ -74,7 +74,7 @@ export const Footer = () => {
             </p>
 
             {/* Payment */}
-            <h4 className="font-semibold text-lg !mt-6 !mb-2">Payment</h4>
+            <h4 className="font-semibold text-lg !mt-6 !mb-2">Thanh toán</h4>
             <div className="flex gap-4">
               <CreditCardOutlined style={{ fontSize: 24 }} title="Bank" />
               <img src={momo} alt="Momo" className="h-6" />
@@ -84,7 +84,7 @@ export const Footer = () => {
 
           {/* 4. Social + Certificate */}
           <div>
-            <h4 className="font-semibold text-lg !mb-2">Follow Us</h4>
+            <h4 className="font-semibold text-lg !mb-2">Theo dõi chúng tôi</h4>
             <div className="flex gap-3 !mb-6 text-2xl">
               <a href="#" className="hover:text-blue-400 transition">
                 <FacebookFilled />
@@ -100,7 +100,7 @@ export const Footer = () => {
               </a>
             </div>
 
-            <h4 className="font-semibold text-lg !mb-2">Certificate</h4>
+            <h4 className="font-semibold text-lg !mb-2">Xác nhận</h4>
             {/* <div className="flex items-center gap-2">
               <SafetyCertificateOutlined style={{ fontSize: 28 }} />
               <span className="text-gray-300">Trusted Travel Agency</span>

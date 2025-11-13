@@ -116,25 +116,30 @@ const PopularTours = () => {
   };
 
   return (
-    <div className="!mb-20 bg-[#dcefff] !py-[30px] !px-0">
+    <div className="!mb-20 bg-gradient-to-r from-[#7dadb0] to-[#ddb5fc] !py-[30px] !px-0">
       <Container>
-        <div className="!mb-[12px]">
-          <h2 className="text-[32px] font-[700] uppercase text-[#0b5da7] !mb-0">Popular Tours</h2>
-          <div className="w-[60px] h-[4px] bg-[#0b5da7] rounded-[2px]" />
+        <div className="!mb-[12px] flex flex-col items-center">
+          <h2 className="text-[32px] font-bold text-center uppercase text-[#fff] !mb-0">
+            CHUYẾN ĐI HẤP DẪN
+          </h2>
+          <div className="w-[200px] h-[4px] bg-[#FFDA32] rounded-[2px]" />
         </div>
-
-        <p className="text-[20px] text-[#444] !mb-[24px] max-w-[720px]">
-          Explore our top-rated tours and find inspiration for your next journey.
-        </p>
-
-        {/* Gọi hàm render nội dung */}
-        {renderSliderContent()}
+        <div className="flex justify-center">
+          <p className="text-[18px] text-center text-[#666] !mb-[24px] max-w-[720px]">
+            Khám phá các chuyến tham quan được xếp hạng hàng đầu của chúng tôi và tìm nguồn cảm hứng
+            cho hành trình tiếp theo của bạn.
+          </p>
+        </div>
+        <div className="!mt-[40px]">
+          {/* Gọi hàm render nội dung */}
+          {renderSliderContent()}
+        </div>
 
         <div className="text-center !mt-[32px]">
           <Button
             type="primary"
             size="large"
-            className="bg-[#0b5da7] border-[#0b5da7] rounded-[8px] !py-0 !px-[32px] h-[48px] text-[16px] font-[600]"
+            className="!bg-[#7BBCB0] rounded-[8px] !py-0 !px-[32px] h-[48px] text-[16px] !font-bold"
             onClick={handleViewMore}
           >
             View more
