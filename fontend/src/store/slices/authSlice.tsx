@@ -3,7 +3,7 @@ import type { AuthState, LoginRequest } from '@/types/Auth.d';
 import { loginService, logoutService, refreshTokenService } from '@/services/authServices';
 import { sessionService } from '@/services/sessionServices';
 import type { IUserUpdate, User } from '@/types/User';
-import { updateProfile } from '@/services/userServices';
+import { updateAvt, updateProfile } from '@/services/userServices';
 
 const initialState: AuthState = {
   isAuth: false,
@@ -54,7 +54,7 @@ export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
 );
 
 export const uploadProfile = createAsyncThunk(
-  'auth/uploadAvatar',
+  'auth/uploadProfile',
   async (arg: { data: IUserUpdate; userId: number | undefined }, thunkAPI) => {
     try {
       // Gọi service API của bạn
@@ -64,7 +64,29 @@ export const uploadProfile = createAsyncThunk(
         return response.result;
       } else {
         // Nếu API trả về lỗi có cấu trúc
-        return thunkAPI.rejectWithValue('Upload thất bại');
+        return thunkAPI.rejectWithValue('Cập nhật thông tin thất bại');
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return thunkAPI.rejectWithValue(err.message);
+      }
+      return thunkAPI.rejectWithValue('Đã xảy ra lỗi không xác định');
+    }
+  }
+);
+
+export const uploadAvatar = createAsyncThunk(
+  'auth/uploadAvatar',
+  async (arg: { data: IUserUpdate; userId: number | undefined }, thunkAPI) => {
+    try {
+      // Gọi service API của bạn
+      const response = await updateAvt(arg.data, arg.userId);
+
+      if (response.code === 1000) {
+        return response.result;
+      } else {
+        // Nếu API trả về lỗi có cấu trúc
+        return thunkAPI.rejectWithValue('Upload avatar thất bại');
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -137,7 +159,35 @@ const authSlice = createSlice({
       // Khi upload thất bại
       .addCase(uploadProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : 'Upload thất bại';
+        state.error =
+          typeof action.payload === 'string' ? action.payload : 'Cập nhật thông tin thất bại';
+      })
+
+      //
+      .addCase(uploadAvatar.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        uploadAvatar.fulfilled,
+        (state, action: PayloadAction<User | { originalFileName: string; url: string }>) => {
+          state.loading = false;
+          if (state.user) {
+            // So sánh nếu action.payload là object kiểu { originalFileName, url }
+            if ('url' in action.payload && 'originalFileName' in action.payload) {
+              state.user.avatar = action.payload.url;
+            } else {
+              // Nếu là User, thì dùng avatar từ user
+              state.user.avatar = action.payload.avatar;
+            }
+          }
+        }
+      )
+      // Khi upload thất bại
+      .addCase(uploadAvatar.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          typeof action.payload === 'string' ? action.payload : 'Upload avatar thất bại';
       });
     //
   },

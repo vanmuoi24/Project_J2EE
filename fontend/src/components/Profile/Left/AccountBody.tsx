@@ -29,15 +29,6 @@ const AccountBody = ({ activeMenu, setActiveMenu }: IProps) => {
           Đơn đặt chỗ
         </div>
         <div
-          onClick={() => setActiveMenu('favorites')}
-          className={`!w-full text-left !px-3 !py-2 !rounded-lg !transition cursor-pointer ${
-            activeMenu === 'favorites' ? 'bg-blue-100 font-semibold' : 'hover:bg-gray-200'
-          }`}
-        >
-          <HeartOutlined className="!mr-2" />
-          Tour yêu thích đã lưu
-        </div>
-        <div
           onClick={() => setActiveMenu('reviews')}
           className={`!w-full text-left !px-3 !py-2 !rounded-lg !transition cursor-pointer ${
             activeMenu === 'reviews' ? 'bg-blue-100 font-semibold' : 'hover:bg-gray-200'

@@ -26,3 +26,17 @@ export const updateProfile = (
     },
   });
 };
+export const updateAvt = (
+  data: IUserUpdate,
+  id: number | undefined
+): Promise<AxiosResponse<User>> => {
+  const formData = new FormData();
+  if (data.file) {
+    formData.append('file', data.file);
+  }
+  return axiosClient.post(`auth/users/updateAvtUser/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};

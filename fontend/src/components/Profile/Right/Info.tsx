@@ -9,9 +9,8 @@ import { uploadProfile } from '@/store/slices/authSlice';
 
 const Info = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state: RootState) => state.auth);
+  const { user, loading } = useAppSelector((state: RootState) => state.auth);
 
   const [form] = Form.useForm();
 
@@ -28,11 +27,25 @@ const Info = () => {
   }, [user, form]);
 
   const onFinish = async (values: IUserUpdate) => {
+    if (!user) {
+      message.error('Không tìm thấy thông tin người dùng. Vui lòng tải lại trang.');
+      return;
+    }
+
+    const newPhone = values.phone || '';
+    const oldPhone = user.phone || '';
+    const newAddress = values.address || '';
+    const oldAddress = user.address || '';
+
+    if (newPhone === oldPhone && newAddress === oldAddress) {
+      message.info('Không có thay đổi nào để lưu.');
+      return;
+    }
+
     try {
       const updatedUser = await dispatch(
         uploadProfile({ data: values, userId: user?.id })
       ).unwrap();
-      console.log(updatedUser);
       message.success('Cập nhật thông tin thành công!');
       form.setFieldsValue(updatedUser);
     } catch (error: any) {
@@ -64,7 +77,7 @@ const Info = () => {
 
         <Form.Item className="!mt-4">
           <div className="flex gap-2">
-            <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isUpdating}>
+            <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={loading}>
               Lưu thay đổi
             </Button>
             <Button icon={<LockOutlined />} onClick={() => setOpenModal(true)}>

@@ -1,6 +1,5 @@
 import { Card } from 'antd';
 import Info from './Info';
-import History from './History';
 import Liked from './Liked';
 import Rate from './Rate';
 
@@ -13,8 +12,8 @@ const AccountContent = ({ activeMenu }: IProps) => {
     switch (activeMenu) {
       case 'info':
         return <Info />;
-      case 'bookings':
-        return <History />;
+      // case 'bookings':
+      //   return <History />;
       case 'favorites':
         return <Liked />;
       case 'reviews':
