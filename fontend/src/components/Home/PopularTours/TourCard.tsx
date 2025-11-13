@@ -43,10 +43,10 @@ const TourCard: React.FC<TourCardProps> = ({ tour, onBooking }) => {
             <NumberOutlined /> <b>ID:</b> {tour.id}
           </p>
           <p className="!px-0 !py-[4px] truncate">
-            <EnvironmentOutlined /> <b>Departs from:</b> {tour.departureCity.city}
+            <EnvironmentOutlined /> <b>Khởi hành từ:</b> {tour.departureCity.city}
           </p>
           <p className="!px-0 !py-[4px] truncate">
-            <CalendarOutlined /> <b>Departure dates: </b>
+            <CalendarOutlined /> <b>Ngày khởi hành: </b>
             <span className="text-gray-600 ml-1">
               {tour.departures && tour.departures.length > 0
                 ? tour.departures
@@ -56,7 +56,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour, onBooking }) => {
             </span>
           </p>
           <p className="!px-0 !py-[4px] truncate">
-            <FieldTimeOutlined /> <b>Duration:</b> {tour.duration} ngày {nightDuration} đêm
+            <FieldTimeOutlined /> <b>Thời gian:</b> {tour.duration} ngày {nightDuration} đêm
           </p>
 
           <div className="!mt-[12px] flex justify-between items-center">
@@ -68,7 +68,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour, onBooking }) => {
               className="!bg-[#7BBCB0] !font-bold"
               onClick={() => onBooking(tour.id)}
             >
-              Booking
+              Đặt ngay
             </Button>
           </div>
         </div>
