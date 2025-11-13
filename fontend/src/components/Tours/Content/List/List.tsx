@@ -1,4 +1,4 @@
-import { Card, Button, Space, Typography } from 'antd';
+import { Card, Button, Space, Typography, Empty } from 'antd';
 import {
   CalendarOutlined,
   EnvironmentOutlined,
@@ -9,7 +9,7 @@ import {
 import type { ITour } from '@/types/Tour';
 import { formatCurrencyVND } from '@/utils';
 import { useNavigate } from 'react-router-dom';
-
+import FALLBACK_IMAGE_URL from '@/assets/images/fallback.png';
 const { Title, Text } = Typography;
 
 const List = ({ tours }: { tours: ITour[] | null }) => {
@@ -17,86 +17,100 @@ const List = ({ tours }: { tours: ITour[] | null }) => {
 
   return (
     <div className="!p-4">
-      <Title level={2} className="text-center mb-8">
+      {/* <Title level={2} className="text-center mb-8">
         Danh sách Tour nổi bật
-      </Title>
+      </Title> */}
       <div className="flex flex-col gap-5 min-h-[600px] max-h-[600px] overflow-y-auto !pr-4">
-        {tours?.map((tour) => (
-          <Card key={tour.id} className="rounded-lg overflow-hidden flex-shrink-0">
-            <div className="flex flex-row gap-4">
-              <div className="w-1/3 flex-shrink-0 rounded-lg overflow-hidden">
-                <img
-                  alt={tour.tourTitle}
-                  src={tour.imageIds[0]}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex-1 flex flex-col h-full">
-                <div className="!mb-6">
-                  <span className="font-[700] text-[20px]">{tour.tourTitle}</span>
+        {tours && tours.length > 0 ? (
+          tours.map((tour) => (
+            <Card
+              onClick={() => {
+                navigate(`/tours/detail/${tour.id}`);
+              }}
+              key={tour.id}
+              className="rounded-lg overflow-hidden flex-shrink-0 cursor-pointer"
+            >
+              <div className="flex flex-row gap-4">
+                <div className="w-1/3 flex-shrink-0 rounded-lg overflow-hidden">
+                  <img
+                    alt={tour.tourTitle}
+                    src={(tour?.imageIds && tour.imageIds[0]) || FALLBACK_IMAGE_URL}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <div className="flex-1 flex flex-col gap-2">
-                  <span>
-                    <span className="!mr-2">
-                      <EnvironmentOutlined className="!mr-1" />
-                      Khởi hành:
-                    </span>
-                    <span className="font-[700]">{tour.departureCity.city}</span>
-                  </span>
-                  <Space size="middle" className=" mb-4">
+                <div className="flex-1 flex flex-col h-full">
+                  <div className="!mb-6">
+                    <span className="font-[700] text-[20px]">{tour.tourTitle}</span>
+                  </div>
+                  <div className="flex-1 flex flex-col gap-2">
                     <span>
                       <span className="!mr-2">
-                        <ClockCircleOutlined className="!mr-1" />
-                        Thời gian:
+                        <EnvironmentOutlined className="!mr-1" />
+                        Khởi hành:
                       </span>
-
-                      <span className="font-[700]">{tour.duration} ngày</span>
+                      <span className="font-[700]">{tour.departureCity.city}</span>
                     </span>
-                    <Text>
+                    <Space size="middle" className=" mb-4">
                       <span>
                         <span className="!mr-2">
-                          {tour.vehicle.name === 'Máy bay' ? (
-                            <SendOutlined className="!mr-1" />
-                          ) : (
-                            <CarOutlined className="!mr-1" />
-                          )}
-                          Phương tiện:
+                          <ClockCircleOutlined className="!mr-1" />
+                          Thời gian:
                         </span>
 
-                        <span className="font-[700]"> {tour.vehicle.name}</span>
+                        <span className="font-[700]">
+                          {tour.duration}N{tour.duration - 1}Đ
+                        </span>
                       </span>
-                    </Text>
-                  </Space>
-                  <span>
-                    <span className="!mr-2">
-                      <CalendarOutlined className="!mr-1" />
-                      Ngày khởi hành:
-                    </span>
-                    <span className="font-[700]"> {tour.vehicle.name}</span>
-                  </span>
-                </div>
-                <div className="!mt-4 flex justify-between items-center">
-                  <div className="">
-                    <Text className="text-gray-500">Giá chỉ từ</Text>
-                    <span className="block text-[#e10600] !mt-0 font-[700] text-[22px]">
-                      {formatCurrencyVND(tour.basePrice)}
+                      <Text>
+                        <span>
+                          <span className="!mr-2">
+                            {tour.vehicle.name === 'Máy bay' ? (
+                              <SendOutlined className="!mr-1" />
+                            ) : (
+                              <CarOutlined className="!mr-1" />
+                            )}
+                            Phương tiện:
+                          </span>
+
+                          <span className="font-[700]"> {tour.vehicle.name}</span>
+                        </span>
+                      </Text>
+                    </Space>
+                    <span>
+                      <span className="!mr-2">
+                        <CalendarOutlined className="!mr-1" />
+                        Ngày khởi hành:
+                      </span>
+                      <span className="font-[700]"> {tour.departureDate}</span>
                     </span>
                   </div>
-                  <Button
-                    onClick={() => {
-                      navigate(`detail/${tour.id}`);
-                    }}
-                    type="primary"
-                    className="mt-2"
-                    size="large"
-                  >
-                    Xem chi tiết
-                  </Button>
+                  <div className="!mt-4 flex justify-between items-center">
+                    <div className="">
+                      <Text className="text-gray-500">Giá chỉ từ</Text>
+                      <span className="block text-[#e10600] !mt-0 font-[700] text-[22px]">
+                        {formatCurrencyVND(tour.basePrice)}
+                      </span>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        navigate(`/tours/detail/${tour.id}`);
+                      }}
+                      type="primary"
+                      className="mt-2"
+                      size="large"
+                    >
+                      Xem chi tiết
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
-        )) ?? <Text className="text-center !text-[18px]">Không có dữ liệu</Text>}
+            </Card>
+          ))
+        ) : (
+          <div className="flex justify-center items-center h-full">
+            <Empty description="Không có chuyến đi phù hợp" />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,15 +1,8 @@
-<<<<<<< HEAD
 import { Card, Typography, Row, Col, Button, Modal, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getTourDepartureById } from '@/services/tourServices';
 import { formatCurrencyVND } from '@/utils/index';
-=======
-import { Card, Typography, Row, Col, Button, Modal, message } from "antd";
-import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from "react";
-import { getTourDepartureById } from '@/services/tourServices';
-import { formatCurrencyVND } from '@/utils/index'
->>>>>>> c14ef71faf2bb31c30afa9c58d3ca7cd60f43c50
 
 const { Title, Text } = Typography;
 

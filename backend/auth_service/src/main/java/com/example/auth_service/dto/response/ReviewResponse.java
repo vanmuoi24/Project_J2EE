@@ -11,5 +11,5 @@ public class ReviewResponse {
   private UserResponse user;
   private String content;
   private Integer rating;
-  private String createdAt; // ✅ đổi sang String để tránh lỗi serialize
+  private String createdAt; 
 }

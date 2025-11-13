@@ -21,6 +21,8 @@ import TourDetail from '@/layouts/TourDetail';
 import Booking from '@/pages/Booking/BookingPage';
 import BookingHistory from '@/pages/Booking/HistoryPage';
 import Invoice from '@/pages/Invoice/InvoicePage';
+import ManagerReViewTour from '@/components/Admin/ManagerTour/ManagerReViewTour';
+import ManagerRole from '@/components/Admin/ManagerTour/ManagerRole';
 
 export default function AppRoutes() {
   return (
@@ -63,6 +65,8 @@ export default function AppRoutes() {
           <Route path="/admin/managerPromotion" element={<ManagerPromotion />} />
           <Route path="/admin/managerTour/itinerary" element={<ManagerSchedule />} />
           <Route path="/admin/managerTour/destination" element={<ManagerDestination />} />
+          <Route path="/admin/managerTour/reviews" element={<ManagerReViewTour />} />
+          <Route path="/admin/role" element={<ManagerRole />} />
         </Route>
       </Routes>
     </BrowserRouter>

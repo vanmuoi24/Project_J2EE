@@ -1,130 +1,100 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
   SearchOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  Input,
-  Popconfirm,
-  Space,
-  Modal,
-  Form,
-  DatePicker,
-  Select,
-  message,
-  Tag,
-} from "antd";
-import { ProTable } from "@ant-design/pro-components";
-import type { ProColumns } from "@ant-design/pro-components";
+} from '@ant-design/icons';
+import { Button, Input, Modal, Form, InputNumber, Select, Space, message } from 'antd';
+import { ProTable } from '@ant-design/pro-components';
+import type { ProColumns } from '@ant-design/pro-components';
+import AddItinerary from './ModelSchedule/AddSchedule';
+import EditItinerary from './ModelSchedule/EditSchedule';
 
-interface Schedule {
+interface Itinerary {
   id: number;
+  dayNumber: number;
+  title: string;
+  description: string;
+  meal: string;
   tourName: string;
-  customerName: string;
-  date: string;
-  status: "pending" | "confirmed" | "canceled";
 }
 
-const ManagerSchedule: React.FC = () => {
-  const [data, setData] = useState<Schedule[]>([
-    {
-      id: 1,
-      tourName: "Tour Hạ Long",
-      customerName: "Nguyễn Văn A",
-      date: "2025-09-20",
-      status: "pending",
-    },
-    {
-      id: 2,
-      tourName: "Tour Đà Nẵng",
-      customerName: "Trần Thị B",
-      date: "2025-09-21",
-      status: "confirmed",
-    },
-    {
-      id: 3,
-      tourName: "Tour Phú Quốc",
-      customerName: "Lê Văn C",
-      date: "2025-09-22",
-      status: "canceled",
-    },
-  ]);
+// ====== FAKE DATA ======
+const FAKE_ITINERARIES: Itinerary[] = [
+  {
+    id: 1,
+    dayNumber: 1,
+    title: 'Khởi hành Hà Nội',
+    description: 'Khởi hành từ Hà Nội, đi Hạ Long, nhận phòng khách sạn.',
+    meal: 'Sáng, Trưa',
+    tourName: 'Tour miền Bắc',
+  },
+  {
+    id: 2,
+    dayNumber: 2,
+    title: 'Tham quan Hạ Long',
+    description: 'Du thuyền Hạ Long, khám phá hang động, ăn trưa trên thuyền.',
+    meal: 'Sáng, Trưa, Tối',
+    tourName: 'Tour miền Bắc',
+  },
+  {
+    id: 3,
+    dayNumber: 1,
+    title: 'Khởi hành TP.HCM',
+    description: 'Bay đến Phú Quốc, nhận phòng resort, nghỉ dưỡng.',
+    meal: 'Trưa, Tối',
+    tourName: 'Tour Phú Quốc',
+  },
+];
 
-  const [searchTour, setSearchTour] = useState("");
-  const [searchCustomer, setSearchCustomer] = useState("");
+const ManagerItinerary: React.FC = () => {
+  const [data, setData] = useState<Itinerary[]>(FAKE_ITINERARIES);
+  const [searchTour, setSearchTour] = useState('');
+  const [searchTitle, setSearchTitle] = useState('');
 
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
+  const [editingItinerary, setEditingItinerary] = useState<Itinerary | null>(null);
 
-  // lọc dữ liệu
+  // Lọc dữ liệu theo search
   const filteredData = data.filter(
     (d) =>
       d.tourName.toLowerCase().includes(searchTour.toLowerCase()) &&
-      d.customerName.toLowerCase().includes(searchCustomer.toLowerCase())
+      d.title.toLowerCase().includes(searchTitle.toLowerCase())
   );
 
-  // xóa
   const handleDelete = (id: number) => {
     setData(data.filter((d) => d.id !== id));
-    message.success("Xóa lịch thành công");
+    message.success('Xóa lịch trình thành công');
   };
 
-  // cột
-  const columns: ProColumns<Schedule>[] = [
+  const columns: ProColumns<Itinerary>[] = [
+    { title: 'STT', key: 'index', width: 60, align: 'center', render: (_, __, index) => index + 1 },
+    { title: 'Tour', dataIndex: 'tourName' },
+    { title: 'Ngày', dataIndex: 'dayNumber', width: 80 },
+    { title: 'Tiêu đề', dataIndex: 'title' },
+    { title: 'Mô tả', dataIndex: 'description', ellipsis: true },
+    { title: 'Bữa ăn', dataIndex: 'meal' },
     {
-      title: "STT",
-      key: "index",
-      width: 60,
-      align: "center",
-      render: (_, __, index) => index + 1,
-    },
-    {
-      title: "Tên tour",
-      dataIndex: "tourName",
-    },
-    {
-      title: "Khách hàng",
-      dataIndex: "customerName",
-    },
-    {
-      title: "Ngày",
-      dataIndex: "date",
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      render: (_, record) => {
-        if (record.status === "pending") return <Tag color="orange">Chờ</Tag>;
-        if (record.status === "confirmed")
-          return <Tag color="green">Xác nhận</Tag>;
-        return <Tag color="red">Hủy</Tag>;
-      },
-    },
-    {
-      title: "Hành động",
-      key: "actions",
+      title: 'Hành động',
+      key: 'actions',
       width: 150,
       render: (_, record) => (
         <Space>
-          <EyeOutlined style={{ color: "#faad14", fontSize: 18 }} />
+          <EyeOutlined style={{ color: '#faad14', fontSize: 18 }} />
           <EditOutlined
-            style={{ color: "#1890ff", fontSize: 18 }}
+            style={{ color: '#1890ff', fontSize: 18 }}
             onClick={() => {
-              setEditingSchedule(record);
+              setEditingItinerary(record);
               setOpenEdit(true);
             }}
           />
-          <Popconfirm
-            title="Bạn có chắc muốn xóa?"
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <DeleteOutlined style={{ color: "#ff4d4f", fontSize: 18 }} />
-          </Popconfirm>
+          <DeleteOutlined
+            style={{ color: '#ff4d4f', fontSize: 18 }}
+            onClick={() => handleDelete(record.id)}
+          />
         </Space>
       ),
     },
@@ -133,9 +103,7 @@ const ManagerSchedule: React.FC = () => {
   return (
     <div>
       {/* Search */}
-      <div
-        style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap" }}
-      >
+      <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
         <Input
           placeholder="Tìm theo tour"
           value={searchTour}
@@ -143,23 +111,26 @@ const ManagerSchedule: React.FC = () => {
           style={{ width: 200 }}
         />
         <Input
-          placeholder="Tìm theo khách hàng"
-          value={searchCustomer}
-          onChange={(e) => setSearchCustomer(e.target.value)}
+          placeholder="Tìm theo tiêu đề"
+          value={searchTitle}
+          onChange={(e) => setSearchTitle(e.target.value)}
           style={{ width: 200 }}
         />
-        <Button icon={<SearchOutlined />} type="primary">
+        <Button
+          type="primary"
+          icon={<SearchOutlined />}
+          onClick={() => message.info('Đang lọc dữ liệu...')}
+        >
           Tìm kiếm
         </Button>
       </div>
 
-      {/* Table */}
-      <ProTable<Schedule>
+      <ProTable<Itinerary>
         columns={columns}
         rowKey="id"
         dataSource={filteredData}
         search={false}
-        headerTitle="Danh sách lịch trình"
+        headerTitle="Danh sách lịch trình tour"
         toolBarRender={() => [
           <Button
             key="create"
@@ -170,11 +141,7 @@ const ManagerSchedule: React.FC = () => {
             Thêm mới
           </Button>,
         ]}
-        pagination={{
-          pageSize: 5,
-          showTotal: (total, range) =>
-            `Hiển thị ${range[0]}-${range[1]} trong tổng số ${total} mục`,
-        }}
+        pagination={{ pageSize: 5 }}
       />
 
       {/* Modal Add */}
@@ -182,30 +149,11 @@ const ManagerSchedule: React.FC = () => {
         title="Thêm lịch trình"
         open={openAdd}
         onCancel={() => setOpenAdd(false)}
-        onOk={() => setOpenAdd(false)}
+        footer={null}
         destroyOnClose
         centered
       >
-        <Form layout="vertical">
-          <Form.Item label="Tên tour">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Khách hàng">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Ngày">
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item label="Trạng thái">
-            <Select
-              options={[
-                { value: "pending", label: "Chờ xác nhận" },
-                { value: "confirmed", label: "Đã xác nhận" },
-                { value: "canceled", label: "Đã hủy" },
-              ]}
-            />
-          </Form.Item>
-        </Form>
+        <AddItinerary />
       </Modal>
 
       {/* Modal Edit */}
@@ -213,33 +161,14 @@ const ManagerSchedule: React.FC = () => {
         title="Chỉnh sửa lịch trình"
         open={openEdit}
         onCancel={() => setOpenEdit(false)}
-        onOk={() => setOpenEdit(false)}
+        footer={null}
         destroyOnClose
         centered
       >
-        <Form layout="vertical" initialValues={editingSchedule || {}}>
-          <Form.Item label="Tên tour" name="tourName">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Khách hàng" name="customerName">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Ngày" name="date">
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item label="Trạng thái" name="status">
-            <Select
-              options={[
-                { value: "pending", label: "Chờ xác nhận" },
-                { value: "confirmed", label: "Đã xác nhận" },
-                { value: "canceled", label: "Đã hủy" },
-              ]}
-            />
-          </Form.Item>
-        </Form>
+        <EditItinerary />
       </Modal>
     </div>
   );
 };
 
-export default ManagerSchedule;
+export default ManagerItinerary;

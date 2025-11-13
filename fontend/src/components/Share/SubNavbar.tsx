@@ -1,5 +1,5 @@
 import { Dropdown, Button, Typography, message } from 'antd';
-import { PhoneOutlined, UserOutlined } from '@ant-design/icons';
+import { PhoneOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import flag from '@/assets/images/en.png';
 import { useNavigate } from 'react-router-dom';
 import ModalChangeLC from '@/components/Home/Modal/ModalChangeLC';
@@ -20,10 +20,9 @@ export default function TopNavbar() {
       {
         key: 'profile',
         label: (
-          <Button
-            type="link"
-            onClick={() => navigate('/profile')}
-          >{`Xin chào ${user.username}!`}</Button>
+          <Button type="link" onClick={() => navigate('/profile')}>
+            {user.username}
+          </Button>
         ),
       },
       {
@@ -71,18 +70,25 @@ export default function TopNavbar() {
           - Daily: 8:00 AM - 11:00 PM
         </Typography.Paragraph>
         <div className="flex items-center justify-center gap-[12px]">
-          <div
+          {/* <div
             className="h-full flex items-center gap-[10px] px-[6px] py-[2px] rounded-[4px] cursor-pointer hover:bg-[#f0f0f0]"
             onClick={() => setIsOpen(!isOpen)}
           >
             <img src={flag} alt="VN" className="w-[20px] h-[20px] object-cover" />
             <span className="text-[13px]/[1] font-[700]">VNĐ</span>
-          </div>
+          </div> */}
           <Dropdown menu={{ items: userMenu }} placement="bottomRight" arrow>
-            <UserOutlined className="text-[20px] text-black cursor-pointer" />
+            {user != null && user.username ? (
+              <SettingOutlined className="text-[20px] text-black cursor-pointer" />
+            ) : (
+              // <UserOutlined className="text-[20px] text-black cursor-pointer" />
+              <span className="text-[14px] text-[#2163ae] font-[700] cursor-pointer">
+                Đăng nhập / Đăng kí
+              </span>
+            )}
           </Dropdown>
         </div>
-        <ModalChangeLC isOpen={isOpen} setIsOpen={setIsOpen} />
+        {/* <ModalChangeLC isOpen={isOpen} setIsOpen={setIsOpen} /> */}
       </Container>
     </div>
   );

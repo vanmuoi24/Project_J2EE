@@ -73,6 +73,10 @@ export const getListComentByTour = (id: number): Promise<AxiosResponse> => {
   return axiosClient.get(`/auth/reviews/tour/${id}`);
 };
 
+export const getListComentByTourALll = (): Promise<AxiosResponse> => {
+  return axiosClient.get(`/auth/reviews/list`);
+};
+
 export const createComent = (data: CreateCommentRequest): Promise<AxiosResponse> => {
   return axiosClient.post('/auth/reviews', data);
 };

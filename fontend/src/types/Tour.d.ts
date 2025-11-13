@@ -1,6 +1,7 @@
 import type { AxiosResponse } from './comment';
 
 export interface ICity {
+  id: number;
   city: string;
   type: string | null;
 }
