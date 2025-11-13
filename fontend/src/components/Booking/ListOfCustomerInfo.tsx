@@ -30,7 +30,7 @@ export default function ListOfCustomerInfo({
   if (onFormReady) onFormReady(form);
   const idCounter = useRef(1);
 
-  const addCustomer = (type: "adult" | "child" | "baby") => {
+  const addCustomer = (type: "ADULT" | "CHILD" | "TODDLER" | "INFANT") => {
     const customers = form.getFieldValue("customers") || [];
     idCounter.current += 1;
     const newItem = {
@@ -43,23 +43,6 @@ export default function ListOfCustomerInfo({
     };
     form.setFieldsValue({ customers: [...customers, newItem] });
   };
-
-  // // add default customer from personal info as first adult
-  // const addDefaultCustomer = () => {
-  //   const personal = personalFormGetter ? personalFormGetter() : null;
-  //   const customers = form.getFieldValue("customers") || [];
-  //   if (!personal) return;
-  //   idCounter.current += 1;
-  //   const item = {
-  //     id: idCounter.current,
-  //     type: "adult",
-  //     fullName: personal.fullName || "",
-  //     gender: personal.gender || undefined,
-  //     birthDate: personal.birthDate || null,
-  //     address: personal.address || personal?.address || "",
-  //   };
-  //   form.setFieldsValue({ customers: [item, ...customers] });
-  // };
 
   return (
     <div>
@@ -81,7 +64,7 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Người lớn</p>
                 <p className="text-xs text-gray-500">Từ 12 tuổi trở lên</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer("adult")}>+ Thêm</Button>
+              <Button type="primary" onClick={() => addCustomer("ADULT")}>+ Thêm</Button>
             </div>
           </Col>
           <Col span={8}>
@@ -90,7 +73,7 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Trẻ em</p>
                 <p className="text-xs text-gray-500">Từ 2 - 11 tuổi</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer("child")}>+ Thêm</Button>
+              <Button type="primary" onClick={() => addCustomer("CHILD")}>+ Thêm</Button>
             </div>
           </Col>
           <Col span={8}>
@@ -99,7 +82,16 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Em bé</p>
                 <p className="text-xs text-gray-500">Dưới 2 tuổi</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer("baby")}>+ Thêm</Button>
+              <Button type="primary" onClick={() => addCustomer("TODDLER")}>+ Thêm</Button>
+            </div>
+          </Col>
+          <Col span={8}>
+            <div className="flex justify-between items-center rounded p-2">
+              <div>
+                <p className="font-medium">Trẻ sơ sinh</p>
+                <p className="text-xs text-gray-500">Dưới 2 tuổi</p>
+              </div>
+              <Button type="primary" onClick={() => addCustomer("INFANT")}>+ Thêm</Button>
             </div>
           </Col>
         </Row>
@@ -127,16 +119,18 @@ export default function ListOfCustomerInfo({
                           <>{/* will render type label via value */}</>
                         </Form.Item>
                         <span>
-                          {form.getFieldValue(["customers", name, "type"]) === "adult"
+                          {form.getFieldValue(["customers", name, "type"]) === "ADULT"
                             ? "Người lớn"
-                            : form.getFieldValue(["customers", name, "type"]) === "child"
-                            ? "Trẻ em"
-                            : "Em bé"}
+                            : form.getFieldValue(["customers", name, "type"]) === "CHILD"
+                              ? "Trẻ em"
+                              : form.getFieldValue(["customers", name, "type"]) === "TODDLER"
+                                ? "Em bé"
+                                : "Trẻ sơ sinh"}
                         </span>
                       </p>
                     </Col>
                     <Col span={4} className="text-right">
-                        <Button type="link" danger onClick={() => remove(name)}>
+                      <Button type="link" danger onClick={() => remove(name)}>
                         Xóa
                       </Button>
                     </Col>

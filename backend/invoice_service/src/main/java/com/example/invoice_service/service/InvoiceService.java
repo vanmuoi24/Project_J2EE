@@ -52,8 +52,8 @@ public class InvoiceService {
         return invoiceMapper.toInvoiceResponse(invoice);
     }
 
-    public InvoiceResponse getInvoiceByBookingId(Long id){
-        Invoice invoice = invoiceRepository.findByBookingId(id)
+    public InvoiceResponse getInvoiceByBookingId(Long bookingId){
+        Invoice invoice = invoiceRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException());
         return invoiceMapper.toInvoiceResponse(invoice);
     }
@@ -111,6 +111,12 @@ public class InvoiceService {
 
     private InvoiceResponse buildInvoiceResponse(
             Invoice invoice, long total, String message) {
+            String orderId = UUID.randomUUID().toString();
+            String orderInfo = "Thanh toan hoa don";
+            String requestId = UUID.randomUUID().toString();
+            String extraData = "";
+            long amount = total;
+
         return InvoiceResponse.builder()
                 .id(String.valueOf(invoice.getId()))
                 .accountId(String.valueOf(invoice.getAccountId()))
@@ -119,7 +125,7 @@ public class InvoiceService {
                 .dayOfPay(String.valueOf(invoice.getDayOfPay()))
                 .status(invoice.getStatus().name())
                 .totalBookingTourExpense(String.valueOf(total))
-                .moMoResponse(createMomoQR())
+                .moMoResponse(createMomoQR(orderId, orderInfo, requestId, extraData, amount))
                 .message(message)
                 .build();
     }
@@ -177,10 +183,13 @@ public class InvoiceService {
     /**
      * 🔹 Hàm thanh toán MOMO
      */
-    public MoMoResponse createMomoQR(){
+    public MoMoResponse createMomoQR(String orderId, String orderInfo, String requestId, String extraData, long amount){
         MoMoRequest momoRequest = MoMoRequest.builder()
-                .amount(10000)
-                .orderId("INV-" + UUID.randomUUID())
+                .orderId(orderId)
+                .orderInfo(orderInfo)
+                .requestId(requestId)
+                .extraData(extraData)
+                .amount(amount)
                 .build();
 
         MoMoResponse momoResp;

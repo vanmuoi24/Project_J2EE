@@ -40,6 +40,17 @@ public class Booking {
     private BookingStatus status;
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Customer> customers = new ArrayList<>();
 
+    public void addCustomer(Customer customer) {
+        customers.add(customer);
+        customer.setBooking(this);
+    }
+
+    public void removeCustomer(Customer customer) {
+        customers.remove(customer);
+        customer.setBooking(null);
+    }
 }
+

@@ -90,6 +90,11 @@ const AdminSidebar: React.FC = () => {
       icon: <GiftOutlined />,
       label: <Link to="/admin/managerPromotion">Quản lý khuyến mãi</Link>,
     },
+    {
+      key: "/admin/managerInvoice",
+      icon: <GiftOutlined />,
+      label: <Link to="/admin/managerInvoice">Quản lý hóa đơn</Link>,
+    },
   ];
 
   // Menu dropdown account

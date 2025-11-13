@@ -50,37 +50,7 @@ export interface ITourResponse {
 }
 
 export interface ITourDeparture {
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-	id: string;
-    tourCode: string;
-    departureDate: string;
-    returnDate: string;
-    availableSeats: string;
-    tourId: string;
-    tourPrice: ITourPrice;
-}
 
-export interface ITourDepartureResponse {
-	code: number;
-	message?: string;
-	result: ITourDeparture;
-}
-
-export interface ITourDeparture {
-	id: int;
-    tourCode: string;
-    departureDate: string;
-    returnDate: string;
-    availableSeats: string;
-    tourId: string;
-    tourPrice: ITourPrice;
-}
-
-=======
-  id: int;
->>>>>>> c14ef71faf2bb31c30afa9c58d3ca7cd60f43c50
   id: string;
   tourCode: string;
   departureDate: string;
@@ -90,18 +60,22 @@ export interface ITourDeparture {
   tourPrice: ITourPrice;
 }
 
-<<<<<<< HEAD
-export interface IDestination {
-  city: string;
-  type: number;
+export interface ITourDepartureResponse {
+  code: number;
+  message?: string;
+  result: ITourDeparture;
 }
-export interface IDeparture {
-  city: string;
-  type: number;
+
+export interface ITourDeparture {
+  id: int;
+  tourCode: string;
+  departureDate: string;
+  returnDate: string;
+  availableSeats: string;
+  tourId: string;
+  tourPrice: ITourPrice;
 }
-=======
->>>>>>> d3fdc808e040ae78e1954bf50f62a626bcf5237c
->>>>>>> c14ef71faf2bb31c30afa9c58d3ca7cd60f43c50
+
 type ToursResponse = AxiosResponse<ITour[]>;
 
 type TourResponse = AxiosResponse<ITour>;
@@ -111,6 +85,7 @@ type TourDeparturesResponse = AxiosResponse<ITourDeparture[]>;
 type TourDepartureResponse = AxiosResponse<ITourDeparture>;
 
 type ItineraryResponse = AxiosResponse<IItinerary[]>;
+
 export interface ITourDepartureResponse {
   code: number;
   message?: string;

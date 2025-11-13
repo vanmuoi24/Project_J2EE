@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-//@JsonInclude(JsonInclude.Include.NON_NUL)
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class InvoiceResponse {
     private String id;
     private String accountId;

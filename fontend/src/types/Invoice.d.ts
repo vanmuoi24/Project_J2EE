@@ -6,8 +6,8 @@ export type InvoiceItem = {
 
 export type InvoiceRequest = {
   bookingId: string;
-  paymentMethod: string;
-  items: InvoiceItem[];
+  tourDepartureId: string;
+  listOfCustomers: CustomerReq
 };
 
 export type CustomerResponse = {

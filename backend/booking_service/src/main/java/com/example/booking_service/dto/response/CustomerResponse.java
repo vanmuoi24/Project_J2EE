@@ -9,14 +9,15 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.ALWAYS)
 
 public class CustomerResponse {
     private String id;
     private String fullName;
-    private String birthdate;
+    private String dateOfBirth;
     private String address;
     private String bookingType;
     private String gender;
     private String status;
+    private BookingResponse booking;
 }

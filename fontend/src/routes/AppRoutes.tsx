@@ -21,6 +21,7 @@ import TourDetail from '@/layouts/TourDetail';
 import Booking from '@/pages/Booking/BookingPage';
 import Invoice from '@/pages/Invoice/InvoicePage';
 import MoMoQRPage from '@/pages/Payment/MoMoQRPage';
+import ManagerInvoice from '@/components/Admin/ManagerInvoice/ManagerInvoice';
 
 export default function AppRoutes() {
   return (
@@ -33,7 +34,7 @@ export default function AppRoutes() {
 
           <Route path="/booking" element={<Booking />} />
           {/* <Route path="/invoice/user/:userId" element={<Invoice />} /> */}
-          <Route path="/invoice" element={<Invoice />} />
+          <Route path="/profile/invoice/booking/:id" element={<Invoice />} />
           <Route path="/payment/momo" element={<MoMoQRPage />} />
           {/* <Route path="/payment/momo/:id" element={<MoMoQRPage />} /> */}
           <Route path="/tours" element={<Tours />} />
@@ -64,6 +65,7 @@ export default function AppRoutes() {
           <Route path="/admin/managerPromotion" element={<ManagerPromotion />} />
           <Route path="/admin/managerTour/itinerary" element={<ManagerSchedule />} />
           <Route path="/admin/managerTour/destination" element={<ManagerDestination />} />
+          <Route path="/admin/managerInvoice" element={<ManagerInvoice />}/>
         </Route>
       </Routes>
     </BrowserRouter>

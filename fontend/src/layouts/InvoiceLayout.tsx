@@ -1,119 +1,115 @@
-import { Row, Col, Card, Spin, Alert, Modal } from 'antd';
-import InvoiceForm from '@/components/Invoice/InvoiceForm';
-import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { createInvoice, getInvoiceById } from '@/services/invoiceServices';
-import MoMoQR from '@/components/Payment/MoMoQR';
+import { Row, Col, Card, Spin, Alert, Modal, message } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+import InvoiceForm from "@/components/Invoice/InvoiceForm";
+import bookingServices from "@/services/bookingServices";
+import { getTourDepartureById } from "@/services/tourServices";
+import { sessionService } from "@/services/sessionServices";
+
+import type { BookingRequest, BookingResponse, CustomerResponse } from "@/types/Booking";
+import type { ITourDeparture } from "@/types/Tour";
+import type { InvoiceRequest, InvoiceResponse } from "@/types/Invoice";
+import type { UserResponse, AxiosResponse } from "@/types/comment";
+import invoiceServices from "@/services/invoiceServices";
 
 export default function InvoiceLayout() {
-  const { id } = useParams();
-  // const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [invoiceData, setInvoiceData] = useState<any | null>(null);
+  const [currentUser, setCurrentUser] = useState<UserResponse>();
+  const [bookingData, setBookingData] = useState<BookingResponse>();
+  const [tourDeparture, setTourDeparture] = useState<ITourDeparture>();
+  const [customers, setCustomers] = useState<CustomerResponse[]>([]);
 
   useEffect(() => {
-    const load = async () => {
-      if (!id) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await getInvoiceById(id as string);
-        setInvoiceData(res || null);
-      } catch (err: any) {
-        setError(err?.message || 'Failed to load invoice');
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    if (id) loadData(Number(id));
   }, [id]);
 
-  // CREATE INVOICE handler called from InvoiceForm
-  const handleCreateInvoice = async (values: { paymentMethod: string; items: any[] }) => {
+  const loadData = async (bookingId: number) => {
     setLoading(true);
-    setError(null);
     try {
-      const invoice = JSON.parse(sessionStorage.getItem("invoice") || "{}");
-      console.log(invoice)
+      const user = sessionService.getUser();
+      if (!user) throw new Error("Không thể xác định người dùng (session error).");
 
-      const bookingId = invoice?.bookingId || id || '';
-      const payload = {
-        bookingId: bookingId as string,
-        paymentMethod: values.paymentMethod,
-        items: values.items,
-      };
+      const [bookingRes, customerRes] = await Promise.all([
+        bookingServices.getBookingById(bookingId),
+        bookingServices.getListOfCustomersByBookingId(bookingId),
+      ]);
 
+      const booking = bookingRes?.result as BookingResponse;
+      const customerList = customerRes?.result as CustomerResponse[];
 
-      const res = await createInvoice(payload as any);
+      setBookingData(booking);
+      setCustomers(customerList);
+      setCurrentUser(user);
 
-      // Show success modal and, if payment info returned, show MoMo QR modal
-      Modal.success({ title: 'Tạo hóa đơn thành công', content: 'Invoice created' });
-
-      const paymentInfo = ((res as any).result || {}) as any;
-      const paymentQrBase64 = paymentInfo?.paymentQrBase64 as string | undefined;
-      const paymentUrl = paymentInfo?.paymentUrl as string | undefined;
-
-      if (paymentQrBase64 || paymentUrl) {
-        Modal.info({
-          title: 'Hoàn tất thanh toán',
-          content: <MoMoQR paymentQrBase64={paymentQrBase64} paymentUrl={paymentUrl} onClose={() => Modal.destroyAll()} />,
-          width: 420,
-          okText: 'Đóng',
-          onOk: () => Modal.destroyAll(),
-        });
-      }
-
-      // const newInvoiceId = (res as any)?.result?.id || undefined;
-      // console.log(res)
-
-      // if (newInvoiceId) {
-      //   navigate(`/invoice/${newInvoiceId}`);
-      // } else {
-      //   // reload current invoice if exists
-      //   if (id) {
-      //     const getRes = await getInvoiceById(id as string);
-      //     setInvoiceData(getRes.result || null);
-      //   }
-      // }
+      const tourRes = await getTourDepartureById(Number(booking.tourDepartureId));
+      setTourDeparture(tourRes?.result);
     } catch (err: any) {
-      setError(err?.message || 'Tạo hóa đơn thất bại');
-      Modal.error({ title: 'Lỗi', content: err?.message || 'Tạo hóa đơn thất bại' });
-      throw err;
+      setError(err?.message || "Không thể tải dữ liệu hóa đơn.");
+      message.error(err?.message);
     } finally {
       setLoading(false);
     }
   };
 
+  /** 🔹 Callback khi nhấn “Thanh toán” */
+  const handleCreateInvoice = async (paymentMethod: string) => {
+    try {
+      if (!bookingData || !tourDeparture) throw new Error("Thiếu dữ liệu để tạo hóa đơn.");
+
+      const invoiceRequest = {
+        bookingRequest: {
+          bookingId: String(bookingData.id),
+          userId: String(sessionService.getUser()?.id),
+          tourDepartureId: String(tourDeparture.id),
+          listOfCustomers: customers.map((c) => ({
+            fullName: c.fullName,
+            birthdate: c.birthdate,
+            address: c.address,
+            gender: c.gender,
+            status: c.status,
+            bookingType: c.bookingType,
+          })),
+        },
+      };
+
+      const invoiceResult = await invoiceServices.create(invoiceRequest);
+
+      if (invoiceResult.code === 9999) {
+        throw new Error("Tạo hóa đơn thất bại.");
+      }
+
+      Modal.success({
+        title: "Tạo hóa đơn thành công",
+        content: "Hóa đơn đã được khởi tạo. Đang chuyển đến trang thanh toán...",
+        onOk: () => navigate(invoiceResult.result.paymentUrl || "/"),
+      });
+    } catch (error: any) {
+      console.error(error);
+      message.error(error.message || "Lỗi khi tạo hóa đơn.");
+    }
+  };
+
   return (
-    <div style={{ padding: '24px 10rem', background: '#fff', minHeight: '100vh' }}>
-      <Row gutter={[24, 24]} justify="center" align="top">
+    <div style={{ padding: "24px 10rem", background: "#fff", minHeight: "100vh" }}>
+      <Row gutter={[24, 24]} justify="center">
         <Col xs={24} lg={16}>
-          <Card bordered={false} style={{ borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', marginBottom: 16 }}>
+          <Card bordered={false} style={{ borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
             {loading && <Spin />}
-            {error && <Alert type="error" message={error} />}
-            {!id && (
-              <InvoiceForm
-                account={{ fullName: 'Khách hàng', email: 'guest@example.com', phone: '0123456789' }}
-                customers={[{ name: 'Nguyễn Văn A', dob: '1990-01-01', price: 1000000 }]}
-                onCreate={handleCreateInvoice}
-              />
-            )}
-            {id && invoiceData && (
-              // Map invoiceData to InvoiceForm props
+            {error && <Alert type="error" message={error} showIcon />}
+            {!loading && !error && bookingData && (
               <InvoiceForm
                 account={{
-                  fullName: invoiceData.userId || 'Khách hàng',
-                  email: '',
-                  phone: '',
+                  fullName: currentUser?.username || "Khách hàng",
+                  email: currentUser?.email || "",
+                  phone: currentUser?.phone || "",
                 }}
-                customers={
-                  (invoiceData.customerResponseList || []).map((c: any) => ({
-                    name: c.fullName,
-                    dob: c.birthdate,
-                    price: Number(c.bookingType) || 0,
-                  }))
-                }
+                customers={customers}
+                tourDeparture={tourDeparture}
                 onCreate={handleCreateInvoice}
               />
             )}

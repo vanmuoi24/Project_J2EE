@@ -39,13 +39,17 @@ public class MomoService {
 
     private final MomoApi momoApi;
 
-    public CreateMomoResponse createMomoQR() {
+    public CreateMomoResponse createMomoQR(String generated_orderId,
+                                           String generated_orderInfo,
+                                           String generated_requestId,
+                                           String generated_extraData,
+                                           long calculated_amount) {
 //        public CreateMomoResponse createMomoQR(String orderId, String orderInfo, String requestId, String extraData, String amount) {
-        String orderId = UUID.randomUUID().toString();
-        String orderInfo = "Thanh toan don hang" + orderId;
-        String requestId = UUID.randomUUID().toString();
-        String extraData = "Khong khuyen mai";
-        long amount = 10000;
+        String orderId = generated_orderId;
+        String orderInfo = generated_orderInfo;
+        String requestId = generated_requestId;
+        String extraData = generated_extraData;
+        long amount = calculated_amount;
 
         String rawSignature = "accessKey=" + ACCESS_KEY +
                 "&amount=" + amount +

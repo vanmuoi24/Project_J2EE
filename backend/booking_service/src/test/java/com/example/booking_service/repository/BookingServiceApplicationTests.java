@@ -29,6 +29,10 @@ class BookingServiceApplicationTests {
         Assertions.assertNotNull(bookingRepository, "Repository chưa được khởi tạo");
     }
 
+    void testGetAllBooking(){
+
+    }
+
     @Test
     void testCreateAndFindBooking() {
         // --- Tạo booking ---

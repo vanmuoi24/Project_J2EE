@@ -11,6 +11,7 @@ import { sessionService } from '@/services/sessionServices';
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import type { BookingRequest, CustomerRequest } from "@/types/Booking";
 // ...existing unused tour detail components removed
 
 export default function BookingLayout() {
@@ -72,16 +73,16 @@ export default function BookingLayout() {
       // build booking request
       const user = sessionService.getUser();
       const bookings = bookingServices.getAllBooking();
-      sessionStorage.setItem('bookingHistoryCache', JSON.stringify(bookings));
 
-      const bookingRequest = {
+      const bookingRequest: BookingRequest = {
         userId: user?.id?.toString() || '',
         tourDepartureId: tourDepartureId || "1",
-        listOfCustomers: customers.map((c: any) => ({
+        listOfCustomers: customers.map((c: CustomerRequest) => ({
           fullName: c.fullName,
           birthdate: c.birthDate ? c.birthDate.format('YYYY-MM-DD') : undefined,
           address: c.address,
           gender: c.gender === 'male' ? 'Male' : 'Female',
+
         })),
       };
 
@@ -93,14 +94,7 @@ export default function BookingLayout() {
 
       Modal.success({ title: 'Message', content: 'Booking created' });
 
-      // After successful booking creation, navigate to booking history and pass new booking
-      // const newBooking = (res as any).result || (res as any).data?.result || (res as any).data || res;
-
-      // const stored = JSON.parse(sessionStorage.getItem('bookingHistoryCache') || '[]');
-      // sessionStorage.setItem('bookingHistoryCache', JSON.stringify([newBooking, ...stored]));
-
-      // navigate(`/invoice/user/${user?.id}`);
-      navigate(`/invoice`)
+      navigate(`profile/invoice/booking/${res.result.id}`)
 
     } catch (err: any) {
       Modal.error({ title: 'Lỗi', content: err?.message || 'Đã xảy ra lỗi' });
@@ -153,7 +147,6 @@ export default function BookingLayout() {
         {/* Cột phải: Tour Info */}
         <Col xs={24} lg={8}>
           <Card
-            bordered={false}
             style={{
               borderRadius: "12px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.15)",

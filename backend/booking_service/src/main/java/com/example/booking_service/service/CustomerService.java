@@ -19,8 +19,13 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
-    public List<CustomerResponse> getAllCustomers(){
+    public List<CustomerResponse> getAllCustomers() {
         List<Customer> customers = customerRepository.findAll();
+        return customerMapper.toCustomerResponseList(customers);
+    }
+
+    public List<CustomerResponse> getListOfCustomersByBookingId(Long id){
+        List<Customer> customers = customerRepository.findCustomersByBookingId(id);
         return customerMapper.toCustomerResponseList(customers);
     }
 
