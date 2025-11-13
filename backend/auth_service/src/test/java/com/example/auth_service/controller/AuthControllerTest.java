@@ -24,7 +24,7 @@ import java.util.Date;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -137,5 +137,38 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.code", is(unauthorizedError.getCode())))
                 // Mong đợi message lỗi
                 .andExpect(jsonPath("$.message", is(unauthorizedError.getMessage())));
+    }
+
+
+    @Test
+    void login_whenEmailIsBlank_thenReturnsBadRequest() throws Exception {
+        // ARRANGE
+        // 1. Tạo một request không hợp lệ (password để trống)
+        AuthenticationRequest invalidRequest = new AuthenticationRequest();
+        invalidRequest.setEmail("");// Vi phạm validation @NotBlank, @Email
+        invalidRequest.setPassword("password123");
+
+        // 2. Chuẩn bị mã lỗi (ví dụ: lỗi EMAIL_IS_REQUIRED)
+        ErrorCode mailError  = ErrorCode.EMAIL_IS_REQUIRED;
+
+        // ACT & ASSERT
+        mockMvc.perform(post("/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+
+                // 1. Mong đợi status 400 Bad Request
+                // (Vì @Valid sẽ thất bại và GlobalExceptionHandler sẽ xử lý)
+                .andExpect(status().is(mailError.getStatusCode().value()))
+
+                // 2. Kiểm tra nội dung lỗi
+                // Giả sử GlobalExceptionHandler của bạn trả về một ErrorCode
+                // cụ thể cho validation: 1009 - EMAIL_IS_REQUIRED
+                // MethodArgumentNotValidException
+                .andExpect(jsonPath("$.code", is(1009)))
+                .andExpect(jsonPath("$.message", is("Email is required")));
+
+        // 3. Quan trọng: Xác nhận rằng service KHÔNG BAO GIỜ được gọi
+        // vì request đã bị chặn ở lớp validation
+        verify(authService, never()).authenticated(any(AuthenticationRequest.class));
     }
 }

@@ -10,11 +10,12 @@ import type { ITour } from '@/types/Tour';
 import { formatCurrencyVND } from '@/utils';
 import { useNavigate } from 'react-router-dom';
 import FALLBACK_IMAGE_URL from '@/assets/images/fallback.png';
+import dayjs from 'dayjs';
 const { Title, Text } = Typography;
 
 const List = ({ tours }: { tours: ITour[] | null }) => {
   const navigate = useNavigate();
-
+  console.log(tours);
   return (
     <div className="!p-4">
       {/* <Title level={2} className="text-center mb-8">
@@ -77,17 +78,23 @@ const List = ({ tours }: { tours: ITour[] | null }) => {
                       </Text>
                     </Space>
                     <span>
-                      <span className="!mr-2">
+                      <p className="!px-0 !py-[4px] truncate">
                         <CalendarOutlined className="!mr-1" />
-                        Ngày khởi hành:
-                      </span>
-                      <span className="font-[700]"> {tour.departureDate}</span>
+                        <span className="!mr-2">Ngày khởi hành:</span>
+                        <span className=" font-bold ml-1">
+                          {tour.departures && tour.departures.length > 0
+                            ? tour.departures
+                                .map((item) => dayjs(item.departureDate).format('DD/MM/YYYY'))
+                                .join(', ')
+                            : 'Đang cập nhật'}
+                        </span>
+                      </p>
                     </span>
                   </div>
                   <div className="!mt-4 flex justify-between items-center">
                     <div className="">
-                      <Text className="text-gray-500">Giá chỉ từ</Text>
-                      <span className="block text-[#e10600] !mt-0 font-[700] text-[22px]">
+                      <Text className="text-gray-500 font-bold !text-[18px]">Giá chỉ từ</Text>
+                      <span className="block text-[#FFDA32] !mt-0 font-[700] text-[24px]">
                         {formatCurrencyVND(tour.basePrice)}
                       </span>
                     </div>
@@ -96,7 +103,7 @@ const List = ({ tours }: { tours: ITour[] | null }) => {
                         navigate(`/tours/detail/${tour.id}`);
                       }}
                       type="primary"
-                      className="mt-2"
+                      className="mt-2 !bg-[#7BBCB0]"
                       size="large"
                     >
                       Xem chi tiết

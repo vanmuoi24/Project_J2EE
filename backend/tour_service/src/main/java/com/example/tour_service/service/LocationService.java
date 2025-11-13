@@ -12,7 +12,6 @@ import com.example.tour_service.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,39 +62,7 @@ public class LocationService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Tìm kiếm điểm đi (DEPARTURE) dựa trên từ khóa (tên thành phố).
-     * Tìm kiếm không phân biệt chữ hoa/thường.
-     */
-    public List<LocationResponse> searchDepartureLocations(String keyword) {
-        // Gọi phương thức repository mới (bạn sẽ cần thêm ở bước sau)
-        if (keyword == null || keyword.trim().isEmpty()) {
-            System.out.println(">>>>>>>>>>>>>>>>>>>>rỗng");
-            return Collections.emptyList(); // Trả về danh sách rỗng
-        }
-        return locationRepository.findByTypeAndCityContainsIgnoreCase(LocationType.DEPARTURE, keyword)
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Tìm kiếm điểm đến (DESTINATION) dựa trên từ khóa (tên thành phố).
-     * Tìm kiếm không phân biệt chữ hoa/thường.
-     */
-    public List<LocationResponse> searchDestinationLocations(String keyword) {
-        // Gọi phương thức repository mới (bạn sẽ cần thêm ở bước sau)
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return Collections.emptyList(); // Trả về danh sách rỗng
-        }
-        return locationRepository.findByTypeAndCityContainsIgnoreCase(LocationType.DESTINATION, keyword)
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-    }
-
     private LocationResponse toResponse(Location location) {
-
         return LocationResponse.builder()
                 .id(location.getId())
                 .city(location.getCity())

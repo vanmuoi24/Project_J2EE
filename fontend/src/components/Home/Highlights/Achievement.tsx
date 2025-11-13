@@ -29,7 +29,7 @@ const Achievements = () => {
   return (
     <div className="py-16 bg-white !mb-20">
       <Container>
-        <h2 className="text-3xl md:text-4xl text-center font-poppins font-bold text-[#0b5da7] !mb-10 uppercase">
+        <h2 className="text-3xl md:text-4xl text-center font-poppins font-bold text-[#7BBCB0] !mb-10 uppercase">
           Thành tựu & Giải thưởng
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -39,9 +39,11 @@ const Achievements = () => {
               hoverable
               className="flex flex-col items-center text-center rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow duration-300"
             >
-              <div className="text-5xl !mb-4">{item.icon}</div>
-              <h3 className="text-xl font-semibold font-poppins mb-2">{item.title}</h3>
-              <p className="text-gray-600 font-inter">{item.desc}</p>
+              <div className="text-5xl  !mb-4">{item.icon}</div>
+              <h3 className="text-xl text-[#7BBCB0] font-semibold font-poppins mb-2">
+                {item.title}
+              </h3>
+              <p className=" text-[#778088] font-inter">{item.desc}</p>
             </Card>
           ))}
         </div>

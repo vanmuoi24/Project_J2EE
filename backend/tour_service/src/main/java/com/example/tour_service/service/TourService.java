@@ -1,16 +1,9 @@
 package com.example.tour_service.service;
 
-
+import com.example.tour_service.dto.response.*;
 import com.example.tour_service.repository.httpClient.PricingClient;
 import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourRequest;
-import com.example.tour_service.dto.request.TourSearchRequest;
-import com.example.tour_service.dto.response.LocationResponse;
-import com.example.tour_service.dto.response.TourDepartureResponse;
-import com.example.tour_service.dto.response.TourFileResponse;
-import com.example.tour_service.dto.response.TourPriceResponse;
-import com.example.tour_service.dto.response.TourResponse;
-import com.example.tour_service.dto.response.VehicleResponse;
 import com.example.tour_service.entity.Location;
 import com.example.tour_service.entity.Tour;
 import com.example.tour_service.entity.Vehicle;
@@ -21,14 +14,7 @@ import com.example.tour_service.repository.TourRepository;
 import com.example.tour_service.repository.VehicleRepository;
 import com.example.tour_service.repository.httpClient.FileClient;
 
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-
-
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Sort;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,7 +30,7 @@ public class TourService {
         private final VehicleRepository vehicleRepository;
         private final PricingClient pricingClient;
         private final FileClient fileClient;
-        private final SearchClient searchClient;
+        private final TourDepartureService tourDepartureService;
 
         public TourResponse getTourById(int id) {
                 Tour tour = tourRepository.findById(id)
@@ -111,21 +97,10 @@ public class TourService {
                                 .destinationLocation(destination)
                                 .vehicle(vehicle)
                                 .tourPriceId(request.getTourPriceId())
-                                .departureDate(request.getDepartureDate())
                                 .build();
-
-                TourDocument document = TourDocument.builder()
-                                .id(tour.getId())
-                                .tourProgram(tour.getTourProgram())
-                                .tourTitle(tour.getTourTitle())
-                                .basePrice(tour.getBasePrice())
-                                .departureLocation(tour.getDepartureLocation().getCity())
-                                .destinationLocation(tour.getDestinationLocation().getCity())
-                                .vehicle(tour.getVehicle().getVehicleType())
-                                .build();
-                searchClient.saveTour(document);
 
                 Tour saved = tourRepository.save(tour);
+
                 if (request.getFiles() != null && !request.getFiles().isEmpty()) {
                         try {
                                 fileClient.uploadMultipleFiles(
@@ -173,55 +148,6 @@ public class TourService {
                 tourRepository.deleteById(id);
         }
 
-        // Phương thức mới cho tìm kiếm và phân trang
-        public Page<TourResponse> searchTours(TourSearchRequest request, Pageable pageable) {
-                // 1. Tạo specification từ request
-                Specification<Tour> spec = TourSpecification.build(request);
-
-                // 2. TẠO LOGIC SORT TỪ REQUEST (Giống như chúng ta đã làm)
-                String sortField = "createdAt"; // Mặc định
-                Sort.Direction direction = Sort.Direction.DESC; // Mặc định
-
-                String sortRequest = (request.getSort() != null && !request.getSort().isEmpty())
-                                ? request.getSort()
-                                : "newest";
-
-                switch (sortRequest) {
-                        case "dateSoon":
-                                sortField = "departureDate";
-                                direction = Sort.Direction.ASC;
-                                break;
-                        case "priceLow":
-                                sortField = "basePrice";
-                                direction = Sort.Direction.ASC;
-                                break;
-                        case "priceHigh":
-                                sortField = "basePrice";
-                                direction = Sort.Direction.DESC;
-                                break;
-                        case "newest":
-                        default:
-                                sortField = "id"; // Hoặc "createAt"
-                                direction = Sort.Direction.DESC;
-                                break;
-                }
-                Sort sort = Sort.by(direction, sortField);
-
-                // 3. TẠO PAGEABLE MỚI KẾT HỢP LOGIC CŨ VÀ SORT MỚI
-                // Chúng ta lấy số trang và kích thước trang từ 'pageable' cũ,
-                // nhưng áp dụng 'sort' mới mà chúng ta vừa tạo.
-                Pageable newPageable = PageRequest.of(
-                                pageable.getPageNumber(),
-                                pageable.getPageSize(),
-                                sort);
-
-                // 2. Gọi repository với cả spec và pageable
-                Page<Tour> toursPage = tourRepository.findAll(spec, newPageable);
-
-                // 3. Chuyển đổi Page<Tour> sang Page<TourResponse>
-                return toursPage.map(this::toResponse);
-        }
-
         private TourResponse toResponse(Tour tour) {
                 return TourResponse.builder()
                                 .id(tour.getId())
@@ -247,7 +173,6 @@ public class TourService {
                                                                 .id(tour.getVehicle().getId())
                                                                 .name(tour.getVehicle().getVehicleType())
                                                                 .build())
-
                                 .build();
         }
 }

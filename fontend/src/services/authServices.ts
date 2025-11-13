@@ -1,5 +1,11 @@
 import axiosClient from '@/api/axios';
-import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '@/types/Auth';
+import type {
+  ChangePWReq,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+} from '@/types/Auth';
 import { sessionService } from './sessionServices';
 import axios from 'axios';
 import type { AxiosResponse, CreateCommentRequest } from '@/types/comment';
@@ -67,6 +73,10 @@ export const refreshTokenService = async (token: string): Promise<LoginResponse>
     }
     throw new Error('Unexpected error');
   }
+};
+
+export const changePW = async (data: ChangePWReq): Promise<AxiosResponse> => {
+  return axios.post('/auth/users/Change-password', data);
 };
 
 export const getListComentByTour = (id: number): Promise<AxiosResponse> => {

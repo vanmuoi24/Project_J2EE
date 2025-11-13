@@ -72,14 +72,16 @@ public class AuthService {
                 .findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         var userResponse = userMapper.toUserResponse(user);
-        try {
-            FileInfo fileInfo = fileServiceClient.getFileByOwnerId(String.valueOf(user.getId()));
-            if (fileInfo != null && fileInfo.getUrl() != null) {
-                userResponse.setAvatar(fileInfo.getUrl());
-            }
-        } catch (Exception e) {
-            userResponse.setAvatar(null);
-        }
+//        try {
+//            FileInfo fileInfo = fileServiceClient.getFileByOwnerId(String.valueOf(user.getId()));
+//            if (fileInfo != null && fileInfo.getUrl() != null) {
+//                userResponse.setAvatar(fileInfo.getUrl());
+//            }
+//        } catch (Exception e) {
+//
+//            System.out.println(">>>>>>>>>> k lấy được ảnh" + e.getMessage() );
+//            userResponse.setAvatar(null);
+//        }
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + VALID_DURATION);
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());

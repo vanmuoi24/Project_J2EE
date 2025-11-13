@@ -2,6 +2,7 @@ package com.example.auth_service.controller;
 
 import java.text.ParseException;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.auth_service.dto.request.ApiResponse;
@@ -26,7 +27,7 @@ import lombok.experimental.FieldDefaults;
 public class AuthController {
     AuthService authService;
     @PostMapping("/login")
-    ApiResponse<AuthenticationResponse>  login ( @RequestBody AuthenticationRequest request){
+    ApiResponse<AuthenticationResponse>  login (@RequestBody @Valid AuthenticationRequest request){
         var result = authService.authenticated(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result).build();

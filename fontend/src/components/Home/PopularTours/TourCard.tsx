@@ -23,8 +23,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour, onBooking }) => {
 
   const nightDuration = tour.duration > 0 ? tour.duration - 1 : 0;
 
-  const displayDate = dayjs().format('DD/MM/YYYY'); // <-- Cần thay thế bằng dữ liệu động
-
+  console.log(tour);
   return (
     <div className="!py-2 !px-[8px]">
       <div className="shadow-xl rounded-2xl overflow-hidden bg-white">
@@ -44,21 +43,32 @@ const TourCard: React.FC<TourCardProps> = ({ tour, onBooking }) => {
             <NumberOutlined /> <b>ID:</b> {tour.id}
           </p>
           <p className="!px-0 !py-[4px] truncate">
-            <EnvironmentOutlined /> <b>Departs from:</b> {tour.departureCity.city}
+            <EnvironmentOutlined /> <b>Khởi hành từ:</b> {tour.departureCity.city}
           </p>
           <p className="!px-0 !py-[4px] truncate">
-            <CalendarOutlined /> <b>Departure dates:</b> {displayDate}
+            <CalendarOutlined /> <b>Ngày khởi hành: </b>
+            <span className="text-gray-600 ml-1">
+              {tour.departures && tour.departures.length > 0
+                ? tour.departures
+                    .map((item) => dayjs(item.departureDate).format('DD/MM/YYYY'))
+                    .join(', ')
+                : 'Đang cập nhật'}
+            </span>
           </p>
           <p className="!px-0 !py-[4px] truncate">
-            <FieldTimeOutlined /> <b>Duration:</b> {tour.duration} ngày {nightDuration} đêm
+            <FieldTimeOutlined /> <b>Thời gian:</b> {tour.duration} ngày {nightDuration} đêm
           </p>
 
           <div className="!mt-[12px] flex justify-between items-center">
-            <span className="text-[18px] font-bold text-[#e63946]">
+            <span className="text-[18px] font-bold text-[#FFDA32]">
               {formatCurrencyVND(tour.basePrice)}
             </span>
-            <Button type="primary" onClick={() => onBooking(tour.id)}>
-              Booking
+            <Button
+              type="primary"
+              className="!bg-[#7BBCB0] !font-bold"
+              onClick={() => onBooking(tour.id)}
+            >
+              Đặt ngay
             </Button>
           </div>
         </div>
