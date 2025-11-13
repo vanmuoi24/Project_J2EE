@@ -1,8 +1,8 @@
 import Slider, { type Settings } from 'react-slick';
-import vou1 from '@/assets/images/vou1.webp';
-import vou2 from '@/assets/images/vou2.webp';
-import vou3 from '@/assets/images/vou3.webp';
-import vou4 from '@/assets/images/vou4.webp';
+import vou1 from '@/assets/images/sl1.jpg';
+import vou2 from '@/assets/images/sl2.jpg';
+import vou3 from '@/assets/images/sl3.jpg';
+import vou4 from '@/assets/images/sl4.jpg';
 
 const VouchersSlider: React.FC = () => {
   const settings: Settings = {

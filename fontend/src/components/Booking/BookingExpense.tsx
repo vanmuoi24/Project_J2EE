@@ -1,8 +1,12 @@
 import { Card, Typography, Row, Col, Button, Modal, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getTourDepartureById } from '@/services/tourServices';
 import { formatCurrencyVND } from '@/utils/index';
+<<<<<<< HEAD
 import { useNavigate } from 'react-router-dom';
+=======
+>>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
 
 const { Title, Text } = Typography;
 

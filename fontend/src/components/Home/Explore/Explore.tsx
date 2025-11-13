@@ -1,4 +1,7 @@
 import Container from '@/components/Share/Container';
+import { getAllDestinations } from '@/services/tourServices';
+import type { IDestination } from '@/types/Tour';
+import { useState } from 'react';
 import Slider, { type Settings } from 'react-slick';
 
 const VouchersSlider: React.FC = () => {
@@ -50,15 +53,13 @@ const VouchersSlider: React.FC = () => {
       <Container>
         {/* Title */}
         <div className="!mb-3">
-          <h2 className="text-[32px] font-bold text-[#0b5da7] mb-2 uppercase">
-            Discover Amazing Adventures with Vietravel
-          </h2>
-          <div className="w-[60px] h-1 bg-[#0b5da7] rounded"></div>
+          <h2 className="text-[32px] font-bold text-[#7BBCB0] mb-2 uppercase">ĐỊA ĐIỂM HẤP DẪN</h2>
+          <div className="w-[60px] h-1 bg-[#FFDA32] rounded"></div>
         </div>
 
         {/* Description */}
-        <p className="text-[20px] leading-relaxed text-[#444] mb-6 max-w-[720px]">
-          Embark on a Journey of a Lifetime – Create Unforgettable Memories Around the World!
+        <p className="text-[18px] leading-relaxed text-[#778088] mb-6 max-w-[720px]">
+          Khám phá các chuyến đi độc quyền của chúng tôi với mức giá vô cùng hợp lý.
         </p>
 
         <Slider {...settings} className="w-full">

@@ -1,6 +1,7 @@
 import type { AxiosResponse } from './comment';
 
 export interface ICity {
+  id: number;
   city: string;
   type: string | null;
 }
@@ -26,14 +27,29 @@ export interface IItinerary {
   description: string;
   meal: string;
 }
-
+export interface IDepartureDate {
+  id: number;
+  tourCode: string;
+  departureDate: string;
+  returnDate: string;
+  availableSeats: number;
+  tourId: number;
+  tourPrice: {
+    id: number;
+    adultPrice: number;
+    childPrice: number;
+    toddlerPrice: number;
+    infantPrice: number;
+    singleSupplementPrice: number;
+  };
+}
 export interface ITour {
   id: number;
   tourTitle: string;
   tourProgram: string;
   description: string;
   duration: number;
-  departureDate: string;
+  departures: IDepartureDate[];
   basePrice: number;
   imageIds: string[];
   itineraries?: IItinerary[];
@@ -50,7 +66,10 @@ export interface ITourResponse {
 }
 
 export interface ITourDeparture {
+<<<<<<< HEAD
 
+=======
+>>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
   id: string;
   tourCode: string;
   departureDate: string;
@@ -64,6 +83,8 @@ export interface ITourDepartureResponse {
   code: number;
   message?: string;
   result: ITourDeparture;
+<<<<<<< HEAD
+=======
 }
 
 export interface ITourDeparture {
@@ -76,6 +97,25 @@ export interface ITourDeparture {
   tourPrice: ITourPrice;
 }
 
+export interface IDestination {
+  city: string;
+  type: number;
+>>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
+}
+
+export interface ITourDeparture {
+  id: int;
+  tourCode: string;
+  departureDate: string;
+  returnDate: string;
+  availableSeats: string;
+  tourId: string;
+  tourPrice: ITourPrice;
+}
+<<<<<<< HEAD
+
+=======
+>>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
 type ToursResponse = AxiosResponse<ITour[]>;
 
 type TourResponse = AxiosResponse<ITour>;

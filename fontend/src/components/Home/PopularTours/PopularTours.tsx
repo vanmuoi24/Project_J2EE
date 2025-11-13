@@ -116,6 +116,7 @@ const PopularTours = () => {
   };
 
   return (
+<<<<<<< HEAD
     <div className="!mb-20 bg-[#dcefff] !py-[30px] !px-0">
       <Container>
         <div className="!mb-[12px]">
@@ -129,12 +130,36 @@ const PopularTours = () => {
 
         {/* Gọi hàm render nội dung */}
         {renderSliderContent()}
+=======
+    <div className="!mb-20 bg-gradient-to-r from-[#7dadb0] to-[#ddb5fc] !py-[30px] !px-0">
+      <Container>
+        <div className="!mb-[12px] flex flex-col items-center">
+          <h2 className="text-[32px] font-bold text-center uppercase text-[#fff] !mb-0">
+            CHUYẾN ĐI HẤP DẪN
+          </h2>
+          <div className="w-[200px] h-[4px] bg-[#FFDA32] rounded-[2px]" />
+        </div>
+        <div className="flex justify-center">
+          <p className="text-[18px] text-center text-[#666] !mb-[24px] max-w-[720px]">
+            Khám phá các chuyến tham quan được xếp hạng hàng đầu của chúng tôi và tìm nguồn cảm hứng
+            cho hành trình tiếp theo của bạn.
+          </p>
+        </div>
+        <div className="!mt-[40px]">
+          {/* Gọi hàm render nội dung */}
+          {renderSliderContent()}
+        </div>
+>>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
 
         <div className="text-center !mt-[32px]">
           <Button
             type="primary"
             size="large"
+<<<<<<< HEAD
             className="bg-[#0b5da7] border-[#0b5da7] rounded-[8px] !py-0 !px-[32px] h-[48px] text-[16px] font-[600]"
+=======
+            className="!bg-[#7BBCB0] rounded-[8px] !py-0 !px-[32px] h-[48px] text-[16px] !font-bold"
+>>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
             onClick={handleViewMore}
           >
             View more
@@ -145,4 +170,8 @@ const PopularTours = () => {
   );
 };
 
+<<<<<<< HEAD
 export default PopularTours;
+=======
+export default PopularTours;
+>>>>>>> fb6f375982862f5228192db8537ae277ed7c4604

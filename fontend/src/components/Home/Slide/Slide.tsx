@@ -24,6 +24,16 @@ const Slide = () => {
           </Flex>
         </div> */}
         <div className="slider" style={{ marginBottom: 100 }}>
+          {/* <div className="!mb-[12px]">
+            <h2 className="text-[32px] font-bold uppercase text-[#7BBCB0] !mb-0">
+              CHUYẾN ĐI HẤP DẪN
+            </h2>
+            <div className="w-[60px] h-[4px] bg-[#FFDA32] rounded-[2px]" />
+          </div>
+          <p className="text-[18px] text-[#666] !mb-[24px] max-w-[720px]">
+            Khám phá các chuyến tham quan được xếp hạng hàng đầu của chúng tôi và tìm nguồn cảm hứng
+            cho hành trình tiếp theo của bạn.
+          </p> */}
           <VouchersSlider />
         </div>
       </Container>

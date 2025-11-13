@@ -25,159 +25,154 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TourService {
 
-    private final TourRepository tourRepository;
-    private final LocationRepository locationRepository; // cần thêm repo cho Location
-    private final VehicleRepository vehicleRepository;
-    private final PricingClient pricingClient;
-    private final FileClient fileClient;
-    private final TourDepartureService tourDepartureService;
+        private final TourRepository tourRepository;
+        private final LocationRepository locationRepository; // cần thêm repo cho Location
+        private final VehicleRepository vehicleRepository;
+        private final PricingClient pricingClient;
+        private final FileClient fileClient;
+        private final TourDepartureService tourDepartureService;
 
-    public TourResponse getTourById(int id) {
-        Tour tour = tourRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+        public TourResponse getTourById(int id) {
+                Tour tour = tourRepository.findById(id)
+                                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
 
-        TourResponse response = toResponse(tour);
+                TourResponse response = toResponse(tour);
 
-        ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
-        response.setTourPrice(priceResp.getResult());
+                ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(tour.getTourPriceId());
+                response.setTourPrice(priceResp.getResult());
 
-        List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(id);
-        response.setDepartures(departures);
+                List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(id);
+                response.setDepartures(departures);
 
-        List<TourFileResponse> fileResponses = fileClient.getAllMedia();
-        List<String> tourImages = fileResponses.stream()
-                .filter(f -> String.valueOf(id).equals(f.getTourId()))
-                .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
-                .map(TourFileResponse::getUrl)
-                .collect(Collectors.toList());
+                List<TourFileResponse> fileResponses = fileClient.getAllMedia();
+                List<String> tourImages = fileResponses.stream()
+                                .filter(f -> String.valueOf(id).equals(f.getTourId()))
+                                .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
+                                .map(TourFileResponse::getUrl)
+                                .collect(Collectors.toList());
 
-        response.setImageIds(tourImages);
+                response.setImageIds(tourImages);
 
-        return response;
-    }
-
-    public List<TourResponse> getAllTours() {
-            List<TourFileResponse> fileResponses = fileClient.getAllMedia();
-            Map<String, List<String>> tourImagesMap = fileResponses.stream()
-                            .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
-                            .collect(Collectors.groupingBy(
-                                            TourFileResponse::getTourId,
-                                            Collectors.mapping(TourFileResponse::getUrl, Collectors.toList())));
-            return tourRepository.findAll().stream()
-                            .map(tour -> {
-                                    TourResponse response = toResponse(tour);
-                                    ApiResponse<TourPriceResponse> priceResp = pricingClient
-                                                    .getPriceById(tour.getTourPriceId());
-                                    List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(tour.getId());
-                                    response.setDepartures(departures);
-                                    response.setTourPrice(priceResp.getResult());
-                                    List<String> urls = tourImagesMap.get(String.valueOf(tour.getId()));
-                                    response.setImageIds(urls != null ? urls : List.of());
-                                    return response;
-                            })
-                            .collect(Collectors.toList());
-    }
-
-    public TourResponse createTour(TourRequest request) {
-            Location departure = locationRepository.findById(request.getDepartureLocationId())
-                            .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
-            Location destination = locationRepository.findById(request.getDestinationLocationId())
-                            .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
-            Vehicle vehicle = vehicleRepository.findById(request.getVehicleId())
-                            .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
-
-            Tour tour = Tour.builder()
-                            .tourProgram(request.getTourProgram())
-                            .tourTitle(request.getTourTitle())
-                            .description(request.getDescription())
-                            .duration(request.getDuration())
-                            .basePrice(request.getBasePrice())
-                            .departureLocation(departure)
-                            .destinationLocation(destination)
-                            .vehicle(vehicle)
-                            .tourPriceId(request.getTourPriceId())
-                            .build();
-
-
-            Tour saved = tourRepository.save(tour);
-
-            if (request.getFiles() != null && !request.getFiles().isEmpty()) {
-                    try {
-                            fileClient.uploadMultipleFiles(
-                                            String.valueOf(saved.getId()),
-                                            request.getFiles());
-                    } catch (Exception e) {
-                            e.printStackTrace();
-                    }
-            }
-
-            return toResponse(saved);
-    }
-
-    public TourResponse updateTour(int id, TourRequest request) {
-        Tour existingTour = tourRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
-
-        Location existingDepartureLocation = locationRepository.findById(request.getDepartureLocationId())
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
-
-        Location existingDestinationLocation = locationRepository.findById(request.getDestinationLocationId())
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
-
-
-        Vehicle existingVehicle = vehicleRepository.findById(request.getVehicleId())
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
-
-
-        //Cap nhat Tour
-        existingTour.setTourTitle(request.getTourTitle());
-        existingTour.setDescription(request.getDescription());
-        existingTour.setDuration(request.getDuration());
-        existingTour.setDepartureLocation(existingDepartureLocation);
-        existingTour.setDestinationLocation(existingDestinationLocation);
-        existingTour.setVehicle(existingVehicle);
-        existingTour.setTourPriceId(request.getTourPriceId());
-
-        Tour saved = tourRepository.save(existingTour);
-        return toResponse(saved);
-    }
-
-    public void deleteTour(int id) {
-        if (!tourRepository.existsById(id)) {
-            throw new AppException(ErrorCode.INVALID_KEY);
+                return response;
         }
 
-        tourRepository.deleteById(id);
-    }
+        public List<TourResponse> getAllTours() {
+                List<TourFileResponse> fileResponses = fileClient.getAllMedia();
+                Map<String, List<String>> tourImagesMap = fileResponses.stream()
+                                .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
+                                .collect(Collectors.groupingBy(
+                                                TourFileResponse::getTourId,
+                                                Collectors.mapping(TourFileResponse::getUrl, Collectors.toList())));
+                return tourRepository.findAll().stream()
+                                .map(tour -> {
+                                        TourResponse response = toResponse(tour);
+                                        ApiResponse<TourPriceResponse> priceResp = pricingClient
+                                                        .getPriceById(tour.getTourPriceId());
+                                        List<TourDepartureResponse> departures = tourDepartureService
+                                                        .getTourDepartureByTourId(tour.getId());
+                                        response.setDepartures(departures);
+                                        response.setTourPrice(priceResp.getResult());
+                                        List<String> urls = tourImagesMap.get(String.valueOf(tour.getId()));
+                                        response.setImageIds(urls != null ? urls : List.of());
+                                        return response;
+                                })
+                                .collect(Collectors.toList());
+        }
 
-    private TourResponse toResponse(Tour tour) {
-        return TourResponse.builder()
-                .id(tour.getId())
-                .tourProgram(tour.getTourProgram())
-                .tourTitle(tour.getTourTitle())
-                .description(tour.getDescription())
-                .duration(tour.getDuration())
-                .departureCity(
-                        LocationResponse.builder()
-                                .id(tour.getDepartureLocation().getId())
-                                .city(tour.getDepartureLocation().getCity())
-                                .type(tour.getDepartureLocation().getType())
-                                .build()
-                )
-                .destinationCity(
-                        LocationResponse.builder()
-                                .id(tour.getDestinationLocation().getId())
-                                .city(tour.getDestinationLocation().getCity())
-                                .type(tour.getDestinationLocation().getType())
-                                .build()
-                )
-                .basePrice(tour.getBasePrice())
-                .vehicle(
-                        VehicleResponse.builder()
-                                .id(tour.getVehicle().getId())
-                                .name(tour.getVehicle().getVehicleType())
-                                .build()
-                )
-                .build();
-    }
+        public TourResponse createTour(TourRequest request) {
+                Location departure = locationRepository.findById(request.getDepartureLocationId())
+                                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+                Location destination = locationRepository.findById(request.getDestinationLocationId())
+                                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+                Vehicle vehicle = vehicleRepository.findById(request.getVehicleId())
+                                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+
+                Tour tour = Tour.builder()
+                                .tourProgram(request.getTourProgram())
+                                .tourTitle(request.getTourTitle())
+                                .description(request.getDescription())
+                                .duration(request.getDuration())
+                                .basePrice(request.getBasePrice())
+                                .departureLocation(departure)
+                                .destinationLocation(destination)
+                                .vehicle(vehicle)
+                                .tourPriceId(request.getTourPriceId())
+                                .build();
+
+                Tour saved = tourRepository.save(tour);
+
+                if (request.getFiles() != null && !request.getFiles().isEmpty()) {
+                        try {
+                                fileClient.uploadMultipleFiles(
+                                                String.valueOf(saved.getId()),
+                                                request.getFiles());
+                        } catch (Exception e) {
+                                e.printStackTrace();
+                        }
+                }
+
+                return toResponse(saved);
+        }
+
+        public TourResponse updateTour(int id, TourRequest request) {
+                Tour existingTour = tourRepository.findById(id)
+                                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+
+                Location existingDepartureLocation = locationRepository.findById(request.getDepartureLocationId())
+                                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+
+                Location existingDestinationLocation = locationRepository.findById(request.getDestinationLocationId())
+                                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+
+                Vehicle existingVehicle = vehicleRepository.findById(request.getVehicleId())
+                                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+
+                // Cap nhat Tour
+                existingTour.setTourTitle(request.getTourTitle());
+                existingTour.setDescription(request.getDescription());
+                existingTour.setDuration(request.getDuration());
+                existingTour.setDepartureLocation(existingDepartureLocation);
+                existingTour.setDestinationLocation(existingDestinationLocation);
+                existingTour.setVehicle(existingVehicle);
+                existingTour.setTourPriceId(request.getTourPriceId());
+
+                Tour saved = tourRepository.save(existingTour);
+                return toResponse(saved);
+        }
+
+        public void deleteTour(int id) {
+                if (!tourRepository.existsById(id)) {
+                        throw new AppException(ErrorCode.INVALID_KEY);
+                }
+
+                tourRepository.deleteById(id);
+        }
+
+        private TourResponse toResponse(Tour tour) {
+                return TourResponse.builder()
+                                .id(tour.getId())
+                                .tourProgram(tour.getTourProgram())
+                                .tourTitle(tour.getTourTitle())
+                                .description(tour.getDescription())
+                                .duration(tour.getDuration())
+                                .departureCity(
+                                                LocationResponse.builder()
+                                                                .id(tour.getDepartureLocation().getId())
+                                                                .city(tour.getDepartureLocation().getCity())
+                                                                .type(tour.getDepartureLocation().getType())
+                                                                .build())
+                                .destinationCity(
+                                                LocationResponse.builder()
+                                                                .id(tour.getDestinationLocation().getId())
+                                                                .city(tour.getDestinationLocation().getCity())
+                                                                .type(tour.getDestinationLocation().getType())
+                                                                .build())
+                                .basePrice(tour.getBasePrice())
+                                .vehicle(
+                                                VehicleResponse.builder()
+                                                                .id(tour.getVehicle().getId())
+                                                                .name(tour.getVehicle().getVehicleType())
+                                                                .build())
+                                .build();
+        }
 }

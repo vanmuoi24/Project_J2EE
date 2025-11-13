@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -13,82 +13,69 @@ import {
   EnvironmentOutlined,
   DollarOutlined,
   TeamOutlined,
-} from "@ant-design/icons";
-import { Layout, Menu, Dropdown, Space, Avatar, Button } from "antd";
-import type { MenuProps } from "antd";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+  SafetyOutlined,
+} from '@ant-design/icons';
+import { Layout, Menu, Dropdown, Space, Avatar, Button } from 'antd';
+import type { MenuProps } from 'antd';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 const { Content, Sider } = Layout;
 
 const AdminSidebar: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [activeMenu, setActiveMenu] = useState("/admin");
+  const [activeMenu, setActiveMenu] = useState('/admin');
   const location = useLocation();
   const navigate = useNavigate();
 
   // Cập nhật menu active theo route
   useEffect(() => {
-    setActiveMenu(location.pathname || "/admin");
+    setActiveMenu(location.pathname || '/admin');
   }, [location.pathname]);
 
   // Menu bên sidebar
-  const menuItems: MenuProps["items"] = [
+  const menuItems: MenuProps['items'] = [
     {
-      key: "/admin/managerUser",
+      key: '/admin/managerUser',
       icon: <UserOutlined />,
       label: <Link to="/admin/managerUser">Quản lý người dùng</Link>,
     },
     {
-      key: "/admin/managerTour",
+      key: '/admin/managerTour',
       icon: <GlobalOutlined />,
-      label: "Quản lý tour du lịch",
+      label: 'Quản lý tour du lịch',
       children: [
         {
-          key: "/admin/managerTour/list",
+          key: '/admin/managerTour/list',
           icon: <UnorderedListOutlined />,
           label: <Link to="/admin/managerTour/list">Danh sách tour</Link>,
         },
         {
-          key: "/admin/managerTour/itinerary",
+          key: '/admin/managerTour/itinerary',
           icon: <CalendarOutlined />,
           label: <Link to="/admin/managerTour/itinerary">Lịch trình</Link>,
         },
         {
-          key: "/admin/managerTour/destination",
+          key: '/admin/managerTour/destination',
           icon: <EnvironmentOutlined />,
-          label: <Link to="/admin/managerTour/destination">Điểm đến</Link>,
+          label: <Link to="/admin/managerTour/destination">địa điểm</Link>,
         },
+
         {
-          key: "/admin/managerTour/pricing",
-          icon: <DollarOutlined />,
-          label: <Link to="/admin/managerTour/pricing">Giá & khuyến mãi</Link>,
-        },
-        {
-          key: "/admin/managerTour/booking",
-          icon: <ScheduleOutlined />,
-          label: <Link to="/admin/managerTour/booking">Booking theo tour</Link>,
-        },
-        {
-          key: "/admin/managerTour/guides",
-          icon: <TeamOutlined />,
-          label: <Link to="/admin/managerTour/guides">Hướng dẫn viên</Link>,
-        },
-        {
-          key: "/admin/managerTour/reviews",
+          key: '/admin/managerTour/reviews',
           icon: <StarOutlined />,
           label: <Link to="/admin/managerTour/reviews">Đánh giá tour</Link>,
         },
       ],
     },
     {
-      key: "/admin/managerBooking",
+      key: '/admin/managerBooking',
       icon: <ScheduleOutlined />,
       label: <Link to="/admin/managerBooking">Quản lý đặt chỗ</Link>,
     },
     {
-      key: "/admin/managerPromotion",
-      icon: <GiftOutlined />,
-      label: <Link to="/admin/managerPromotion">Quản lý khuyến mãi</Link>,
+      key: '/admin/role',
+      icon: <SafetyOutlined />,
+      label: <Link to="/admin/role">Quản lý Phân Quyền</Link>,
     },
     {
       key: "/admin/managerInvoice",
@@ -98,19 +85,19 @@ const AdminSidebar: React.FC = () => {
   ];
 
   // Menu dropdown account
-  const itemsDropdown: MenuProps["items"] = [
+  const itemsDropdown: MenuProps['items'] = [
     {
-      key: "home",
+      key: 'home',
       label: <Link to="/">Trang chủ</Link>,
     },
     {
-      key: "logout",
+      key: 'logout',
       label: (
         <span
-          style={{ cursor: "pointer" }}
+          style={{ cursor: 'pointer' }}
           onClick={() => {
             localStorage.clear();
-            navigate("/login", { replace: true });
+            navigate('/login', { replace: true });
           }}
         >
           Đăng xuất
@@ -120,7 +107,7 @@ const AdminSidebar: React.FC = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: "100vh", position: "relative" }}>
+    <Layout style={{ minHeight: '100vh', position: 'relative' }}>
       {/* Sidebar */}
       <Sider
         theme="light"
@@ -134,12 +121,12 @@ const AdminSidebar: React.FC = () => {
           style={{
             height: 32,
             margin: 16,
-            textAlign: "center",
-            fontWeight: "bold",
-            color: "#1890ff",
+            textAlign: 'center',
+            fontWeight: 'bold',
+            color: '#1890ff',
           }}
         >
-          <BugOutlined /> {!collapsed && "Hệ Thống Quản Trị"}
+          <BugOutlined /> {!collapsed && 'Hệ Thống Quản Trị'}
         </div>
         <Menu
           selectedKeys={[activeMenu]}
@@ -154,23 +141,23 @@ const AdminSidebar: React.FC = () => {
         {/* Header */}
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
+            display: 'flex',
+            justifyContent: 'space-between',
             marginRight: 20,
-            padding: "0 1rem",
-            alignItems: "center",
+            padding: '0 1rem',
+            alignItems: 'center',
             height: 64,
-            background: "#fff",
+            background: '#fff',
           }}
         >
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
-            style={{ fontSize: "16px", width: 64, height: 64 }}
+            style={{ fontSize: '16px', width: 64, height: 64 }}
           />
-          <Dropdown menu={{ items: itemsDropdown }} trigger={["click"]}>
-            <Space style={{ cursor: "pointer" }}>
+          <Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
+            <Space style={{ cursor: 'pointer' }}>
               Welcome Admin <Avatar>A</Avatar>
             </Space>
           </Dropdown>
@@ -179,40 +166,39 @@ const AdminSidebar: React.FC = () => {
         {/* Nội dung */}
         <Content
           style={{
-            padding: "1rem",
-            overflow: "hidden",
-            height: "calc(100vh - 64px)",
-            position: "relative",
+            padding: '1rem',
+            overflow: 'hidden',
+            height: 'calc(100vh - 64px)',
+            position: 'relative',
           }}
         >
           <div
             style={{
-              height: "100%",
-              overflowY: "auto",
+              height: '100%',
+              overflowY: 'auto',
               paddingRight: 0,
-              position: "relative",
+              position: 'relative',
             }}
             className="custom-scrollbar"
           >
-            {location.pathname === "/" ? (
+            {location.pathname === '/' ? (
               // 👇 Banner chữ chạy
               <div
                 style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  fontSize: "2rem",
-                  fontWeight: "bold",
-                  color: "#1890ff",
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  fontSize: '2rem',
+                  fontWeight: 'bold',
+                  color: '#1890ff',
                 }}
               >
                 <div
                   style={{
-                    display: "inline-block",
-                    animation: "marquee 12s linear infinite",
+                    display: 'inline-block',
+                    animation: 'marquee 12s linear infinite',
                   }}
                 >
-                  🚀 Chào mừng bạn đến với trang quản trị – Quản lý dữ liệu dễ
-                  dàng 🚀
+                  🚀 Chào mừng bạn đến với trang quản trị – Quản lý dữ liệu dễ dàng 🚀
                 </div>
 
                 {/* CSS cho animation chữ chạy và ẩn scrollbar */}

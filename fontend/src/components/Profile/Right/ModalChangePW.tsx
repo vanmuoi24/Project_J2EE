@@ -1,6 +1,9 @@
+import { changePW } from '@/services/authServices';
+import type { RootState } from '@/store';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { LockOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Modal } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface IProps {
   visible: boolean;
@@ -8,23 +11,41 @@ interface IProps {
 }
 
 const ModalChangePW = ({ visible, onClose }: IProps) => {
-  const [loading, setLoading] = useState(false);
+  const { token } = useAppSelector((state: RootState) => state.auth);
+
+  const [form] = Form.useForm();
 
   const handleSubmit = async (values: any) => {
-    setLoading(true);
-    try {
-      // Gọi API đổi mật khẩu
-      console.log('Form values:', values);
-      // Ví dụ: await axios.post('/api/change-password', values)
+    if (!values.currentPassword || !values.newPassword || !values.confirmPassword) {
+      message.info('Vui lòng điền đầy đủ các trường');
+      return;
+    }
 
-      message.success('Đổi mật khẩu thành công!');
-      onClose();
-    } catch (error) {
-      message.error('Có lỗi xảy ra. Vui lòng thử lại.');
-    } finally {
-      setLoading(false);
+    const currentPassword = values.currentPassword || '';
+    const newPassword = values.newPassword || '';
+    const confirmPassword = values.confirmPassword || '';
+
+    const dataChangPW = {
+      oldPassword: currentPassword,
+      newPassword,
+      confirmPassword,
+      token: token ?? '',
+    };
+    console.log('>>>>>>>>>>', dataChangPW);
+
+    const res = await changePW(dataChangPW);
+    if (res.code === 1000) {
+      message.success('Cập nhật mật khẩu thành công!');
+    } else {
+      message.error('Cập nhật thất bại.');
     }
   };
+
+  useEffect(() => {
+    if (visible) {
+      form.resetFields();
+    }
+  }, [form, visible]);
 
   return (
     <Modal
@@ -35,7 +56,7 @@ const ModalChangePW = ({ visible, onClose }: IProps) => {
       centered
       destroyOnClose
     >
-      <Form layout="vertical" onFinish={handleSubmit} className="!space-y-4">
+      <Form form={form} layout="vertical" onFinish={handleSubmit} className="!space-y-4">
         <Form.Item
           label="Mật khẩu cũ"
           name="currentPassword"
@@ -72,7 +93,7 @@ const ModalChangePW = ({ visible, onClose }: IProps) => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} block>
+          <Button type="primary" onClick={() => form.submit()} block>
             Xác nhận
           </Button>
         </Form.Item>

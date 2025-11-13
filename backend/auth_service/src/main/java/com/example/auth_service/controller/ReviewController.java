@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.auth_service.dto.request.ApiResponse;
 import com.example.auth_service.dto.request.ReviewRequest;
+import com.example.auth_service.dto.response.ReviewGroupResponse;
 import com.example.auth_service.dto.response.ReviewResponse;
 import com.example.auth_service.service.ReviewService;
 
@@ -28,6 +29,13 @@ public class ReviewController {
     public ApiResponse<List<ReviewResponse>> getByTour(@PathVariable Long tourId) {
         return ApiResponse.<List<ReviewResponse>>builder()
                 .result(reviewService.getReviewsByTour(tourId))
+                .build();
+    }
+
+    @GetMapping("/list")
+    public ApiResponse<List<ReviewGroupResponse>> getAllReViews() {
+        return ApiResponse.<List<ReviewGroupResponse>>builder()
+                .result(reviewService.getAllReviewsGroupedByTour())
                 .build();
     }
 
