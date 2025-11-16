@@ -75,11 +75,13 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        FileResponse fileResponse = fileServiceClient.uploadFile(req.getFile());
-        if (fileResponse != null && fileResponse.getUrl() != null) {
-            user.setAvatar(fileResponse.getUrl());
-        } else {
-            log.warn("Upload file thất bại hoặc trả về null!");
+        if (req.getFile() != null) {
+            FileResponse fileResponse = fileServiceClient.uploadFile(req.getFile());
+            if (fileResponse != null && fileResponse.getUrl() != null) {
+                user.setAvatar(fileResponse.getUrl());
+            } else {
+                log.warn("Upload file thất bại hoặc trả về null!");
+            }
         }
 
         userMapper.updateUserFromRequest(req, user);

@@ -1,6 +1,8 @@
 package com.example.tour_service.service;
 
+import com.example.tour_service.dto.request.TourSearchRequest;
 import com.example.tour_service.dto.response.*;
+import com.example.tour_service.repository.TourSpecification;
 import com.example.tour_service.repository.httpClient.PricingClient;
 import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourRequest;
@@ -15,6 +17,11 @@ import com.example.tour_service.repository.VehicleRepository;
 import com.example.tour_service.repository.httpClient.FileClient;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -150,13 +157,68 @@ public class TourService {
         tourRepository.deleteById(id);
     }
 
+    public Page<TourResponse> searchTours(TourSearchRequest request, Pageable pageable) {
+        // 1. Tạo specification từ request
+        Specification<Tour> spec = TourSpecification.build(request);
+
+        // 2. TẠO LOGIC SORT TỪ REQUEST (Giống như chúng ta đã làm)
+        String sortField = "createdAt"; // Mặc định
+        Sort.Direction direction = Sort.Direction.DESC; // Mặc định
+
+        String sortRequest = (request.getSort() != null && !request.getSort().isEmpty())
+                ? request.getSort()
+                : "newest";
+
+        switch (sortRequest) {
+            case "dateSoon":
+                sortField = "departureDate";
+                direction = Sort.Direction.ASC;
+                break;
+            case "priceLow":
+                sortField = "basePrice";
+                direction = Sort.Direction.ASC;
+                break;
+            case "priceHigh":
+                sortField = "basePrice";
+                direction = Sort.Direction.DESC;
+                break;
+            case "newest":
+            default:
+                sortField = "id"; // Hoặc "createAt"
+                direction = Sort.Direction.DESC;
+                break;
+        }
+        Sort sort = Sort.by(direction, sortField);
+
+        // 3. TẠO PAGEABLE MỚI KẾT HỢP LOGIC CŨ VÀ SORT MỚI
+        // Chúng ta lấy số trang và kích thước trang từ 'pageable' cũ,
+        // nhưng áp dụng 'sort' mới mà chúng ta vừa tạo.
+        Pageable newPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                sort
+        );
+
+        // 2. Gọi repository với cả spec và pageable
+        Page<Tour> toursPage = tourRepository.findAll(spec, newPageable);
+
+        // 3. Chuyển đổi Page<Tour> sang Page<TourResponse>
+        return toursPage.map(this::toResponse);
+    }
+
     private TourResponse toResponse(Tour tour) {
+        ApiResponse<TourPriceResponse> priceResp = pricingClient
+                .getPriceById(tour.getTourPriceId());
+        List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(tour.getId());
+
         return TourResponse.builder()
                 .id(tour.getId())
                 .tourProgram(tour.getTourProgram())
                 .tourTitle(tour.getTourTitle())
                 .description(tour.getDescription())
                 .duration(tour.getDuration())
+                .departures(departures)
+                .tourPrice(priceResp.getResult())
                 .departureCity(
                         LocationResponse.builder()
                                 .id(tour.getDepartureLocation().getId())
