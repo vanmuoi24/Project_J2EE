@@ -5,6 +5,7 @@ import type {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  ReviewResponse,
 } from '@/types/Auth';
 import { sessionService } from './sessionServices';
 import axios from 'axios';
@@ -76,13 +77,21 @@ export const refreshTokenService = async (token: string): Promise<LoginResponse>
 };
 
 export const changePW = async (data: ChangePWReq): Promise<AxiosResponse> => {
-  return axios.post('/auth/users/Change-password', data);
+  return axiosClient.post('/auth/users/Change-password', data);
 };
 
 export const getListComentByTour = (id: number): Promise<AxiosResponse> => {
   return axiosClient.get(`/auth/reviews/tour/${id}`);
 };
 
+export const getListComentByTourALll = (): Promise<AxiosResponse> => {
+  return axiosClient.get(`/auth/reviews/list`);
+};
+
 export const createComent = (data: CreateCommentRequest): Promise<AxiosResponse> => {
   return axiosClient.post('/auth/reviews', data);
+};
+
+export const getHighReviews = (size: number = 4): Promise<AxiosResponse<ReviewResponse[]>> => {
+  return axiosClient.get(`/auth/reviews/high-rating?size=${size}`);
 };

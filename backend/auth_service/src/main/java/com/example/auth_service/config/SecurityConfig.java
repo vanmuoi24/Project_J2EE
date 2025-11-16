@@ -25,6 +25,11 @@ public class SecurityConfig {
             "users/refresh"
     };
 
+    private final String[] PUBLIC_GET_URLS = {
+
+            "/reviews/high-rating"
+    };
+
     private final CustomJwtDecoder customJwtDecoder;
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
         this.customJwtDecoder = customJwtDecoder;
@@ -32,9 +37,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST,
-                PUBLIC_URLS)
-                .permitAll()
+        httpSecurity.authorizeHttpRequests(request -> request
+                .requestMatchers(HttpMethod.POST, PUBLIC_URLS).permitAll()
+                .requestMatchers(HttpMethod.GET, PUBLIC_GET_URLS).permitAll()
                 .anyRequest()
                 .authenticated());
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer

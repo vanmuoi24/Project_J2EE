@@ -26,6 +26,10 @@ export const updateProfile = (
     },
   });
 };
+
+export const getListUser = (): Promise<AxiosResponse> => {
+  return axiosClient.get('auth/users/list');
+};
 export const updateAvt = (
   data: IUserUpdate,
   id: number | undefined

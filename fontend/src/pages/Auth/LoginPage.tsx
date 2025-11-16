@@ -99,7 +99,7 @@ export default function LoginPage() {
               </Space>
 
               <Typography.Paragraph className="text-center !mb-0">
-                Chưa có thành viên?{' '}
+                Chưa có tài khoản?{' '}
                 <Button
                   type="link"
                   onClick={() => navigate('/register')}

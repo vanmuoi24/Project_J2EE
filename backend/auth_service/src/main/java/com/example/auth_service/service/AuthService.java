@@ -219,8 +219,8 @@ public class AuthService {
 
     public void changePassword(ChangePasswordRequest request) throws ParseException, JOSEException {
         var signedJWT = verifyToken(request.getToken(), false);
-        var username = signedJWT.getJWTClaimsSet().getSubject();
-        var user = userRepository.findByEmail(username)
+        var id = signedJWT.getJWTClaimsSet().getSubject();
+        var user = userRepository.findById(Long.parseLong(id))
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         // Kiểm tra confirmPassword

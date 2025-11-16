@@ -218,13 +218,18 @@ const Filter = ({ tours, searchParams, setSearchParams }: IProps) => {
               onChange={(checkedValues) => {
                 setSelectedTransports(checkedValues as string[]);
               }}
-              className="mt-2"
+              className="!mt-2"
             />
           </div>
         </div>
 
         {/* Nút Áp dụng */}
-        <Button type="primary" size="large" className="w-full !mt-4" onClick={handleApplyFilters}>
+        <Button
+          type="primary"
+          size="large"
+          className="w-full !mt-4 !bg-[#7BBCB0]"
+          onClick={handleApplyFilters}
+        >
           Áp dụng
         </Button>
       </Space>

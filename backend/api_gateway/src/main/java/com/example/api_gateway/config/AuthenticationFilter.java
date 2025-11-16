@@ -40,6 +40,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/auth/users/register",
             "/auth/users/refresh",
             "/auth/users/introspect",
+            "/auth/reviews/high-rating",
             "/notification/email/send",
             "/file/media/download/.*",
             "/pricing/prices/.*",

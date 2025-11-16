@@ -2,13 +2,21 @@ package com.example.auth_service.service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import com.example.auth_service.dto.FileInfo;
 import com.example.auth_service.dto.request.ReviewRequest;
+import com.example.auth_service.dto.response.ReviewGroupResponse;
 import com.example.auth_service.dto.response.ReviewResponse;
 import com.example.auth_service.dto.response.UserResponse;
 import com.example.auth_service.entity.Review;
@@ -77,4 +85,64 @@ public List<ReviewResponse> getReviewsByTour(Long tourId) {
     return responseList;
 }
 
+public List<ReviewGroupResponse> getAllReviewsGroupedByTour() {
+    List<Review> allReviews = reviewRepository.findAllByOrderByCreatedAtDesc();
+    Map<Long, ReviewGroupResponse> grouped = new LinkedHashMap<>();
+
+    for (Review review : allReviews) {
+        Long tourId = review.getTourId();
+     
+        User user = review.getUser();
+        UserResponse userResponse = new UserResponse();
+        if (user != null) {
+          
+            userResponse.setUsername(user.getUsername());
+            userResponse.setEmail(user.getEmail());
+            userResponse.setAvatar(user.getAvatar());
+        }
+
+        // Tạo ReviewResponse
+        ReviewResponse reviewRes = ReviewResponse.builder()
+                .id(review.getId())
+                .tourId(tourId)
+                .user(userResponse)
+                .content(review.getContent())
+                .rating(review.getRating())
+                .createdAt(review.getCreatedAt() != null ? review.getCreatedAt().toString() : null)
+                .build();
+
+        // Nếu chưa có nhóm tour này → tạo mới
+        grouped.computeIfAbsent(tourId, id -> new ReviewGroupResponse(id, "abc", new ArrayList<>()));
+
+        // Thêm review vào nhóm tour tương ứng
+        grouped.get(tourId).getReviews().add(reviewRes);
+    }
+
+    return new ArrayList<>(grouped.values());
+}
+
+    public List<ReviewResponse> getHighRatings(Integer size) {
+
+        // 1. Tạo một đối tượng Pageable để yêu cầu database
+        // - Trang 0 (trang đầu tiên)
+        // - 'size' (số lượng bản ghi mong muốn)
+        // - Sắp xếp: ưu tiên 1 là "rating" giảm dần (DESC), ưu tiên 2 là "createdAt" giảm dần
+        Pageable pageable = PageRequest.of(
+                0,
+                size,
+                Sort.by("rating").descending().and(Sort.by("createdAt").descending())
+        );
+
+        // 2. Gọi repository với Pageable
+        // Giả sử bạn muốn lấy các đánh giá có rating >= 4
+        // (Nếu bạn không có phương thức này, bạn có thể dùng `reviewRepository.findAll(pageable)`)
+        Page<Review> reviewPage = reviewRepository.findByRatingGreaterThanEqual(4, pageable);
+
+        // 3. Chuyển đổi Page<Review> thành List<ReviewResponse>
+
+        return reviewPage.getContent().stream()
+                .map(reviewMapper::toResponse) // Hoặc logic chuyển đổi của bạn
+                .collect(Collectors.toList());
+
+    }
 }

@@ -3,8 +3,6 @@ import MainLayout from '@layouts/MainLayout';
 import Home from '@pages/Home/page';
 import About from '@pages/About';
 import NotFound from '@pages/NotFound';
-import DashboardLayout from '@/layouts/DashboardLayout';
-import DashboardPage from '@/pages/Dashboard';
 import ProfilePage from '@/pages/Profile';
 import LoginPage from '@/pages/Auth/LoginPage';
 import RegisterPage from '@/pages/Auth/RegisterPage';
@@ -21,6 +19,8 @@ import TourDetail from '@/layouts/TourDetail';
 import Booking from '@/pages/Booking/BookingPage';
 import BookingHistory from '@/pages/Booking/HistoryPage';
 import Invoice from '@/pages/Invoice/InvoicePage';
+import ManagerReViewTour from '@/components/Admin/ManagerTour/ManagerReViewTour';
+import ManagerRole from '@/components/Admin/ManagerTour/ManagerRole';
 
 export default function AppRoutes() {
   return (
@@ -47,13 +47,6 @@ export default function AppRoutes() {
           <Route path="/register" element={<RegisterPage />} />
         </Route>
 
-        <Route element={<RouteGuard isPrivate />}>
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-          </Route>
-        </Route>
-
         <Route path="*" element={<NotFound />} />
 
         <Route path="/admin" element={<LayoutAdmin />}>
@@ -63,6 +56,8 @@ export default function AppRoutes() {
           <Route path="/admin/managerPromotion" element={<ManagerPromotion />} />
           <Route path="/admin/managerTour/itinerary" element={<ManagerSchedule />} />
           <Route path="/admin/managerTour/destination" element={<ManagerDestination />} />
+          <Route path="/admin/managerTour/reviews" element={<ManagerReViewTour />} />
+          <Route path="/admin/role" element={<ManagerRole />} />
         </Route>
       </Routes>
     </BrowserRouter>
