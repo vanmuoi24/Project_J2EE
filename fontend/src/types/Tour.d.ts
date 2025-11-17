@@ -15,6 +15,14 @@ export interface ITourPrice {
   singleSupplementPrice: number;
 }
 
+export interface TourPriceRequest {
+  adultPrice: number;
+  childPrice: number;
+  infantPrice: number;
+  toddlerPrice: number;
+  singleSupplementPrice: number;
+}
+
 export interface IVehicle {
   id: string;
   name: string;
@@ -27,6 +35,14 @@ export interface IItinerary {
   description: string;
   meal: string;
 }
+
+export interface ItineraryRequest{
+  title: string;
+  description: string;
+  meal: string;
+  tourId: number;
+}
+
 export interface IDepartureDate {
   id: number;
   tourCode: string;
@@ -43,6 +59,14 @@ export interface IDepartureDate {
     singleSupplementPrice: number;
   };
 }
+
+export interface DepartureDateRequest {
+  departureDate: string;
+  returnDate: string;
+  availableSeats: number;
+  tourId: number;
+}
+
 export interface ITour {
   id: number;
   tourTitle: string;
@@ -59,10 +83,33 @@ export interface ITour {
   vehicle: IVehicle;
 }
 
+export interface TourRequest {
+  tourTitle: string;
+  tourProgram: string;
+  description: string;
+  duration: number;
+  departureLocationId: number;
+  destinationLocationId: number;
+  basePrice: number;
+  vehicleId: string;
+  tourPriceId: number;
+  files: File[];
+}
+
 export interface ITourResponse {
   code: number;
   message?: string;
   result: ITour[];
+}
+
+export interface ITourDeparture {
+  id: int;
+  tourCode: string;
+  departureDate: string;
+  returnDate: string;
+  availableSeats: string;
+  tourId: string;
+  tourPrice: ITourPrice;
 }
 
 export interface ITourDeparture {
@@ -81,16 +128,6 @@ export interface ITourDepartureResponse {
   result: ITourDeparture;
 }
 
-export interface ITourDeparture {
-  id: int;
-  tourCode: string;
-  departureDate: string;
-  returnDate: string;
-  availableSeats: string;
-  tourId: string;
-  tourPrice: ITourPrice;
-}
-
 export interface IDestination {
   city: string;
   type: number;
@@ -99,6 +136,18 @@ export interface IDeparture {
   city: string;
   type: number;
 }
+
+export interface ILocation {
+  id: number;
+  city: string;
+  type: string;
+}
+
+export interface LocationRequest {
+  city: string;
+  type: string;
+}
+
 type ToursResponse = AxiosResponse<ITour[]>;
 
 type TourResponse = AxiosResponse<ITour>;
@@ -108,8 +157,11 @@ type TourDeparturesResponse = AxiosResponse<ITourDeparture[]>;
 type TourDepartureResponse = AxiosResponse<ITourDeparture>;
 
 type ItineraryResponse = AxiosResponse<IItinerary[]>;
+
 export interface ITourDepartureResponse {
   code: number;
   message?: string;
   result: ITourDeparture;
 }
+
+

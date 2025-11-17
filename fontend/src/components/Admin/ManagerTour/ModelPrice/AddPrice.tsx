@@ -2,11 +2,11 @@ import React from 'react';
 import { Form, Input, InputNumber, Select, Button, Card, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
-interface AddItineraryProps {
+interface AddPriceProps {
   onSubmit?: (values: any) => void;
 }
 
-const AddItinerary: React.FC<AddItineraryProps> = ({ onSubmit }) => {
+const AddPrice: React.FC<AddPriceProps> = ({ onSubmit }) => {
   const [form] = Form.useForm();
 
   const handleFinish = (values: any) => {
@@ -17,7 +17,7 @@ const AddItinerary: React.FC<AddItineraryProps> = ({ onSubmit }) => {
 
   return (
     <Card
-      title="🗺️ Thêm lịch trình tour"
+      title="🗺️ Thêm giá tour"
       bordered={false}
       style={{
         maxWidth: 600,
@@ -35,35 +35,46 @@ const AddItinerary: React.FC<AddItineraryProps> = ({ onSubmit }) => {
         style={{ marginTop: 8 }}
       >
         <Form.Item
-          label="Tiêu đề"
-          name="title"
-          rules={[{ required: true, message: 'Vui lòng nhập tiêu đề lịch trình' }]}
+          label="Giá người lớn"
+          name="adultPrice"
+          rules={[{ required: true, message: 'Vui lòng giá người lớn' }]}
         >
-          <Input placeholder="Ví dụ: Tham quan phố cổ Hội An..." allowClear />
+          <Input allowClear />
         </Form.Item>
-
-        <Form.Item label="Mô tả chi tiết" name="description">
-          <Input.TextArea rows={4} placeholder="Mô tả hoạt động, điểm tham quan, ghi chú..." />
-        </Form.Item>
-
         <Form.Item
-          label="Bữa ăn"
-          name="meal"
-          rules={[{ required: true, message: 'Vui lòng chọn bữa ăn' }]}
+          label="Giá trẻ em"
+          name="childPrice"
+          rules={[{ required: true, message: 'Vui lòng giá trẻ em' }]}
         >
-          <Select placeholder="Chọn bữa ăn trong ngày">
-            <Select.Option value="Sáng">Sáng</Select.Option>
-            <Select.Option value="Trưa">Trưa</Select.Option>
-            <Select.Option value="Tối">Tối</Select.Option>
-            <Select.Option value="Sáng, Trưa, Tối">Sáng, Trưa, Tối</Select.Option>
-          </Select>
+          <Input allowClear />
+        </Form.Item>
+        <Form.Item
+          label="Giá trẻ nhỏ"
+          name="toddlerPrice"
+          rules={[{ required: true, message: 'Vui lòng giá trẻ nhỏ' }]}
+        >
+          <Input allowClear />
+        </Form.Item>
+        <Form.Item
+          label="Giá em bé"
+          name="infantPrice"
+          rules={[{ required: true, message: 'Vui lòng giá em bé ' }]}
+        >
+          <Input allowClear />
+        </Form.Item>
+        <Form.Item
+          label="Giá phụ thu phòng đơn"
+          name="singleSupplementPrice"
+          rules={[{ required: true, message: 'Vui lòng giá phụ thu phòng đơn' }]}
+        >
+          <Input allowClear />
         </Form.Item>
 
         <Form.Item style={{ textAlign: 'right', marginTop: 24 }}>
           <Space>
             <Button htmlType="reset">Làm mới</Button>
             <Button type="primary" htmlType="submit" icon={<PlusOutlined />}>
-              Thêm lịch trình
+              Thêm
             </Button>
           </Space>
         </Form.Item>
@@ -72,4 +83,4 @@ const AddItinerary: React.FC<AddItineraryProps> = ({ onSubmit }) => {
   );
 };
 
-export default AddItinerary;
+export default AddPrice;

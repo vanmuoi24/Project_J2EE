@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { Form, Input, InputNumber, Select, Button, Divider } from 'antd';
 
-interface EditItineraryProps {
+interface EditTourDepartureProps {
   data?: any; // dữ liệu itinerary để edit
   onSubmit?: (values: any) => void;
 }
 
-const EditItinerary: React.FC<EditItineraryProps> = ({ data, onSubmit }) => {
+const EditTourDeparture: React.FC<EditTourDepartureProps> = ({ data, onSubmit }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -91,4 +91,4 @@ const EditItinerary: React.FC<EditItineraryProps> = ({ data, onSubmit }) => {
   );
 };
 
-export default EditItinerary;
+export default EditTourDeparture;

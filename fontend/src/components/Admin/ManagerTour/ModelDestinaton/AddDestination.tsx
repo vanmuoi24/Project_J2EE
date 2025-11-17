@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Input, Button, Select } from 'antd';
+const { Option } = Select;
 
 interface AddDestinationProps {
   onSubmit?: (values: any) => void;
@@ -9,7 +10,6 @@ const AddDestination: React.FC<AddDestinationProps> = ({ onSubmit }) => {
   const [form] = Form.useForm();
 
   const handleFinish = (values: any) => {
-    console.log('Add Destination:', values);
     if (onSubmit) onSubmit(values);
     form.resetFields();
   };
@@ -28,29 +28,21 @@ const AddDestination: React.FC<AddDestinationProps> = ({ onSubmit }) => {
         <Form.Item
           label="Tên điểm đến"
           name="name"
-          rules={[{ required: true, message: 'Vui lòng nhập tên điểm đến' }]}
+          rules={[{ required: true, message: 'Vui lòng nhập tên địa điểm' }]}
         >
-          <Input placeholder="Nhập tên điểm đến" size="large" />
+          <Input placeholder="Nhập tên địa điểm" size="large" />
         </Form.Item>
 
+        
         <Form.Item
-          label="Quốc gia"
-          name="country"
-          rules={[{ required: true, message: 'Vui lòng nhập quốc gia' }]}
+          label="Loại điểm"
+          name="type"
+          rules={[{ required: true, message: 'Vui lòng chọn loại điểm' }]}
         >
-          <Input placeholder="Nhập quốc gia" size="large" />
-        </Form.Item>
-
-        <Form.Item
-          label="Thành phố"
-          name="city"
-          rules={[{ required: true, message: 'Vui lòng nhập thành phố' }]}
-        >
-          <Input placeholder="Nhập thành phố" size="large" />
-        </Form.Item>
-
-        <Form.Item label="Mô tả" name="description">
-          <Input.TextArea rows={4} placeholder="Nhập mô tả" />
+          <Select placeholder="Chọn loại điểm" size="large">
+            <Option value="DEPARTURE">DEPARTURE</Option>
+            <Option value="DESTINATION">DESTINATION</Option>
+          </Select>
         </Form.Item>
 
         <Form.Item style={{ textAlign: 'right', marginTop: 16 }}>

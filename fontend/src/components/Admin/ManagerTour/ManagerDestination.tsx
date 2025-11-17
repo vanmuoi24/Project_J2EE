@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Input, Space, Popconfirm, message, Modal } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
@@ -11,58 +11,60 @@ import {
 } from '@ant-design/icons';
 import EditDestination from './ModelDestinaton/EditDestination';
 import AddDestination from './ModelDestinaton/AddDestination';
-
-interface Destination {
-  id: number;
-  name: string;
-  country: string;
-  city: string;
-  description: string;
-}
+import type { ILocation, LocationRequest } from '@/types/Tour';
+import { addLocation, deleteLocation, getAllLocation } from '@/services/tourServices';
 
 const ManagerDestination: React.FC = () => {
-  const [data, setData] = useState<Destination[]>([
-    {
-      id: 1,
-      name: 'Vịnh Hạ Long',
-      country: 'Việt Nam',
-      city: 'Quảng Ninh',
-      description: 'Di sản thiên nhiên thế giới',
-    },
-    {
-      id: 2,
-      name: 'Kyoto',
-      country: 'Nhật Bản',
-      city: 'Kyoto',
-      description: 'Thành phố cổ với nhiều đền chùa',
-    },
-  ]);
-
-  const [searchName, setSearchName] = useState('');
-  const [searchCountry, setSearchCountry] = useState('');
+  const [data, setData] = useState<ILocation[]>([]);
   const [searchCity, setSearchCity] = useState('');
-
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [editingDest, setEditingDest] = useState<Destination | null>(null);
+  const [editingDest, setEditingDest] = useState<ILocation | null>(null);
+
+  const fetchDataLocation = useCallback(async () => {
+      try {
+        const res = await getAllLocation();
+        if (res.code === 1000) {
+          setData(res.result);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tours:", error);
+      }
+    }, []);
+  
+    useEffect(() => {
+      fetchDataLocation();
+    }, [fetchDataLocation]);
 
   // Filter dữ liệu
   const filteredData = data.filter(
     (d) =>
-      d.name.toLowerCase().includes(searchName.toLowerCase()) &&
-      d.country.toLowerCase().includes(searchCountry.toLowerCase()) &&
-      d.city.toLowerCase().includes(searchCity.toLowerCase())
+      d.city.toLowerCase().includes(searchCity.toLowerCase()) 
   );
 
-  const handleDelete = (id: number) => {
-    setData(data.filter((d) => d.id !== id));
-    message.success('Xóa điểm đến thành công');
+  const handleDelete = async (id: number) => {
+    const res = await deleteLocation(id);
+    if (res.code === 1000) {
+      setData((prevData) => prevData.filter((d) => d.id !== id));
+      message.success('Xóa điểm đến thành công');
+    } else {
+      message.error('Xóa thất bại: ');
+    }
   };
 
-  const handleAdd = (values: any) => {
-    const newDest: Destination = { id: Date.now(), ...values };
-    setData([newDest, ...data]);
-    message.success('Thêm điểm đến thành công');
+  const handleAdd = async (values: any) => {
+    const newLocation: LocationRequest = {
+      city: values.name,
+      type: values.type,
+    };
+    const res = await addLocation(newLocation);
+    if (res.code === 1000) {
+      setData([res.result, ...data]);
+      message.success('Thêm điểm đến thành công');
+      setOpenAdd(false);
+    } else {
+      message.error('Thêm điểm đến thất bại: ');
+    }
     setOpenAdd(false);
   };
 
@@ -74,19 +76,15 @@ const ManagerDestination: React.FC = () => {
     setOpenEdit(false);
   };
 
-  const columns: ProColumns<Destination>[] = [
-    { title: 'STT', key: 'index', width: 60, align: 'center', render: (_, __, index) => index + 1 },
-    { title: 'Tên điểm đến', dataIndex: 'name' },
-    { title: 'Quốc gia', dataIndex: 'country' },
-    { title: 'Thành phố', dataIndex: 'city' },
-    { title: 'Mô tả', dataIndex: 'description' },
+  const columns: ProColumns<ILocation>[] = [
+    { title: 'Tên thành phố', dataIndex: 'city' },
+    { title: 'Loại', dataIndex: 'type' },
     {
       title: 'Hành động',
       key: 'actions',
       width: 150,
       render: (_, record) => (
         <Space>
-          <EyeOutlined style={{ color: '#faad14', fontSize: 18 }} />
           <EditOutlined
             style={{ color: '#1890ff', fontSize: 18 }}
             onClick={() => {
@@ -107,18 +105,6 @@ const ManagerDestination: React.FC = () => {
       {/* Search */}
       <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
         <Input
-          placeholder="Tìm theo tên"
-          value={searchName}
-          onChange={(e) => setSearchName(e.target.value)}
-          style={{ width: 200 }}
-        />
-        <Input
-          placeholder="Tìm theo quốc gia"
-          value={searchCountry}
-          onChange={(e) => setSearchCountry(e.target.value)}
-          style={{ width: 200 }}
-        />
-        <Input
           placeholder="Tìm theo thành phố"
           value={searchCity}
           onChange={(e) => setSearchCity(e.target.value)}
@@ -130,7 +116,7 @@ const ManagerDestination: React.FC = () => {
       </div>
 
       {/* Table */}
-      <ProTable<Destination>
+      <ProTable<ILocation>
         columns={columns}
         rowKey="id"
         dataSource={filteredData}

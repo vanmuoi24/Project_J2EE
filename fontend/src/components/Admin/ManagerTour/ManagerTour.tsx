@@ -1,63 +1,62 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ProTable, type ProColumns } from '@ant-design/pro-components';
 import { Button, Space, Image, message, Modal } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import AddNewTour from './ModelTour/AddNewTour';
 import EditTour from './ModelTour/EditTour';
+import type { ITour, TourRequest } from '@/types/Tour';
+import { addTour, getAllTours } from '@/services/tourServices';
+import { useNavigate } from "react-router-dom";
 
-// ==== FAKE DỮ LIỆU ====
-const FAKE_TOURS = [
-  {
-    id: 1,
-    tourTitle: 'Khám phá miền Bắc',
-    tourProgram: 'Hà Nội - Hạ Long - Sapa',
-    description: 'Trải nghiệm phong cảnh hùng vĩ và văn hóa miền Bắc Việt Nam.',
-    duration: 5,
-    basePrice: 4500000,
-    departureName: 'Hà Nội',
-    destinationName: 'Sapa',
-    vehicleName: 'Xe giường nằm',
-    imageUrls: [
-      'https://picsum.photos/seed/1/300/200',
-      'https://picsum.photos/seed/2/300/200',
-      'https://picsum.photos/seed/3/300/200',
-    ],
-  },
-  {
-    id: 2,
-    tourTitle: 'Thiên đường đảo ngọc',
-    tourProgram: 'TP.HCM - Phú Quốc',
-    description: 'Tour nghỉ dưỡng cao cấp trên đảo Phú Quốc.',
-    duration: 4,
-    basePrice: 6900000,
-    departureName: 'TP.HCM',
-    destinationName: 'Phú Quốc',
-    vehicleName: 'Máy bay',
-    imageUrls: [
-      'https://picsum.photos/seed/4/300/200',
-      'https://picsum.photos/seed/5/300/200',
-      'https://picsum.photos/seed/6/300/200',
-    ],
-  },
-  {
-    id: 3,
-    tourTitle: 'Di sản miền Trung',
-    tourProgram: 'Đà Nẵng - Hội An - Huế',
-    description: 'Hành trình di sản văn hóa và ẩm thực miền Trung.',
-    duration: 3,
-    basePrice: 3500000,
-    departureName: 'Đà Nẵng',
-    destinationName: 'Huế',
-    vehicleName: 'Xe du lịch',
-    imageUrls: ['https://picsum.photos/seed/8/300/200', 'https://picsum.photos/seed/9/300/200'],
-  },
-];
-
-// ==== Cấu hình bảng ====
 
 const ManagerTourList: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [dataTour, setDataTour] = useState<ITour[]>([]);
+  const navigate = useNavigate();
+
+  const fetchDataTour = useCallback(async () => {
+    try {
+      const res = await getAllTours();
+      if (res.code === 1000) {
+        setDataTour(res.result);
+      }
+    } catch (error) {
+      console.error("Failed to fetch tours:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDataTour();
+  }, [fetchDataTour]);
+
+  const handleAdd = async (values: any) => {
+    const newData: TourRequest = {
+      tourProgram: values.tourProgram,
+      tourTitle: values.tourTitle,
+      description: values.description,
+      duration: values.duration,
+      departureLocationId: values.departureLocationId,
+      destinationLocationId: values.destinationLocationId,
+      basePrice: values.basePrice,
+      vehicleId: values.vehicleId,
+      tourPriceId: values.tourPriceId,
+      files: values.files?.map((f: any) => f.originFileObj)
+    };
+
+    console.log('Data to send:', newData);
+    const res = await addTour(newData);
+    console.log('API Response:', res);
+
+    if (res.code === 1000) {
+      setDataTour(prev => [res.result, ...prev]);
+      message.success("Thêm tour thành công");
+      setOpen(false);
+    } else {
+      message.error("Thêm tour thất bại");
+    }
+  };
+
   const columns: ProColumns<any>[] = [
     {
       title: 'Tên tour',
@@ -76,15 +75,15 @@ const ManagerTourList: React.FC = () => {
     },
     {
       title: 'Điểm đi → đến',
-      key: 'route',
+      key: 'location',
       width: 220,
-      renderText: (_, r) => `${r.departureName} → ${r.destinationName}`,
+      renderText: (_, r) => `${r.departureCity.city} → ${r.destinationCity.city}`,
     },
     {
       title: 'Phương tiện',
-      dataIndex: 'vehicleName',
-      key: 'vehicleName',
+      key: 'vehicle',
       width: 140,
+      renderText: (_, r) => `${r.vehicle.name}`,
     },
     {
       title: 'Thời lượng (ngày)',
@@ -102,15 +101,45 @@ const ManagerTourList: React.FC = () => {
       renderText: (v) => Number(v).toLocaleString('vi-VN'),
     },
     {
+      title: "Lịch trình",
+      key: "schedule",
+      width: 100,
+      align: "center",
+      render: (_, r) => (
+        <Button
+          type="link"
+          icon={<EyeOutlined />}
+          onClick={() => {
+            navigate(`/admin/managerTour/itinerary?tourId=${r.id}`);
+          }}
+        />
+      ),
+    },
+    {
+      title: "Ngày khởi hành",
+      key: "tourDeparture",
+      width: 100,
+      align: "center",
+      render: (_, r) => (
+        <Button
+          type="link"
+          icon={<EyeOutlined />}
+          onClick={() => {
+            navigate(`/admin/managerTour/tourDeparture?tourId=${r.id}`);
+          }}
+        />
+      ),
+    },
+    {
       title: 'Hình ảnh',
       dataIndex: 'imageUrls',
       key: 'imageUrls',
       width: 180,
       render: (_, r) =>
-        r.imageUrls?.length ? (
+        r.imageIds?.length ? (
           <Image.PreviewGroup>
             <Space wrap>
-              {r.imageUrls.slice(0, 3).map((url: any, i: any) => (
+              {r.imageIds.slice(0, 3).map((url: any, i: any) => (
                 <Image
                   key={i}
                   src={url}
@@ -119,7 +148,7 @@ const ManagerTourList: React.FC = () => {
                   style={{ objectFit: 'cover', borderRadius: 8 }}
                 />
               ))}
-              {r.imageUrls.length > 3 ? <span>+{r.imageUrls.length - 3}</span> : null}
+              {r.imageIds.length > 3 ? <span>+{r.imageIds.length - 3}</span> : null}
             </Space>
           </Image.PreviewGroup>
         ) : (
@@ -156,7 +185,7 @@ const ManagerTourList: React.FC = () => {
         headerTitle="Danh sách Tour"
         rowKey="id"
         columns={columns}
-        dataSource={FAKE_TOURS}
+        dataSource={dataTour}
         search={{ labelWidth: 'auto' }}
         pagination={{ pageSize: 10, showSizeChanger: true }}
         toolBarRender={() => [
@@ -171,11 +200,11 @@ const ManagerTourList: React.FC = () => {
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-        destroyOnClose
+        destroyOnHidden
         style={{ top: 40 }}
         width={900}
       >
-        <AddNewTour />
+        <AddNewTour onSubmit={handleAdd} />
       </Modal>
 
       <Modal
@@ -183,7 +212,7 @@ const ManagerTourList: React.FC = () => {
         open={openEdit}
         onCancel={() => setOpenEdit(false)}
         footer={null}
-        destroyOnClose
+        destroyOnHidden
         centered={false}
         style={{ top: 40 }}
         width={900}

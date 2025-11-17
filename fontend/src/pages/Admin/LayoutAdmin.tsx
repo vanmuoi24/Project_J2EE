@@ -3,7 +3,6 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   BugOutlined,
-  GiftOutlined,
   UserOutlined,
   GlobalOutlined,
   ScheduleOutlined,
@@ -11,9 +10,9 @@ import {
   UnorderedListOutlined,
   CalendarOutlined,
   EnvironmentOutlined,
-  DollarOutlined,
-  TeamOutlined,
   SafetyOutlined,
+  FieldTimeOutlined,
+  MoneyCollectOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Space, Avatar, Button } from 'antd';
 import type { MenuProps } from 'antd';
@@ -50,16 +49,25 @@ const AdminSidebar: React.FC = () => {
           label: <Link to="/admin/managerTour/list">Danh sách tour</Link>,
         },
         {
-          key: '/admin/managerTour/itinerary',
+          key: '/admin/managerTour/tourDeparture',
           icon: <CalendarOutlined />,
+          label: <Link to="/admin/managerTour/tourDeparture">Ngày khởi hành</Link>,
+        },
+        {
+          key: '/admin/managerTour/itinerary',
+          icon: <FieldTimeOutlined />,
           label: <Link to="/admin/managerTour/itinerary">Lịch trình</Link>,
         },
         {
           key: '/admin/managerTour/destination',
           icon: <EnvironmentOutlined />,
-          label: <Link to="/admin/managerTour/destination">địa điểm</Link>,
+          label: <Link to="/admin/managerTour/destination">Địa điểm</Link>,
         },
-
+        {
+          key: '/admin/managerTour/price',
+          icon: <MoneyCollectOutlined />,
+          label: <Link to="/admin/managerTour/price">Giá</Link>,
+        },
         {
           key: '/admin/managerTour/reviews',
           icon: <StarOutlined />,

@@ -9,30 +9,28 @@ import {
 import { Button, Input, Modal, Form, InputNumber, Select, Space, message } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
-import type { IItinerary, ItineraryRequest } from '@/types/Tour';
-import { addItinerary, getAllItineraries, getItineraryByTourId } from '@/services/tourServices';
+import type { DepartureDateRequest, IItinerary, ITourDeparture } from '@/types/Tour';
+import { addTourDeparture, getAllItineraries, getDepartureByTourId, getItineraryByTourId, getTourDepartureById } from '@/services/tourServices';
 import { useLocation } from 'react-router-dom';
-import AddItinerary from './ModelSchedule/AddSchedule';
-import EditItinerary from './ModelSchedule/EditSchedule';
+import AddTourDeparture from './ModelTourDeparture/AddTourDeparture';
+import EditTourDeparture from './ModelTourDeparture/EditTourDeparture';
 
-const ManagerItinerary: React.FC = () => {
+const ManagerTourDeparture: React.FC = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const tourIdParam = params.get("tourId");
   const tourId = tourIdParam ? Number(tourIdParam) : null;
-  const [data, setData] = useState<IItinerary[]>([]);
-  const [searchTour, setSearchTour] = useState('');
-  const [searchTitle, setSearchTitle] = useState('');
+  const [data, setData] = useState<ITourDeparture[]>([]);
 
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [editingItinerary, setEditingItinerary] = useState<IItinerary | null>(null);
+  const [editingItinerary, setEditingItinerary] = useState<ITourDeparture | null>(null);
 
-  const fetchDataItinerary = useCallback(async () => {
+  const fetchDataTourDeparture = useCallback(async () => {
     try {
       if (!tourId) return;
 
-      const res = await getItineraryByTourId(tourId);
+      const res = await getDepartureByTourId(tourId);
       if (res.code === 1000) {
         setData(res.result);
       }
@@ -42,44 +40,38 @@ const ManagerItinerary: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchDataItinerary();
-  }, [fetchDataItinerary]);
+    fetchDataTourDeparture();
+  }, [fetchDataTourDeparture]);
 
-  // Lọc dữ liệu theo search
-  const filteredData = data.filter(
-    (d) =>
-      d.title.toLowerCase().includes(searchTour.toLowerCase()) &&
-      d.title.toLowerCase().includes(searchTitle.toLowerCase())
-  );
+  const handleAdd = async (values: any) => {
+    const newLocation: DepartureDateRequest = {
+      departureDate: values.departureDate,
+      returnDate: values.returnDate,
+      availableSeats: values.availableSeats,
+      tourId: tourId!
+    };
+    const res = await addTourDeparture(newLocation);
+    if (res.code === 1000) {
+      setData([res.result, ...data]);
+      message.success('Thêm ngày khởi hành thành công');
+      setOpenAdd(false);
+    } else {
+      message.error('Thêm ngày khởi hành thất bại: ');
+    }
+    setOpenAdd(false);
+  };
 
   const handleDelete = (id: number) => {
     setData(data.filter((d) => d.id !== id));
     message.success('Xóa lịch trình thành công');
   };
 
-  const handleAdd = async (values: any) => {
-    const newLocation: ItineraryRequest = {
-      title: values.title,
-      description: values.description,
-      meal: values.meal,
-      tourId: tourId!
-    };
-    const res = await addItinerary(newLocation);
-    if (res.code === 1000) {
-      setData([res.result, ...data]);
-      message.success('Thêm lịch trình thành công');
-      setOpenAdd(false);
-    } else {
-      message.error('Thêm lịch trình thất bại: ');
-    }
-    setOpenAdd(false);
-  };
-
-  const columns: ProColumns<IItinerary>[] = [
-    { title: 'Ngày', dataIndex: 'dayNumber', width: 80 },
-    { title: 'Tiêu đề', dataIndex: 'title' },
-    { title: 'Mô tả', dataIndex: 'description', ellipsis: true },
-    { title: 'Bữa ăn', dataIndex: 'meal' },
+  const columns: ProColumns<ITourDeparture>[] = [
+    { title: 'STT', key: 'index', width: 60, align: 'center', render: (_, __, index) => index + 1 },
+    { title: 'Mã tour', dataIndex: 'tourCode' },
+    { title: 'Ngày khởi hành', dataIndex: 'departureDate' },
+    { title: 'Ngày trở về', dataIndex: 'returnDate' },
+    { title: 'Chỗ', dataIndex: 'availableSeats' },
     {
       title: 'Hành động',
       key: 'actions',
@@ -105,35 +97,12 @@ const ManagerItinerary: React.FC = () => {
 
   return (
     <div>
-      {/* Search */}
-      <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
-        <Input
-          placeholder="Tìm theo tour"
-          value={searchTour}
-          onChange={(e) => setSearchTour(e.target.value)}
-          style={{ width: 200 }}
-        />
-        <Input
-          placeholder="Tìm theo tiêu đề"
-          value={searchTitle}
-          onChange={(e) => setSearchTitle(e.target.value)}
-          style={{ width: 200 }}
-        />
-        <Button
-          type="primary"
-          icon={<SearchOutlined />}
-          onClick={() => message.info('Đang lọc dữ liệu...')}
-        >
-          Tìm kiếm
-        </Button>
-      </div>
-
-      <ProTable<IItinerary>
+      <ProTable<ITourDeparture>
         columns={columns}
         rowKey="id"
-        dataSource={filteredData}
+        dataSource={data}
         search={false}
-        headerTitle="Danh sách lịch trình tour"
+        headerTitle="Danh sách ngày khởi hành tour"
         toolBarRender={() => [
           <Button
             key="create"
@@ -156,7 +125,7 @@ const ManagerItinerary: React.FC = () => {
         destroyOnClose
         centered
       >
-        <AddItinerary onSubmit={handleAdd} />
+        <AddTourDeparture onSubmit={handleAdd}/>
       </Modal>
 
       {/* Modal Edit */}
@@ -168,10 +137,10 @@ const ManagerItinerary: React.FC = () => {
         destroyOnClose
         centered
       >
-        <EditItinerary />
+        <EditTourDeparture />
       </Modal>
     </div>
   );
 };
 
-export default ManagerItinerary;
+export default ManagerTourDeparture;
