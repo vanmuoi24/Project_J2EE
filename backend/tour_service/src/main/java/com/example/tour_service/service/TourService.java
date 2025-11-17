@@ -111,7 +111,24 @@ public class TourService {
                         }
                 }
 
-                return toResponse(saved);
+                TourResponse response = toResponse(saved);
+
+                // Lấy price
+                ApiResponse<TourPriceResponse> priceResp = pricingClient.getPriceById(saved.getTourPriceId());
+                response.setTourPrice(priceResp.getResult());
+
+                List<TourDepartureResponse> departures = tourDepartureService.getTourDepartureByTourId(saved.getId());
+                response.setDepartures(departures);
+
+                List<TourFileResponse> fileResponses = fileClient.getAllMedia();
+                List<String> tourImages = fileResponses.stream()
+                        .filter(f -> String.valueOf(saved.getId()).equals(f.getTourId()))
+                        .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
+                        .map(TourFileResponse::getUrl)
+                        .collect(Collectors.toList());
+                response.setImageIds(tourImages);
+
+                return response;
         }
 
         public TourResponse updateTour(int id, TourRequest request) {

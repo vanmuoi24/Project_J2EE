@@ -48,6 +48,14 @@ public class LocationService {
         locationRepository.deleteById(id);
     }
 
+
+    public List<LocationResponse> getAllLocation() {
+        return locationRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
     public List<LocationResponse> getAllDepartureLocations() {
         return locationRepository.findByType(LocationType.DEPARTURE)
                 .stream()

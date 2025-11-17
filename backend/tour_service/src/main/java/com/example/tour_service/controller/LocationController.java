@@ -40,6 +40,14 @@ public class LocationController {
                 .build();
     }
 
+    @GetMapping("/all")
+    public ApiResponse<List<LocationResponse>> getAllLocation() {
+        return ApiResponse.<List<LocationResponse>>builder()
+                .result(locationService.getAllLocation())
+                .message("Fetched All Locations")
+                .build();
+    }
+
     @GetMapping("/departures")
     public ApiResponse<List<LocationResponse>> getAllDepartureLocations() {
         return ApiResponse.<List<LocationResponse>>builder()
