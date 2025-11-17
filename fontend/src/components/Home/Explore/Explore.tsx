@@ -49,7 +49,7 @@ const VouchersSlider: React.FC = () => {
   ];
 
   return (
-    <div className="py-10 bg-gray-50 !mb-20">
+    <div className="py-10  !mb-20">
       <Container>
         {/* Title */}
         <div className="!mb-3">

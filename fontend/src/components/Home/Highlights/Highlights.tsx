@@ -26,7 +26,7 @@ const highlights = [
 
 export default function HighlightsSection() {
   return (
-    <div className="py-16 bg-gray-50 !mb-20">
+    <div className="py-16  !mb-20">
       <Container>
         <h2 className="text-3xl md:text-4xl text-center font-poppins font-bold text-[#7BBCB0] !mb-10 uppercase">
           Vì sao nên chọn SGU TOUR

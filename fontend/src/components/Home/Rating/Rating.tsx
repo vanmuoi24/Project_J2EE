@@ -1,6 +1,7 @@
 import Container from '@/components/Share/Container';
 import { getHighReviews } from '@/services/authServices';
 import type { ReviewResponse } from '@/types/Auth';
+import { Empty } from 'antd';
 import { useEffect, useState } from 'react';
 
 const renderStars = (rating: number) => {
@@ -33,7 +34,7 @@ const Rating = () => {
   }, []);
 
   return (
-    <div className="!mb-20">
+    <div className="!mb-40">
       <Container>
         <div>
           <div className="!mb-3">
@@ -51,7 +52,7 @@ const Rating = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* --- LẶP VÀ RENDER THẺ --- */}
           {/* 4. Lặp qua dữ liệu MỚI */}
-          {reviews &&
+          {(reviews &&
             reviews.map((review) => (
               <div
                 key={review.id}
@@ -77,7 +78,15 @@ const Rating = () => {
                   })}
                 </p>
               </div>
-            ))}
+            ))) || (
+            <>
+              <div></div>
+              <div className="">
+                <Empty description="No rating found at this moment." />
+              </div>
+              <div></div>
+            </>
+          )}
         </div>
       </Container>
     </div>
