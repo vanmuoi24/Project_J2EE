@@ -18,12 +18,31 @@ export const loginService = async (data: LoginRequest): Promise<LoginResponse> =
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
       const serverError = err.response?.data as { message?: string };
-      throw new Error(serverError?.message || 'Login failed');
+      throw new Error(serverError?.message || 'Đăng nhập thất bại');
     }
     if (err instanceof Error) {
       throw err;
     }
     throw new Error('Unexpected error');
+  }
+};
+export const loginWithGGService = async (googleToken: string) => {
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/auth/users/google`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${googleToken}`,
+        },
+      }
+    );
+    if (res.data.code === 1000) {
+      return res.data;
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Đăng nhập thất bại');
   }
 };
 

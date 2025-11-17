@@ -33,7 +33,10 @@ public class User {
 
     @Column
     private String address;
-    
 
+    @Column
+    private String googleId;   // id duy nhất từ Google
+
+    private String provider = "LOCAL";
 
 }

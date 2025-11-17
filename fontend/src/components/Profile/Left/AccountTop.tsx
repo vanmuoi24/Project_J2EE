@@ -69,7 +69,7 @@ const AccountTop = () => {
       message.error(error.message || 'Upload thất bại.');
     }
   };
-
+  console.log('>>>>>>>>>>>>', user);
   return (
     <>
       <Card className="flex items-center gap-4 shadow-md rounded-2xl">
@@ -82,8 +82,10 @@ const AccountTop = () => {
               className="border-2 border-gray-200"
             />
             {!loading && (
-              <div className="absolute w-[50%] inset-0 bg-[#c1c1c1] bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <CameraOutlined className="!text-white text-2xl" />
+              <div
+                className={`absolute w-full inset-0 bg-[#c1c1c1] bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity`}
+              >
+                <CameraOutlined className="!text-white text-2xl " />
               </div>
             )}
           </div>
