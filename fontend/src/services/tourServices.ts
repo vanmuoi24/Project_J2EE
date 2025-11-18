@@ -4,8 +4,6 @@ import type { IPaginationResponse } from '@/types/Pagination';
 import type {
   DepartureDateRequest,
   ICity,
-  IDeparture,
-  IDestination,
   IItinerary,
   ILocation,
   ItineraryRequest,
@@ -16,6 +14,7 @@ import type {
   LocationRequest,
   TourPriceRequest,
   TourRequest,
+  UpdateTourRequest,
 } from '@/types/Tour';
 
 export const searchTours = (
@@ -81,10 +80,6 @@ export const addLocation = (data: LocationRequest): Promise<AxiosResponse<ILocat
   return axiosClient.post(`/tour/locations`, data);
 };
 
-export const deleteLocation = (id: number): Promise<AxiosResponse<any>> => {
-  return axiosClient.delete(`/tour/locations/${id}`);
-};
-
 export const addItinerary = (data: ItineraryRequest): Promise<AxiosResponse<IItinerary>> => {
   return axiosClient.post(`tour/itineraries`, data);
 }
@@ -114,4 +109,29 @@ export const addTour = (data: TourRequest): Promise<AxiosResponse<ITour>> => {
     },
   });
 };
+
+export const updateTour = (data: UpdateTourRequest): Promise<AxiosResponse<ITour>> => {
+  const formData = new FormData();
+
+  // Chỉ gửi các trường có giá trị, không gửi undefined/null
+  Object.entries(data).forEach(([key, value]) => {
+    if (value === undefined || value === null || key === "id") return;
+
+    if (key === "files" && Array.isArray(value)) {
+      value.forEach((file: File) => formData.append("files", file));
+    } else {
+      formData.append(key, value as any);
+    }
+  });
+
+  return axiosClient.put(`tour/tours/${data.id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+
+export const deleteLocation = (id: number): Promise<AxiosResponse<any>> => {
+  return axiosClient.delete(`/tour/locations/${id}`);
+};
+
 

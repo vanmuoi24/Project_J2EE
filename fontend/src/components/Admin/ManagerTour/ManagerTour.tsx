@@ -5,14 +5,14 @@ import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-de
 import AddNewTour from './ModelTour/AddNewTour';
 import EditTour from './ModelTour/EditTour';
 import type { ITour, TourRequest } from '@/types/Tour';
-import { addTour, getAllTours } from '@/services/tourServices';
+import { addTour, getAllTours, updateTour } from '@/services/tourServices';
 import { useNavigate } from "react-router-dom";
-
 
 const ManagerTourList: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [dataTour, setDataTour] = useState<ITour[]>([]);
+  const [selectedTour, setSelectedTour] = useState<ITour | null>(null);
   const navigate = useNavigate();
 
   const fetchDataTour = useCallback(async () => {
@@ -55,6 +55,43 @@ const ManagerTourList: React.FC = () => {
     } else {
       message.error("Thêm tour thất bại");
     }
+  };
+
+  const handleEdit = async (values: any) => {
+    if (!selectedTour) return;
+
+    const updateData = {
+      ...values,
+      id: selectedTour.id,
+      files: values.files?.map((f: any) => f.originFileObj)
+    };
+
+    console.log('Data to update:', updateData);
+    const res = await updateTour(updateData);
+    console.log('API Response:', res);
+
+    if (res.code === 1000) {
+      // Cập nhật lại danh sách tour
+      setDataTour(prev => prev.map(tour => 
+        tour.id === selectedTour.id ? { ...tour, ...res.result } : tour
+      ));
+      message.success("Cập nhật tour thành công");
+      setOpenEdit(false);
+      setSelectedTour(null);
+    } else {
+      message.error("Cập nhật tour thất bại");
+    }
+  };
+
+  const handleOpenEdit = (tour: ITour) => {
+    console.log("Dữ liệu gửi vào EditTour:", tour);
+    setSelectedTour(tour);
+    setOpenEdit(true);
+  };
+
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+    setSelectedTour(null);
   };
 
   const columns: ProColumns<any>[] = [
@@ -167,7 +204,11 @@ const ManagerTourList: React.FC = () => {
             icon={<EyeOutlined />}
             onClick={() => message.info(`Xem: ${r.tourTitle}`)}
           />
-          <Button type="link" icon={<EditOutlined />} onClick={() => setOpenEdit(true)} />
+          <Button 
+            type="link" 
+            icon={<EditOutlined />} 
+            onClick={() => handleOpenEdit(r)} 
+          />
           <Button
             type="link"
             danger
@@ -200,7 +241,7 @@ const ManagerTourList: React.FC = () => {
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-        destroyOnHidden
+        destroyOnClose
         style={{ top: 40 }}
         width={900}
       >
@@ -208,16 +249,19 @@ const ManagerTourList: React.FC = () => {
       </Modal>
 
       <Modal
-        title={'Chỉnh sửa tour:'}
+        title={`Chỉnh sửa tour: ${selectedTour?.tourTitle || ''}`}
         open={openEdit}
-        onCancel={() => setOpenEdit(false)}
+        onCancel={handleCloseEdit}
         footer={null}
-        destroyOnHidden
-        centered={false}
+        destroyOnClose
         style={{ top: 40 }}
         width={900}
       >
-        <EditTour />
+        <EditTour 
+          data={selectedTour} 
+          isEdit={true} 
+          onSubmit={handleEdit} 
+        />
       </Modal>
     </>
   );

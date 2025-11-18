@@ -96,6 +96,20 @@ export interface TourRequest {
   files: File[];
 }
 
+export interface UpdateTourRequest {
+  id: number;
+  tourTitle?: string;
+  tourProgram?: string;
+  description?: string;
+  duration?: number;
+  departureLocationId?: number;
+  destinationLocationId?: number;
+  basePrice?: number;
+  vehicleId?: string;
+  tourPriceId?: number;
+  files?: File[];
+}
+
 export interface ITourResponse {
   code: number;
   message?: string;

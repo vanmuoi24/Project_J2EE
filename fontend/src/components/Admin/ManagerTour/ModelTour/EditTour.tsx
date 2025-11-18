@@ -1,128 +1,268 @@
-import React, { useEffect } from 'react';
-import { Form, Input, InputNumber, Button, Select, Row, Col } from 'antd';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Form, Input, InputNumber, Button, Select, Upload, message, Space, Card, Tooltip } from 'antd';
+import { UploadOutlined, SaveOutlined } from '@ant-design/icons';
+import type { ILocation, ITourPrice, IVehicle } from '@/types/Tour';
+import { getAllDepartures, getAllDestinations, getAllPrice, getAllVehicles } from '@/services/tourServices';
 
 const { TextArea } = Input;
+const { Option } = Select;
 
 interface EditTourProps {
-  data?: any; // dữ liệu tour khi edit
-  isEdit?: boolean; // true nếu là edit
+  data?: any;
+  isEdit?: boolean;
   onSubmit?: (values: any) => void;
 }
 
 const EditTour: React.FC<EditTourProps> = ({ data, isEdit = false, onSubmit }) => {
   const [form] = Form.useForm();
+  const [departureList, setDepartureList] = useState<ILocation[]>([]);
+  const [destinationList, setDestinationList] = useState<ILocation[]>([]);
+  const [vehicleList, setVehicleList] = useState<IVehicle[]>([]);
+  const [tourPriceList, setTourPriceList] = useState<ITourPrice[]>([]);
 
-  // Khi modal mở, tự điền dữ liệu
+  const fetchDataDestinations = async () => {
+    try {
+      const res = await getAllDestinations();
+      if (res.code === 1000) {
+        setDestinationList(res.result);
+      }
+    } catch (error) {
+      console.error("Failed to fetch destinations combobox:", error);
+    }
+  }
+
+  const fetchDataDepartures = async () => {
+    try {
+      const res = await getAllDepartures();
+      if (res.code === 1000) {
+        setDepartureList(res.result);
+      }
+    } catch (error) {
+      console.error("Failed to fetch departures combobox:", error);
+    }
+  }
+
+  const fetchDataVehicles = async () => {
+    try {
+      const res = await getAllVehicles();
+      if (res.code === 1000) {
+        setVehicleList(res.result);
+      }
+    } catch (error) {
+      console.error("Failed to fetch vehicles combobox:", error);
+    }
+  }
+
+  const fetchDataTourPrice = async () => {
+    try {
+      const res = await getAllPrice();
+      if (res.code === 1000) {
+        setTourPriceList(res.result);
+      }
+    } catch (error) {
+      console.error("Failed to fetch tour price combobox:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchDataDestinations();
+    fetchDataDepartures();
+    fetchDataVehicles();
+    fetchDataTourPrice();
+  }, []);
+
+  // Khi data thay đổi, set giá trị cho form
   useEffect(() => {
     if (isEdit && data) {
       form.setFieldsValue({
-        tourTitle: data.tourTitle,
         tourProgram: data.tourProgram,
+        tourTitle: data.tourTitle,
         description: data.description,
         duration: data.duration,
         basePrice: data.basePrice,
-        departureName: data.departureName,
-        destinationName: data.destinationName,
-        vehicleName: data.vehicleName,
+        departureLocationId: data.departureCity?.id,
+        destinationLocationId: data.destinationCity?.id,
+        vehicleId: data.vehicle?.id,
+        tourPriceId: data.tourPrice?.id,
+        files: data.imageIds?.map((url: string, index: number) => ({
+          uid: `-${index}`,        
+          name: `image-${index}`,  
+          status: 'done',           
+          url,                     
+        })),
       });
     } else {
       form.resetFields();
     }
   }, [data, isEdit, form]);
 
-  const handleFinish = (values: any) => {
-    console.log('Form submit:', values);
-    if (onSubmit) onSubmit(values);
+  const handleFinish = async (values: any) => {
+    if (onSubmit) await onSubmit(values);
+    if (!isEdit) {
+      form.resetFields();
+    }
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={handleFinish}>
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            label="Tên tour"
-            name="tourTitle"
-            rules={[{ required: true, message: 'Vui lòng nhập tên tour' }]}
-          >
-            <Input placeholder="Nhập tên tour" />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            label="Chương trình"
-            name="tourProgram"
-            rules={[{ required: true, message: 'Vui lòng nhập chương trình' }]}
-          >
-            <Input placeholder="Ví dụ: Hà Nội - Hạ Long - Sapa" />
-          </Form.Item>
-        </Col>
-      </Row>
+    <Card
+      title={isEdit ? "Chỉnh sửa Tour" : "Thêm Tour Mới"}
+      bordered={false}
+      style={{
+        maxWidth: 800,
+        margin: '0 auto',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        borderRadius: 12,
+      }}
+    >
+      <Form
+        layout="vertical"
+        form={form}
+        onFinish={handleFinish}
+      >
+        <Form.Item
+          label="Tên chương trình"
+          name="tourProgram"
+          rules={[{ required: true, message: 'Vui lòng nhập tên tour!' }]}
+        >
+          <Input placeholder="VD: Hành trình miền Trung di sản" />
+        </Form.Item>
 
-      <Form.Item label="Mô tả" name="description">
-        <TextArea rows={3} placeholder="Nhập mô tả tour" />
-      </Form.Item>
+        <Form.Item
+          label="Tiêu đề"
+          name="tourTitle"
+          rules={[{ required: true, message: 'Vui lòng nhập chương trình!' }]}
+        >
+          <Input placeholder="VD: Đà Nẵng - Hội An - Huế" />
+        </Form.Item>
 
-      <Row gutter={16}>
-        <Col span={8}>
+        <Form.Item label="Mô tả" name="description">
+          <TextArea rows={3} placeholder="Giới thiệu ngắn gọn về tour..." />
+        </Form.Item>
+
+        <Space size="large" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          {/* Điểm khởi hành */}
           <Form.Item
-            label="Thời lượng (ngày)"
-            name="duration"
-            rules={[{ required: true, message: 'Vui lòng nhập thời lượng' }]}
+            label="Điểm khởi hành"
+            name="departureLocationId"
+            style={{ flex: 1 }}
+            rules={[{ required: true, message: 'Chọn điểm khởi hành!' }]}
           >
-            <InputNumber min={1} style={{ width: '100%' }} />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item
-            label="Giá cơ bản (VNĐ)"
-            name="basePrice"
-            rules={[{ required: true, message: 'Vui lòng nhập giá' }]}
-          >
-            <InputNumber min={0} style={{ width: '100%' }} />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item
-            label="Phương tiện"
-            name="vehicleName"
-            rules={[{ required: true, message: 'Vui lòng chọn phương tiện' }]}
-          >
-            <Select placeholder="Chọn phương tiện">
-              <Select.Option value="Xe du lịch">Xe du lịch</Select.Option>
-              <Select.Option value="Xe giường nằm">Xe giường nằm</Select.Option>
-              <Select.Option value="Máy bay">Máy bay</Select.Option>
+            <Select placeholder="Chọn điểm đi">
+              {departureList.map((item) => (
+                <Option key={item.id} value={item.id}>
+                  {item.city}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
-        </Col>
-      </Row>
 
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            label="Điểm đi"
-            name="departureName"
-            rules={[{ required: true, message: 'Vui lòng nhập điểm đi' }]}
-          >
-            <Input placeholder="Nhập điểm đi" />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
+          {/* Điểm đến */}
           <Form.Item
             label="Điểm đến"
-            name="destinationName"
-            rules={[{ required: true, message: 'Vui lòng nhập điểm đến' }]}
+            name="destinationLocationId"
+            style={{ flex: 1 }}
+            rules={[{ required: true, message: 'Chọn điểm đến!' }]}
           >
-            <Input placeholder="Nhập điểm đến" />
+            <Select placeholder="Chọn điểm đến">
+              {destinationList.map((item) => (
+                <Option key={item.id} value={item.id}>
+                  {item.city}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
-        </Col>
-      </Row>
 
-      <Form.Item style={{ textAlign: 'right' }}>
-        <Button type="primary" htmlType="submit">
-          {isEdit ? 'Lưu thay đổi' : 'Thêm tour'}
-        </Button>
-      </Form.Item>
-    </Form>
+          <Form.Item
+            label="Combo giá"
+            name="tourPriceId"
+            style={{ flex: 1 }}
+            rules={[{ required: true, message: 'Chọn combo giá!' }]}
+          >
+            <Select placeholder="Chọn combo giá" optionLabelProp="label">
+              {tourPriceList.map((item) => {
+                const label = `Người lớn: ${item.adultPrice.toLocaleString()} | Trẻ em: ${item.childPrice.toLocaleString()} | Em bé: ${item.toddlerPrice.toLocaleString()} | Sơ sinh: ${item.infantPrice.toLocaleString()} | Phụ thu: ${item.singleSupplementPrice.toLocaleString()}`;
+
+                return (
+                  <Option
+                    key={item.id}
+                    value={item.id}
+                    label={`Combo ${item.id}`}
+                  >
+                    <Tooltip title={label} placement="right">
+                      <div
+                        style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {label}
+                      </div>
+                    </Tooltip>
+                  </Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
+        </Space>
+
+        <Space size="large" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Form.Item
+            label="Phương tiện"
+            name="vehicleId"
+            style={{ flex: 1 }}
+            rules={[{ required: true, message: 'Chọn phương tiện!' }]}
+          >
+            <Select placeholder="Chọn phương tiện">
+              {vehicleList.map((item) => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item 
+            label="Thời lượng (ngày)" 
+            name="duration" 
+            style={{ flex: 1 }}
+            rules={[{ required: true, message: 'Nhập thời lượng tour!' }]}
+          >
+            <InputNumber min={1} max={30} style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item 
+            label="Giá cơ bản (VNĐ)" 
+            name="basePrice" 
+            style={{ flex: 1 }}
+            rules={[{ required: true, message: 'Nhập giá cơ bản!' }]}
+          >
+            <InputNumber
+              style={{ width: '100%' }}
+              formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(val) => val?.replace(/\$\s?|(,*)/g, '') as any}
+            />
+          </Form.Item>
+        </Space>
+
+        <Form.Item
+          label="Hình ảnh tour"
+          name="files"
+          valuePropName="fileList"
+          getValueFromEvent={(e) => e.fileList}
+        >
+          <Upload listType="picture" beforeUpload={() => false} multiple>
+            <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+          </Upload>
+        </Form.Item>
+
+        <Form.Item style={{ textAlign: 'center', marginTop: 24 }}>
+          <Button type="primary" icon={<SaveOutlined />} htmlType="submit">
+            {isEdit ? 'Cập nhật Tour' : 'Lưu Tour'}
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 };
 

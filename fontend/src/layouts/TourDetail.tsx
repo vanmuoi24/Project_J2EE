@@ -90,7 +90,7 @@ export default function TourDetail() {
 
           <Row gutter={24}>
             <Col span={17}>
-              <TourImages />
+              {dataDetailtour && <TourImages imageIds={dataDetailtour.imageIds} />}
               {dataDetailtour && <Schedule tourData={dataDetailtour} onSelectDepartureId={handleSelectDeparture}/>}
               <AdditionalInfo />
               <Itinerary tourId={dataDetailtour?.id}/>
