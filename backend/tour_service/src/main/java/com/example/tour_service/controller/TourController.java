@@ -41,7 +41,7 @@ public class TourController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<TourResponse> updateTour(@PathVariable int id,  @RequestBody TourRequest request) {
+    public ApiResponse<TourResponse> updateTour(@PathVariable int id,  @ModelAttribute TourRequest request) {
         return ApiResponse.<TourResponse>builder()
                 .result(tourService.updateTour(id, request))
                 .message("Updated successfully")
