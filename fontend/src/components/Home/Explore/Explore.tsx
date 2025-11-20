@@ -1,7 +1,4 @@
 import Container from '@/components/Share/Container';
-import { getAllDestinations } from '@/services/tourServices';
-import type { IDestination } from '@/types/Tour';
-import { useState } from 'react';
 import Slider, { type Settings } from 'react-slick';
 
 const VouchersSlider: React.FC = () => {

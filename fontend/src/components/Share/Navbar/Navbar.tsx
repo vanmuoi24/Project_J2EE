@@ -1,8 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, Button, Dropdown, Menu, message } from 'antd';
+import { Avatar, Button, Dropdown, message } from 'antd';
 import brand from '@/assets/images/logo.png';
 import Container from '@/components/Share/Container';
-import { SettingOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store';
 import { logoutUser } from '@/store/slices/authSlice';

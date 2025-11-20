@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import { getAllDepartures, getAllDestinations, getAllVehicles } from '@/services/tourServices';
 import type { IDeparture, IDestination, ITour, IVehicle } from '@/types/Tour';
-import type { SetURLSearchParams, useSearchParams } from 'react-router-dom';
+import type { useSearchParams } from 'react-router-dom';
 
 dayjs.locale('vi');
 
@@ -26,7 +26,7 @@ const getBudgetStateFromParams = (minP: string | null, maxP: string | null): str
   return null; // Không giới hạn
 };
 
-const Filter = ({ tours, searchParams, setSearchParams }: IProps) => {
+const Filter = ({ searchParams, setSearchParams }: IProps) => {
   // State để lưu trữ các giá trị của bộ lọc
   const [budget, setBudget] = useState<string | null>(null);
   const [departure, setDeparture] = useState<IDeparture[] | null>(null);

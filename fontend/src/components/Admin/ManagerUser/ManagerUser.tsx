@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
-import { Button, Input, Space, message, Modal, Descriptions } from 'antd';
+import { Button, Input, Space, Modal, Descriptions } from 'antd';
 import { PlusOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { getListUser } from '@/services/userServices';
 

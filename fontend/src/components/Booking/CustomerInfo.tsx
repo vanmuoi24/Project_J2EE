@@ -1,23 +1,13 @@
-import { useEffect } from "react";
-import {
-  Form,
-  Input,
-  DatePicker,
-  Select,
-  Row,
-  Col,
-  Button,
-  Divider,
-  Typography,
-} from "antd";
-import type { FormInstance } from "antd";
-import type { Customer as CustomerProp } from "@/types/Booking";
+import { useEffect } from 'react';
+import { Form, Input, Select, Row, Col, Button, Divider, Typography } from 'antd';
+import type { FormInstance } from 'antd';
+import type { Customer as CustomerProp } from '@/types/Booking';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 type CustomerType = CustomerProp & {
-  type: "adult" | "child" | "toddler" | "infant";
+  type: 'adult' | 'child' | 'toddler' | 'infant';
 };
 
 export default function CustomerInfo({
@@ -67,12 +57,9 @@ export default function CustomerInfo({
                     type="primary"
                     block
                     onClick={() => {
-                      const customers = getFieldValue("customers") || [];
+                      const customers = getFieldValue('customers') || [];
                       setFieldsValue({
-                        customers: [
-                          ...customers,
-                          { type: "adult" } as CustomerType,
-                        ],
+                        customers: [...customers, { type: 'adult' } as CustomerType],
                       });
                     }}
                   >
@@ -93,12 +80,9 @@ export default function CustomerInfo({
                     type="primary"
                     block
                     onClick={() => {
-                      const customers = getFieldValue("customers") || [];
+                      const customers = getFieldValue('customers') || [];
                       setFieldsValue({
-                        customers: [
-                          ...customers,
-                          { type: "child" } as CustomerType,
-                        ],
+                        customers: [...customers, { type: 'child' } as CustomerType],
                       });
                     }}
                   >
@@ -119,12 +103,9 @@ export default function CustomerInfo({
                     type="primary"
                     block
                     onClick={() => {
-                      const customers = getFieldValue("customers") || [];
+                      const customers = getFieldValue('customers') || [];
                       setFieldsValue({
-                        customers: [
-                          ...customers,
-                          { type: "toddler" } as CustomerType,
-                        ],
+                        customers: [...customers, { type: 'toddler' } as CustomerType],
                       });
                     }}
                   >
@@ -145,12 +126,9 @@ export default function CustomerInfo({
                     type="primary"
                     block
                     onClick={() => {
-                      const customers = getFieldValue("customers") || [];
+                      const customers = getFieldValue('customers') || [];
                       setFieldsValue({
-                        customers: [
-                          ...customers,
-                          { type: "infant" } as CustomerType,
-                        ],
+                        customers: [...customers, { type: 'infant' } as CustomerType],
                       });
                     }}
                   >
@@ -171,32 +149,32 @@ export default function CustomerInfo({
           {(fields, { remove }) => (
             <>
               {fields.length === 0 && (
-                <p style={{ color: "#888" }}>Chưa có hành khách nào được thêm.</p>
+                <p style={{ color: '#888' }}>Chưa có hành khách nào được thêm.</p>
               )}
 
               {fields.map(({ key, name, ...restField }, index) => {
-                const type = form.getFieldValue(["customers", name, "type"]);
+                const type = form.getFieldValue(['customers', name, 'type']);
 
                 return (
                   <div
                     key={key}
                     style={{
                       marginBottom: 24,
-                      borderBottom: "1px solid #eee",
+                      borderBottom: '1px solid #eee',
                       paddingBottom: 16,
                     }}
                   >
                     <Row gutter={16} align="middle">
                       <Col span={20}>
                         <p className="font-bold mb-2">
-                          {index + 1}.{" "}
-                          {type === "adult"
-                            ? "Người lớn"
-                            : type === "child"
-                              ? "Trẻ em"
-                              : type === "toddler"
-                                ? "Trẻ nhỏ"
-                                : "Em bé"}
+                          {index + 1}.{' '}
+                          {type === 'adult'
+                            ? 'Người lớn'
+                            : type === 'child'
+                              ? 'Trẻ em'
+                              : type === 'toddler'
+                                ? 'Trẻ nhỏ'
+                                : 'Em bé'}
                         </p>
                       </Col>
                       <Col span={4} className="text-right">
@@ -209,11 +187,9 @@ export default function CustomerInfo({
                       <Col span={6}>
                         <Form.Item
                           {...restField}
-                          name={[name, "fullName"]}
+                          name={[name, 'fullName']}
                           label="Họ tên"
-                          rules={[
-                            { required: true, message: "Vui lòng nhập họ tên" },
-                          ]}
+                          rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
                         >
                           <Input placeholder="Nhập họ tên" />
                         </Form.Item>
@@ -223,11 +199,9 @@ export default function CustomerInfo({
                       <Col span={6}>
                         <Form.Item
                           {...restField}
-                          name={[name, "gender"]}
+                          name={[name, 'gender']}
                           label="Giới tính"
-                          rules={[
-                            { required: true, message: "Chọn giới tính" },
-                          ]}
+                          rules={[{ required: true, message: 'Chọn giới tính' }]}
                         >
                           <Select placeholder="Chọn giới tính">
                             <Option value="male">Nam</Option>
@@ -268,12 +242,7 @@ export default function CustomerInfo({
                       </Col> */}
 
                       {/* Loại khách (ẩn) */}
-                      <Form.Item
-                        {...restField}
-                        name={[name, "type"]}
-                        hidden
-                        initialValue={type}
-                      >
+                      <Form.Item {...restField} name={[name, 'type']} hidden initialValue={type}>
                         <Input />
                       </Form.Item>
                     </Row>

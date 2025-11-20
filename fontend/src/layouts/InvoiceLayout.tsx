@@ -1,13 +1,11 @@
 import { Row, Col, Card, Spin, Alert, Modal } from 'antd';
 import InvoiceForm from '@/components/Invoice/InvoiceForm';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { createInvoice, getInvoiceById } from '@/services/invoiceServices';
 
 export default function InvoiceLayout() {
   const { id } = useParams();
-  const { bookingId } = useParams();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [invoiceData, setInvoiceData] = useState<any | null>(null);
@@ -34,8 +32,8 @@ export default function InvoiceLayout() {
     setLoading(true);
     setError(null);
     try {
-      const invoice = JSON.parse(sessionStorage.getItem("invoice") || "{}");
-      console.log(invoice)
+      const invoice = JSON.parse(sessionStorage.getItem('invoice') || '{}');
+      console.log(invoice);
 
       const bookingId = invoice?.bookingId || id || '';
       const payload = {
@@ -43,7 +41,6 @@ export default function InvoiceLayout() {
         paymentMethod: values.paymentMethod,
         items: values.items,
       };
-
 
       const res = await createInvoice(payload as any);
       Modal.success({ title: 'Tạo hóa đơn thành công', content: res.message || 'Invoice created' });
@@ -73,13 +70,20 @@ export default function InvoiceLayout() {
     <div style={{ padding: '24px 10rem', background: '#fff', minHeight: '100vh' }}>
       <Row gutter={[24, 24]} justify="center" align="top">
         <Col xs={24} lg={16}>
-          <Card bordered={false} style={{ borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', marginBottom: 16 }}>
+          <Card
+            bordered={false}
+            style={{ borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', marginBottom: 16 }}
+          >
             {loading && <Spin />}
             {error && <Alert type="error" message={error} />}
             {!id && (
               <InvoiceForm
-                account={{ fullName: 'Khách hàng', email: 'guest@example.com', phone: '0123456789'}}
-                customers={[{ name: 'Nguyễn Văn A', dob: '1990-01-01', price: 1000000}]}
+                account={{
+                  fullName: 'Khách hàng',
+                  email: 'guest@example.com',
+                  phone: '0123456789',
+                }}
+                customers={[{ name: 'Nguyễn Văn A', dob: '1990-01-01', price: 1000000 }]}
                 onCreate={handleCreateInvoice}
               />
             )}
@@ -91,13 +95,11 @@ export default function InvoiceLayout() {
                   email: '',
                   phone: '',
                 }}
-                customers={
-                  (invoiceData.customerResponseList || []).map((c: any) => ({
-                    name: c.fullName,
-                    dob: c.birthdate,
-                    price: Number(c.bookingType) || 0,
-                  }))
-                }
+                customers={(invoiceData.customerResponseList || []).map((c: any) => ({
+                  name: c.fullName,
+                  dob: c.birthdate,
+                  price: Number(c.bookingType) || 0,
+                }))}
                 onCreate={handleCreateInvoice}
               />
             )}

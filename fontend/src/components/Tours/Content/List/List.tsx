@@ -11,7 +11,7 @@ import { formatCurrencyVND } from '@/utils';
 import { useNavigate } from 'react-router-dom';
 import FALLBACK_IMAGE_URL from '@/assets/images/fallback.png';
 import dayjs from 'dayjs';
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const List = ({ tours }: { tours: ITour[] | null }) => {
   const navigate = useNavigate();

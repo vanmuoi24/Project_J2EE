@@ -1,7 +1,7 @@
 import { useState } from 'react'; // <-- Thêm useState
 import type { RootState } from '@/store';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { uploadAvatar, uploadProfile } from '@/store/slices/authSlice';
+import { uploadAvatar } from '@/store/slices/authSlice';
 import type { IUserUpdate } from '@/types/User';
 import { CameraOutlined, LoadingOutlined, UserOutlined } from '@ant-design/icons';
 import { Card, Avatar, message, Tooltip, Upload, Modal, Button } from 'antd';

@@ -6,7 +6,6 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { GoogleLogin, type GoogleCredentialResponse } from '@react-oauth/google';
 import { sessionService } from '@/services/sessionServices';
 import type { RootState } from '@/store';
-import axios from 'axios';
 
 export default function LoginPage() {
   const navigate = useNavigate();

@@ -3,7 +3,6 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   BugOutlined,
-  GiftOutlined,
   UserOutlined,
   GlobalOutlined,
   ScheduleOutlined,
@@ -11,8 +10,6 @@ import {
   UnorderedListOutlined,
   CalendarOutlined,
   EnvironmentOutlined,
-  DollarOutlined,
-  TeamOutlined,
   SafetyOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Space, Avatar, Button } from 'antd';

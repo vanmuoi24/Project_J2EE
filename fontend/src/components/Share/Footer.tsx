@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   FacebookFilled,
   TwitterSquareFilled,
@@ -8,7 +7,6 @@ import {
   PhoneOutlined,
   EnvironmentOutlined,
   CreditCardOutlined,
-  SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import Container from '@/components/Share/Container';
 import momo from '@/assets/images/momo.png';

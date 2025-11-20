@@ -1,11 +1,8 @@
-import { Row, Col, Card, Modal } from "antd";
-import PersonalInfo from "@/components/Booking/PersonalInfo";
-import ListOfCustomerInfo from "@/components/Booking/ListOfCustomerInfo";
-import BookingTitle from "@/components/Booking/BookingTitle";
-import TourDetailCard from "@/components/TourDetail/TourDetailCard";
-import Itinerary from "@/components/TourDetail/Itinerary";
-import ImportantInfo from "@/components/TourDetail/ImportantInfo";
-import BookingExpense from "@/components/Booking/BookingExpense";
+import { Row, Col, Card, Modal } from 'antd';
+import PersonalInfo from '@/components/Booking/PersonalInfo';
+import ListOfCustomerInfo from '@/components/Booking/ListOfCustomerInfo';
+import BookingTitle from '@/components/Booking/BookingTitle';
+import BookingExpense from '@/components/Booking/BookingExpense';
 import { createBooking } from '@/services/bookingServices';
 import { sessionService } from '@/services/sessionServices';
 import { useNavigate } from 'react-router-dom';
@@ -18,8 +15,12 @@ export default function BookingLayout() {
   // use refs so form instances persist across renders
   const personalFormRef = useRef<any>(null);
   const customersFormRef = useRef<any>(null);
-  const handlePersonalFormReady = (f: any) => { personalFormRef.current = f; };
-  const handleCustomersFormReady = (f: any) => { customersFormRef.current = f; };
+  const handlePersonalFormReady = (f: any) => {
+    personalFormRef.current = f;
+  };
+  const handleCustomersFormReady = (f: any) => {
+    customersFormRef.current = f;
+  };
   const [expenseItems, setExpenseItems] = useState<any[]>([]);
   const [searchParams] = useSearchParams();
   const tourDepartureId = searchParams.get('departureId') || undefined;
@@ -39,7 +40,7 @@ export default function BookingLayout() {
     return Object.values(summary);
   };
 
-  // === HANDLE BOOKING === //  
+  // === HANDLE BOOKING === //
   const handleConfirm = async () => {
     try {
       // validate both forms
@@ -73,7 +74,7 @@ export default function BookingLayout() {
       const user = sessionService.getUser();
       const bookingRequest = {
         userId: user?.id?.toString() || '',
-        tourDepartureId: tourDepartureId || "1",
+        tourDepartureId: tourDepartureId || '1',
         listOfCustomers: customers.map((c: any) => ({
           fullName: c.fullName,
           birthdate: c.birthDate ? c.birthDate.format('YYYY-MM-DD') : undefined,
@@ -91,7 +92,8 @@ export default function BookingLayout() {
       Modal.success({ title: 'Đặt tour thành công', content: res.message || 'Booking created' });
 
       // After successful booking creation, navigate to booking history and pass new booking
-      const newBooking = (res as any).result || (res as any).data?.result || (res as any).data || res;
+      const newBooking =
+        (res as any).result || (res as any).data?.result || (res as any).data || res;
       try {
         // persist new booking locally as fallback
         const stored = JSON.parse(sessionStorage.getItem('bookingHistoryCache') || '[]');
@@ -100,7 +102,6 @@ export default function BookingLayout() {
         // ignore
       }
       navigate('/booking/history', { state: { newBooking } });
-
     } catch (err: any) {
       Modal.error({ title: 'Lỗi', content: err?.message || 'Đã xảy ra lỗi' });
     }
@@ -119,20 +120,19 @@ export default function BookingLayout() {
   }, []);
 
   return (
-    <div style={{ padding: "24px 10rem", background: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: '24px 10rem', background: '#fff', minHeight: '100vh' }}>
       <Row gutter={[24, 24]} justify="center" align="top">
         <BookingTitle />
       </Row>
       <Row gutter={[24, 24]} justify="center" align="top">
         {/* Cột trái: Booking Info */}
         <Col xs={24} lg={16}>
-
           <Card
             bordered={false}
             style={{
-              borderRadius: "12px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              marginBottom: "16px",
+              borderRadius: '12px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              marginBottom: '16px',
             }}
           >
             <PersonalInfo onFormReady={handlePersonalFormReady} />
@@ -141,11 +141,14 @@ export default function BookingLayout() {
           <Card
             bordered={false}
             style={{
-              borderRadius: "12px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              borderRadius: '12px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             }}
           >
-            <ListOfCustomerInfo onFormReady={handleCustomersFormReady} onCustomersChange={handleCustomersChange} />
+            <ListOfCustomerInfo
+              onFormReady={handleCustomersFormReady}
+              onCustomersChange={handleCustomersChange}
+            />
           </Card>
         </Col>
 
@@ -154,11 +157,11 @@ export default function BookingLayout() {
           <Card
             bordered={false}
             style={{
-              borderRadius: "12px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              marginBottom: "16px",
-              width: "25em",
-              position: "fixed"
+              borderRadius: '12px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              marginBottom: '16px',
+              width: '25em',
+              position: 'fixed',
             }}
           >
             <BookingExpense
@@ -169,7 +172,6 @@ export default function BookingLayout() {
               tourDepartureId={tourDepartureId ? Number(tourDepartureId) : 1}
             />
           </Card>
-
         </Col>
       </Row>
     </div>

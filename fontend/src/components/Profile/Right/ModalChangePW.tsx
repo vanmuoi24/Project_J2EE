@@ -1,8 +1,7 @@
-import { changePW, logoutService } from '@/services/authServices';
-import { sessionService } from '@/services/sessionServices';
+import { changePW } from '@/services/authServices';
 import type { RootState } from '@/store';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { loginUser, logoutUser } from '@/store/slices/authSlice';
+import { logoutUser } from '@/store/slices/authSlice';
 import { LockOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Modal } from 'antd';
 import { useEffect } from 'react';
@@ -45,7 +44,8 @@ const ModalChangePW = ({ visible, onClose }: IProps) => {
         message.error('Cập nhật thất bại.');
       }
     } catch (error) {
-      message.error(error.response.data.message || 'Cập nhật thất bại.');
+      console.log(error);
+      message.error('Cập nhật thất bại.');
     }
   };
 
