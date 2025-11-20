@@ -43,12 +43,12 @@ public class TourPriceService {
         return toResponse(repository.save(existing));
     }
 
-    public void deletePrice(Long id) {
-        if (!repository.existsById(id)) {
-            throw new AppException(ErrorCode.INVALID_KEY);
-        }
-        repository.deleteById(id);
-    }
+//    public void deletePrice(Long id) {
+//        if (!repository.existsById(id)) {
+//            throw new AppException(ErrorCode.INVALID_KEY);
+//        }
+//        repository.deleteById(id);
+//    }
 
     public List<TourPriceResponse> getAllPrices() {
         return repository.findAll().stream()

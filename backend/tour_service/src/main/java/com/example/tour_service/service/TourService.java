@@ -1,5 +1,6 @@
 package com.example.tour_service.service;
 
+import com.example.tour_service.dto.request.UpdateTourRequest;
 import com.example.tour_service.dto.response.*;
 import com.example.tour_service.repository.httpClient.PricingClient;
 import com.example.tour_service.dto.request.ApiResponse;
@@ -131,7 +132,7 @@ public class TourService {
                 return response;
         }
 
-        public TourResponse updateTour(int id, TourRequest request) {
+        public TourResponse updateTour(int id, UpdateTourRequest request) {
                 // Lấy Tour hiện tại
                 Tour existingTour = tourRepository.findById(id)
                         .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
@@ -187,6 +188,17 @@ public class TourService {
                         }
                 }
 
+
+                // Xóa các file nếu client gửi url
+                if (request.getUrl() != null && !request.getUrl().isEmpty()) {
+                        try {
+                                fileClient.deleteMultipleTourImagesByUrl(request.getUrl());
+                        } catch (Exception e) {
+                                e.printStackTrace();
+                                // có thể log hoặc throw exception nếu muốn dừng update khi xóa file thất bại
+                        }
+                }
+
                 // Tạo response
                 TourResponse response = toResponse(saved);
 
@@ -212,13 +224,13 @@ public class TourService {
                 return response;
         }
 
-        public void deleteTour(int id) {
-                if (!tourRepository.existsById(id)) {
-                        throw new AppException(ErrorCode.INVALID_KEY);
-                }
-
-                tourRepository.deleteById(id);
-        }
+//        public void deleteTour(int id) {
+//                if (!tourRepository.existsById(id)) {
+//                        throw new AppException(ErrorCode.INVALID_KEY);
+//                }
+//
+//                tourRepository.deleteById(id);
+//        }
 
         private TourResponse toResponse(Tour tour) {
                 return TourResponse.builder()

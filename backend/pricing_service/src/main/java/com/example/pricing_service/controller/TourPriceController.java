@@ -32,13 +32,13 @@ public class TourPriceController {
                 .build();
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
-        service.deletePrice(id);
-        return ApiResponse.<Void>builder()
-                .message("Deleted successfully")
-                .build();
-    }
+//    @DeleteMapping("/{id}")
+//    public ApiResponse<Void> delete(@PathVariable Long id) {
+//        service.deletePrice(id);
+//        return ApiResponse.<Void>builder()
+//                .message("Deleted successfully")
+//                .build();
+//    }
 
     @GetMapping
     public ApiResponse<List<TourPriceResponse>> getAll() {

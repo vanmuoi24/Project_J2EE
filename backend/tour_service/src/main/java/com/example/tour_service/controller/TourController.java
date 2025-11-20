@@ -2,6 +2,7 @@ package com.example.tour_service.controller;
 
 import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourRequest;
+import com.example.tour_service.dto.request.UpdateTourRequest;
 import com.example.tour_service.dto.response.TourResponse;
 import com.example.tour_service.service.TourService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class TourController {
     }
 
     @PostMapping()
-    public ApiResponse<TourResponse> createTour(@ModelAttribute TourRequest request) {
+        public ApiResponse<TourResponse> createTour(@ModelAttribute TourRequest request) {
         return ApiResponse.<TourResponse>builder()
                 .result(tourService.createTour(request))
                 .message("Created successfully")
@@ -41,21 +42,19 @@ public class TourController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<TourResponse> updateTour(@PathVariable int id,  @ModelAttribute TourRequest request) {
+    public ApiResponse<TourResponse> updateTour(@PathVariable int id,  @ModelAttribute UpdateTourRequest request) {
         return ApiResponse.<TourResponse>builder()
                 .result(tourService.updateTour(id, request))
                 .message("Updated successfully")
                 .build();
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> deleteTour(@PathVariable int id) {
-        tourService.deleteTour(id);
-        return ApiResponse.<Void>builder()
-                .message("Deleted successfully")
-                .build();
-    }
-
-
+//    @DeleteMapping("/{id}")
+//    public ApiResponse<Void> deleteTour(@PathVariable int id) {
+//        tourService.deleteTour(id);
+//        return ApiResponse.<Void>builder()
+//                .message("Deleted successfully")
+//                .build();
+//    }
 
 }

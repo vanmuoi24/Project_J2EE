@@ -109,13 +109,13 @@ public class TourDepartureService {
         return toResponse(saved);
     }
 
-    public void delete(int id) {
-        if (!tourDepartureRepository.existsById(id)) {
-            throw new AppException(ErrorCode.INVALID_KEY);
-        }
-
-        tourDepartureRepository.deleteById(id);
-    }
+//    public void delete(int id) {
+//        if (!tourDepartureRepository.existsById(id)) {
+//            throw new AppException(ErrorCode.INVALID_KEY);
+//        }
+//
+//        tourDepartureRepository.deleteById(id);
+//    }
 
 
     //Ham dem so luong Tour Departure cua Tour

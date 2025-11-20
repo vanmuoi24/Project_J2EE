@@ -41,7 +41,7 @@ public class TourDepartureController {
     }
 
     @PostMapping
-    public ApiResponse<TourDepartureResponse> createTourDeparture(@RequestBody TourDepartureRequest request) {
+    public ApiResponse<TourDepartureResponse> createTourDeparture(@ModelAttribute TourDepartureRequest request) {
         return ApiResponse.<TourDepartureResponse>builder()
                 .result(tourDepartureService.create(request))
                 .message("Created Successfully")
@@ -56,12 +56,12 @@ public class TourDepartureController {
                 .build();
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> deleteTourDeparture(@PathVariable int id) {
-        tourDepartureService.delete(id);
-        return ApiResponse.<Void>builder()
-                .message("Deleted successfully")
-                .build();
-    }
+//    @DeleteMapping("/{id}")
+//    public ApiResponse<Void> deleteTourDeparture(@PathVariable int id) {
+//        tourDepartureService.delete(id);
+//        return ApiResponse.<Void>builder()
+//                .message("Deleted successfully")
+//                .build();
+//    }
 
 }
