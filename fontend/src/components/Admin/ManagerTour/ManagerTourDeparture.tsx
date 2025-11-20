@@ -6,11 +6,11 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import { Button, Input, Modal, Form, InputNumber, Select, Space, message } from 'antd';
+import { Button, Modal, Space, message, Tooltip } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
-import type { DepartureDateRequest, IItinerary, ITourDeparture } from '@/types/Tour';
-import { addTourDeparture, getAllItineraries, getDepartureByTourId, getItineraryByTourId, getTourDepartureById } from '@/services/tourServices';
+import type { AddTourDepartureRequest, ITourDeparture } from '@/types/Tour';
+import { addTourDeparture, getDepartureByTourId, updateTourDeparture } from '@/services/tourServices';
 import { useLocation } from 'react-router-dom';
 import AddTourDeparture from './ModelTourDeparture/AddTourDeparture';
 import EditTourDeparture from './ModelTourDeparture/EditTourDeparture';
@@ -24,7 +24,7 @@ const ManagerTourDeparture: React.FC = () => {
 
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [editingItinerary, setEditingItinerary] = useState<ITourDeparture | null>(null);
+  const [selectedTourDeparture, setSelectedTourDeparture] = useState<ITourDeparture | null>(null);
 
   const fetchDataTourDeparture = useCallback(async () => {
     try {
@@ -44,7 +44,7 @@ const ManagerTourDeparture: React.FC = () => {
   }, [fetchDataTourDeparture]);
 
   const handleAdd = async (values: any) => {
-    const newLocation: DepartureDateRequest = {
+    const newLocation: AddTourDepartureRequest = {
       departureDate: values.departureDate,
       returnDate: values.returnDate,
       availableSeats: values.availableSeats,
@@ -61,9 +61,31 @@ const ManagerTourDeparture: React.FC = () => {
     setOpenAdd(false);
   };
 
-  const handleDelete = (id: number) => {
-    setData(data.filter((d) => d.id !== id));
-    message.success('Xóa lịch trình thành công');
+  const handleEditClick = (record: ITourDeparture) => {
+    setSelectedTourDeparture(record);
+    setOpenEdit(true);
+  };
+
+  const handleEdit = async (values: any) => {
+    if (!selectedTourDeparture) return;
+
+    const updateData = {
+      ...values,
+      id: selectedTourDeparture.id,
+    };
+
+    const res = await updateTourDeparture(updateData);
+
+    if (res.code === 1000) {
+      setData(prev => prev.map(tour =>
+        tour.id === selectedTourDeparture.id ? { ...tour, ...res.result } : tour
+      ));
+      message.success("Cập nhật ngày khởi hành thành công");
+      setOpenEdit(false);
+      setSelectedTourDeparture(null);
+    } else {
+      message.error("Cập nhật ngày khởi hành thất bại");
+    }
   };
 
   const columns: ProColumns<ITourDeparture>[] = [
@@ -78,22 +100,45 @@ const ManagerTourDeparture: React.FC = () => {
       width: 150,
       render: (_, record) => (
         <Space>
-          <EyeOutlined style={{ color: '#faad14', fontSize: 18 }} />
           <EditOutlined
             style={{ color: '#1890ff', fontSize: 18 }}
             onClick={() => {
-              setEditingItinerary(record);
-              setOpenEdit(true);
+              handleEditClick(record)
             }}
           />
-          <DeleteOutlined
-            style={{ color: '#ff4d4f', fontSize: 18 }}
-            onClick={() => handleDelete(record.id)}
-          />
+
         </Space>
       ),
     },
   ];
+
+  const renderAddButton = () => {
+    if (!tourId) {
+      return (
+        <Tooltip title="Vui lòng chọn tour trước khi thêm ngày khởi hành">
+          <Button
+            key="create"
+            type="primary"
+            icon={<PlusOutlined />}
+            disabled
+          >
+            Thêm mới
+          </Button>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <Button
+        key="create"
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => setOpenAdd(true)}
+      >
+        Thêm mới
+      </Button>
+    );
+  };
 
   return (
     <div>
@@ -104,14 +149,7 @@ const ManagerTourDeparture: React.FC = () => {
         search={false}
         headerTitle="Danh sách ngày khởi hành tour"
         toolBarRender={() => [
-          <Button
-            key="create"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setOpenAdd(true)}
-          >
-            Thêm mới
-          </Button>,
+          renderAddButton()
         ]}
         pagination={{ pageSize: 5 }}
       />
@@ -125,7 +163,7 @@ const ManagerTourDeparture: React.FC = () => {
         destroyOnClose
         centered
       >
-        <AddTourDeparture onSubmit={handleAdd}/>
+        <AddTourDeparture onSubmit={handleAdd} />
       </Modal>
 
       {/* Modal Edit */}
@@ -137,7 +175,9 @@ const ManagerTourDeparture: React.FC = () => {
         destroyOnClose
         centered
       >
-        <EditTourDeparture />
+        <EditTourDeparture
+          data={selectedTourDeparture}
+          onSubmit={handleEdit} />
       </Modal>
     </div>
   );

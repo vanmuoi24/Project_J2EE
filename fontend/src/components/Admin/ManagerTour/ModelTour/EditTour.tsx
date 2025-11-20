@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Form, Input, InputNumber, Button, Select, Upload, message, Space, Card, Tooltip } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, InputNumber, Button, Select, Upload, Space, Card, Tooltip } from 'antd';
 import { UploadOutlined, SaveOutlined } from '@ant-design/icons';
 import type { ILocation, ITourPrice, IVehicle } from '@/types/Tour';
 import { getAllDepartures, getAllDestinations, getAllPrice, getAllVehicles } from '@/services/tourServices';
@@ -19,6 +19,7 @@ const EditTour: React.FC<EditTourProps> = ({ data, isEdit = false, onSubmit }) =
   const [destinationList, setDestinationList] = useState<ILocation[]>([]);
   const [vehicleList, setVehicleList] = useState<IVehicle[]>([]);
   const [tourPriceList, setTourPriceList] = useState<ITourPrice[]>([]);
+  const [deletedImageUrls, setDeletedImageUrls] = useState<string[]>([]);
 
   const fetchDataDestinations = async () => {
     try {
@@ -74,6 +75,13 @@ const EditTour: React.FC<EditTourProps> = ({ data, isEdit = false, onSubmit }) =
   // Khi data thay đổi, set giá trị cho form
   useEffect(() => {
     if (isEdit && data) {
+      const initialFiles = data.imageIds?.map((url: string, index: number) => ({
+        uid: `-${index}`,
+        name: `image-${index}`,
+        status: 'done',
+        url,
+      }));
+
       form.setFieldsValue({
         tourProgram: data.tourProgram,
         tourTitle: data.tourTitle,
@@ -84,28 +92,36 @@ const EditTour: React.FC<EditTourProps> = ({ data, isEdit = false, onSubmit }) =
         destinationLocationId: data.destinationCity?.id,
         vehicleId: data.vehicle?.id,
         tourPriceId: data.tourPrice?.id,
-        files: data.imageIds?.map((url: string, index: number) => ({
-          uid: `-${index}`,        
-          name: `image-${index}`,  
-          status: 'done',           
-          url,                     
-        })),
+        files: initialFiles,
       });
+      setDeletedImageUrls([]); 
     } else {
       form.resetFields();
+      setDeletedImageUrls([]);
     }
   }, [data, isEdit, form]);
 
+  const handleRemove = (file: any) => {
+    // Nếu file có url (là ảnh cũ từ server), thêm vào danh sách xóa
+    if (file.url) {
+      setDeletedImageUrls(prev => [...prev, file.url]);
+    }
+    return true; // Cho phép xóa
+  };
+
   const handleFinish = async (values: any) => {
-    if (onSubmit) await onSubmit(values);
-    if (!isEdit) {
-      form.resetFields();
+    if (onSubmit) {
+      await onSubmit({
+        ...values,
+        deletedImageUrls
+      });
     }
   };
 
+
   return (
     <Card
-      title={isEdit ? "Chỉnh sửa Tour" : "Thêm Tour Mới"}
+      title={"Chỉnh sửa Tour"}
       bordered={false}
       style={{
         maxWidth: 800,
@@ -251,14 +267,14 @@ const EditTour: React.FC<EditTourProps> = ({ data, isEdit = false, onSubmit }) =
           valuePropName="fileList"
           getValueFromEvent={(e) => e.fileList}
         >
-          <Upload listType="picture" beforeUpload={() => false} multiple>
+          <Upload listType="picture" beforeUpload={() => false} multiple onRemove={handleRemove}>
             <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
           </Upload>
         </Form.Item>
 
         <Form.Item style={{ textAlign: 'center', marginTop: 24 }}>
           <Button type="primary" icon={<SaveOutlined />} htmlType="submit">
-            {isEdit ? 'Cập nhật Tour' : 'Lưu Tour'}
+            Cập nhật Tour
           </Button>
         </Form.Item>
       </Form>

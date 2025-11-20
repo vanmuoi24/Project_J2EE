@@ -1,24 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-    DeleteOutlined,
     EditOutlined,
-    EyeOutlined,
     PlusOutlined,
 } from '@ant-design/icons';
 import { Button, Modal, Space, message } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
-import type { ITourPrice, TourPriceRequest } from '@/types/Tour';
-import { addPrice, getAllPrice, } from '@/services/tourServices';
+import type { AddTourPriceRequest, ITourPrice } from '@/types/Tour';
+import { addPrice, getAllPrice, updateTourPrice, } from '@/services/tourServices';
 import AddPrice from './ModelPrice/AddPrice';
 import EditPrice from './ModelPrice/EditPrice';
 
 const ManagerPrice: React.FC = () => {
     const [data, setData] = useState<ITourPrice[]>([]);
-
     const [openAdd, setOpenAdd] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
-    const [editingItinerary, setEditingItinerary] = useState<ITourPrice | null>(null);
+    const [selectedTourPrice, setSelectedTourPrice] = useState<ITourPrice | null>(null);
 
     const fetchDataPrice = useCallback(async () => {
         try {
@@ -36,14 +33,14 @@ const ManagerPrice: React.FC = () => {
     }, [fetchDataPrice]);
 
     const handleAdd = async (values: any) => {
-        const newLocation: TourPriceRequest = {
+        const newPrice: AddTourPriceRequest = {
             adultPrice: values.adultPrice,
             childPrice: values.childPrice,
             toddlerPrice: values.toddlerPrice,
             infantPrice: values.infantPrice,
             singleSupplementPrice: values.singleSupplementPrice,
         }
-        const res = await addPrice(newLocation);
+        const res = await addPrice(newPrice);
         if (res.code === 1000) {
             setData([res.result, ...data]);
             message.success('Thêm giá thành công');
@@ -54,13 +51,32 @@ const ManagerPrice: React.FC = () => {
         setOpenAdd(false);
     };
 
-    const handleDelete = (id: number) => {
-        setData(data.filter((d) => d.id !== id));
-        message.success('Xóa lịch trình thành công');
+    const handleEdit = async (values: any) => {
+        if (!selectedTourPrice) return;
+
+        const updateData = {
+            ...values,
+            id: selectedTourPrice.id,
+        };
+
+        console.log('Data to update:', updateData);
+        const res = await updateTourPrice(updateData);
+        console.log('API Response:', res);
+
+        if (res.code === 1000) {
+            setData(prev => prev.map(tour =>
+                tour.id === selectedTourPrice.id ? { ...tour, ...res.result } : tour
+            ));
+            message.success("Cập nhật tour thành công");
+            setOpenEdit(false);
+            setSelectedTourPrice(null);
+        } else {
+            message.error("Cập nhật tour thất bại");
+        }
     };
 
     const columns: ProColumns<ITourPrice>[] = [
-        
+        { title: 'STT', key: 'index', width: 60, align: 'center', render: (_, __, index) => index + 1 },
         { title: 'Người lớn', dataIndex: 'adultPrice' },
         { title: 'Trẻ em', dataIndex: 'childPrice' },
         { title: 'Trẻ nhỏ', dataIndex: 'toddlerPrice' },
@@ -72,17 +88,12 @@ const ManagerPrice: React.FC = () => {
             width: 150,
             render: (_, record) => (
                 <Space>
-                    <EyeOutlined style={{ color: '#faad14', fontSize: 18 }} />
                     <EditOutlined
                         style={{ color: '#1890ff', fontSize: 18 }}
                         onClick={() => {
-                            setEditingItinerary(record);
+                            setSelectedTourPrice(record);
                             setOpenEdit(true);
                         }}
-                    />
-                    <DeleteOutlined
-                        style={{ color: '#ff4d4f', fontSize: 18 }}
-                        onClick={() => handleDelete(record.id)}
                     />
                 </Space>
             ),
@@ -96,7 +107,7 @@ const ManagerPrice: React.FC = () => {
                 rowKey="id"
                 dataSource={data}
                 search={false}
-                headerTitle="Danh sách ngày khởi hành tour"
+                headerTitle="Danh sách Combo giá"
                 toolBarRender={() => [
                     <Button
                         key="create"
@@ -119,7 +130,7 @@ const ManagerPrice: React.FC = () => {
                 destroyOnClose
                 centered
             >
-                <AddPrice onSubmit={handleAdd}/>
+                <AddPrice onSubmit={handleAdd} />
             </Modal>
 
             {/* Modal Edit */}
@@ -131,7 +142,10 @@ const ManagerPrice: React.FC = () => {
                 destroyOnClose
                 centered
             >
-                <EditPrice />
+                <EditPrice
+                    data={selectedTourPrice}
+                    onSubmit={handleEdit}
+                />
             </Modal>
         </div>
     );

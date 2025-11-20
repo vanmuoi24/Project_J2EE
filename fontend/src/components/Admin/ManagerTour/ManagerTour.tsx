@@ -1,16 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ProTable, type ProColumns } from '@ant-design/pro-components';
-import { Button, Space, Image, message, Modal } from 'antd';
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Space, message, Modal } from 'antd';
+import { EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import AddNewTour from './ModelTour/AddNewTour';
 import EditTour from './ModelTour/EditTour';
 import type { ITour, TourRequest } from '@/types/Tour';
 import { addTour, getAllTours, updateTour } from '@/services/tourServices';
 import { useNavigate } from "react-router-dom";
+import WatchTour from './ModelTour/WatchTour';
 
 const ManagerTourList: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [openWatch, setOpenWatch] = useState(false);
   const [dataTour, setDataTour] = useState<ITour[]>([]);
   const [selectedTour, setSelectedTour] = useState<ITour | null>(null);
   const navigate = useNavigate();
@@ -44,9 +46,7 @@ const ManagerTourList: React.FC = () => {
       files: values.files?.map((f: any) => f.originFileObj)
     };
 
-    console.log('Data to send:', newData);
     const res = await addTour(newData);
-    console.log('API Response:', res);
 
     if (res.code === 1000) {
       setDataTour(prev => [res.result, ...prev]);
@@ -58,41 +58,49 @@ const ManagerTourList: React.FC = () => {
   };
 
   const handleEdit = async (values: any) => {
-    if (!selectedTour) return;
+  if (!selectedTour) return;
 
-    const updateData = {
-      ...values,
-      id: selectedTour.id,
-      files: values.files?.map((f: any) => f.originFileObj)
-    };
+  // Phân loại files: file mới và file cũ
+  const newFiles: File[] = [];
+  const existingUrls: string[] = [];
 
-    console.log('Data to update:', updateData);
-    const res = await updateTour(updateData);
-    console.log('API Response:', res);
-
-    if (res.code === 1000) {
-      // Cập nhật lại danh sách tour
-      setDataTour(prev => prev.map(tour => 
-        tour.id === selectedTour.id ? { ...tour, ...res.result } : tour
-      ));
-      message.success("Cập nhật tour thành công");
-      setOpenEdit(false);
-      setSelectedTour(null);
-    } else {
-      message.error("Cập nhật tour thất bại");
+  values.files?.forEach((file: any) => {
+    if (file.originFileObj) {
+      // Đây là file mới được upload
+      newFiles.push(file.originFileObj);
+    } else if (file.url) {
+      // Đây là file cũ (chỉ có url)
+      existingUrls.push(file.url);
     }
+  });
+
+  // Tạo updateData theo đúng interface UpdateTourRequest
+  const updateData = {
+    ...values,
+    id: selectedTour.id,
+    files: newFiles, // File mới
+    url: values.deletedImageUrls || [], // URLs ảnh cần xóa (từ deletedImageUrls)
+    // existingImageUrls không cần truyền vì interface không có
   };
 
-  const handleOpenEdit = (tour: ITour) => {
-    console.log("Dữ liệu gửi vào EditTour:", tour);
-    setSelectedTour(tour);
-    setOpenEdit(true);
-  };
+  // Loại bỏ các trường không cần thiết khỏi values
+  delete updateData.deletedImageUrls;
 
-  const handleCloseEdit = () => {
+  console.log('Data to update:', updateData);
+  const res = await updateTour(updateData);
+  console.log('API Response:', res);
+
+  if (res.code === 1000) {
+    setDataTour(prev => prev.map(tour =>
+      tour.id === selectedTour.id ? { ...tour, ...res.result } : tour
+    ));
+    message.success("Cập nhật tour thành công");
     setOpenEdit(false);
     setSelectedTour(null);
-  };
+  } else {
+    message.error("Cập nhật tour thất bại");
+  }
+};
 
   const columns: ProColumns<any>[] = [
     {
@@ -116,27 +124,27 @@ const ManagerTourList: React.FC = () => {
       width: 220,
       renderText: (_, r) => `${r.departureCity.city} → ${r.destinationCity.city}`,
     },
-    {
-      title: 'Phương tiện',
-      key: 'vehicle',
-      width: 140,
-      renderText: (_, r) => `${r.vehicle.name}`,
-    },
-    {
-      title: 'Thời lượng (ngày)',
-      dataIndex: 'duration',
-      key: 'duration',
-      width: 140,
-      sorter: (a, b) => a.duration - b.duration,
-    },
-    {
-      title: 'Giá cơ bản (VNĐ)',
-      dataIndex: 'basePrice',
-      key: 'basePrice',
-      width: 160,
-      sorter: (a, b) => a.basePrice - b.basePrice,
-      renderText: (v) => Number(v).toLocaleString('vi-VN'),
-    },
+    // {
+    //   title: 'Phương tiện',
+    //   key: 'vehicle',
+    //   width: 140,
+    //   renderText: (_, r) => `${r.vehicle.name}`,
+    // },
+    // {
+    //   title: 'Thời lượng (ngày)',
+    //   dataIndex: 'duration',
+    //   key: 'duration',
+    //   width: 140,
+    //   sorter: (a, b) => a.duration - b.duration,
+    // },
+    // {
+    //   title: 'Giá cơ bản (VNĐ)',
+    //   dataIndex: 'basePrice',
+    //   key: 'basePrice',
+    //   width: 160,
+    //   sorter: (a, b) => a.basePrice - b.basePrice,
+    //   renderText: (v) => Number(v).toLocaleString('vi-VN'),
+    // },
     {
       title: "Lịch trình",
       key: "schedule",
@@ -167,31 +175,31 @@ const ManagerTourList: React.FC = () => {
         />
       ),
     },
-    {
-      title: 'Hình ảnh',
-      dataIndex: 'imageUrls',
-      key: 'imageUrls',
-      width: 180,
-      render: (_, r) =>
-        r.imageIds?.length ? (
-          <Image.PreviewGroup>
-            <Space wrap>
-              {r.imageIds.slice(0, 3).map((url: any, i: any) => (
-                <Image
-                  key={i}
-                  src={url}
-                  width={48}
-                  height={48}
-                  style={{ objectFit: 'cover', borderRadius: 8 }}
-                />
-              ))}
-              {r.imageIds.length > 3 ? <span>+{r.imageIds.length - 3}</span> : null}
-            </Space>
-          </Image.PreviewGroup>
-        ) : (
-          <span>—</span>
-        ),
-    },
+    // {
+    //   title: 'Hình ảnh',
+    //   dataIndex: 'imageUrls',
+    //   key: 'imageUrls',
+    //   width: 180,
+    //   render: (_, r) =>
+    //     r.imageIds?.length ? (
+    //       <Image.PreviewGroup>
+    //         <Space wrap>
+    //           {r.imageIds.slice(0, 3).map((url: any, i: any) => (
+    //             <Image
+    //               key={i}
+    //               src={url}
+    //               width={48}
+    //               height={48}
+    //               style={{ objectFit: 'cover', borderRadius: 8 }}
+    //             />
+    //           ))}
+    //           {r.imageIds.length > 3 ? <span>+{r.imageIds.length - 3}</span> : null}
+    //         </Space>
+    //       </Image.PreviewGroup>
+    //     ) : (
+    //       <span>—</span>
+    //     ),
+    // },
     {
       title: 'Hành động',
       key: 'action',
@@ -202,18 +210,18 @@ const ManagerTourList: React.FC = () => {
           <Button
             type="link"
             icon={<EyeOutlined />}
-            onClick={() => message.info(`Xem: ${r.tourTitle}`)}
-          />
-          <Button 
-            type="link" 
-            icon={<EditOutlined />} 
-            onClick={() => handleOpenEdit(r)} 
+            onClick={() => {
+              setSelectedTour(r);
+              setOpenWatch(true);
+            }}
           />
           <Button
             type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => message.success(`(Demo) Đã yêu cầu xóa tour #${r.id}`)}
+            icon={<EditOutlined />}
+            onClick={() => {
+              setSelectedTour(r);
+              setOpenEdit(true);
+            }}
           />
         </Space>
       ),
@@ -251,16 +259,35 @@ const ManagerTourList: React.FC = () => {
       <Modal
         title={`Chỉnh sửa tour: ${selectedTour?.tourTitle || ''}`}
         open={openEdit}
-        onCancel={handleCloseEdit}
+        onCancel={() => {
+          setOpenEdit(false);
+          setSelectedTour(null);
+        }}
         footer={null}
         destroyOnClose
         style={{ top: 40 }}
         width={900}
       >
-        <EditTour 
-          data={selectedTour} 
-          isEdit={true} 
-          onSubmit={handleEdit} 
+        <EditTour
+          data={selectedTour}
+          isEdit={true}
+          onSubmit={handleEdit}
+        />
+      </Modal>
+      <Modal
+        title={`Thôn tin Tour: ${selectedTour?.tourTitle || ''}`}
+        open={openWatch}
+        onCancel={() => {
+          setOpenWatch(false);
+          setSelectedTour(null);
+        }}
+        footer={null}
+        destroyOnClose
+        style={{ top: 40 }}
+        width={900}
+      >
+        <WatchTour
+          data={selectedTour}
         />
       </Modal>
     </>

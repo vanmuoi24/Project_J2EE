@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { Form, Input, InputNumber, Select, Button, Divider } from 'antd';
+import { Form, InputNumber, DatePicker, Button, Card, Space } from 'antd';
+import dayjs from 'dayjs'; // THÊM IMPORT dayjs
 
 interface EditTourDepartureProps {
-  data?: any; // dữ liệu itinerary để edit
+  data?: any; 
   onSubmit?: (values: any) => void;
 }
 
@@ -11,12 +12,11 @@ const EditTourDeparture: React.FC<EditTourDepartureProps> = ({ data, onSubmit })
 
   useEffect(() => {
     if (data) {
+      // CHUYỂN ĐỔI DATE STRING THÀNH dayjs OBJECT
       form.setFieldsValue({
-        tourName: data.tourName,
-        dayNumber: data.dayNumber,
-        title: data.title,
-        description: data.description,
-        meal: data.meal,
+        departureDate: data.departureDate ? dayjs(data.departureDate) : null,
+        returnDate: data.returnDate ? dayjs(data.returnDate) : null,
+        availableSeats: data.availableSeats,
       });
     } else {
       form.resetFields();
@@ -24,70 +24,91 @@ const EditTourDeparture: React.FC<EditTourDepartureProps> = ({ data, onSubmit })
   }, [data, form]);
 
   const handleFinish = (values: any) => {
-    console.log('Edit Itinerary:', values);
-    if (onSubmit) onSubmit(values);
+    const payload = {
+      ...values,
+      departureDate: values.departureDate?.toISOString(),
+      returnDate: values.returnDate?.toISOString(),
+    };
+
+    console.log('Edit Departure:', payload);
+    if (onSubmit) onSubmit(payload);
   };
 
   return (
-    <div
+    <Card
+      title="Chỉnh sửa ngày khởi hành tour"
+      bordered={false}
       style={{
-        padding: 24,
-        background: '#fff',
-        borderRadius: 8,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        maxWidth: 600,
+        margin: '0 auto',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+        borderRadius: 12,
       }}
     >
-      <h2 style={{ marginBottom: 20, color: '#1890ff' }}>Chỉnh sửa lịch trình</h2>
-      <Divider style={{ margin: '12px 0' }} />
-      <Form form={form} layout="vertical" onFinish={handleFinish}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleFinish}
+        size="middle"
+        autoComplete="off"
+        style={{ marginTop: 8 }}
+      >
+        {/* Ngày khởi hành */}
         <Form.Item
-          label="Tour"
-          name="tourName"
-          rules={[{ required: true, message: 'Vui lòng nhập tên tour' }]}
+          label="Ngày khởi hành"
+          name="departureDate"
+          rules={[{ required: true, message: 'Vui lòng chọn ngày khởi hành' }]}
         >
-          <Input placeholder="Nhập tên tour" size="large" />
+          <DatePicker
+            showTime
+            format="DD/MM/YYYY HH:mm" // THÊM FORMAT CHO RÕ RÀNG
+            style={{ width: '100%' }}
+            placeholder="Chọn ngày khởi hành..."
+          />
         </Form.Item>
 
+        {/* Ngày kết thúc */}
         <Form.Item
-          label="Ngày thứ"
-          name="dayNumber"
-          rules={[{ required: true, message: 'Vui lòng nhập ngày thứ' }]}
+          label="Ngày kết thúc"
+          name="returnDate"
+          rules={[{ required: true, message: 'Vui lòng chọn ngày kết thúc' }]}
         >
-          <InputNumber min={1} style={{ width: '100%' }} size="large" />
+          <DatePicker
+            showTime
+            format="DD/MM/YYYY HH:mm" // THÊM FORMAT CHO RÕ RÀNG
+            style={{ width: '100%' }}
+            placeholder="Chọn ngày kết thúc..."
+          />
         </Form.Item>
 
+        {/* Số lượng chỗ */}
         <Form.Item
-          label="Tiêu đề"
-          name="title"
-          rules={[{ required: true, message: 'Vui lòng nhập tiêu đề' }]}
+          label="Số lượng chỗ"
+          name="availableSeats"
+          rules={[{ required: true, message: 'Vui lòng nhập số lượng chỗ' }]}
         >
-          <Input placeholder="Nhập tiêu đề lịch trình" size="large" />
+          <InputNumber 
+            min={1} 
+            style={{ width: '100%' }} 
+            placeholder="Nhập số lượng chỗ..." 
+          />
         </Form.Item>
 
-        <Form.Item label="Mô tả" name="description">
-          <Input.TextArea rows={4} placeholder="Nhập mô tả chi tiết" />
-        </Form.Item>
-
-        <Form.Item
-          label="Bữa ăn"
-          name="meal"
-          rules={[{ required: true, message: 'Vui lòng chọn bữa ăn' }]}
-        >
-          <Select placeholder="Chọn bữa ăn" size="large">
-            <Select.Option value="Sáng">Sáng</Select.Option>
-            <Select.Option value="Trưa">Trưa</Select.Option>
-            <Select.Option value="Tối">Tối</Select.Option>
-            <Select.Option value="Sáng, Trưa, Tối">Sáng, Trưa, Tối</Select.Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item style={{ textAlign: 'right', marginTop: 16 }}>
-          <Button type="primary" htmlType="submit" size="large" style={{ minWidth: 140 }}>
-            Lưu thay đổi
-          </Button>
+        <Form.Item style={{ textAlign: 'right', marginTop: 24 }}>
+          <Space>
+            <Button 
+              htmlType="button" 
+              onClick={() => form.resetFields()}
+            >
+              Làm mới
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Cập nhật lịch trình
+            </Button>
+          </Space>
         </Form.Item>
       </Form>
-    </div>
+    </Card>
   );
 };
 

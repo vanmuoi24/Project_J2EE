@@ -1,20 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Input, Space, Popconfirm, message, Modal } from 'antd';
+import { Button, Input, Space, message, Modal } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 import {
-  EyeOutlined,
   EditOutlined,
-  DeleteOutlined,
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import EditDestination from './ModelDestinaton/EditDestination';
-import AddDestination from './ModelDestinaton/AddDestination';
-import type { ILocation, LocationRequest } from '@/types/Tour';
-import { addLocation, deleteLocation, getAllLocation } from '@/services/tourServices';
+import EditLocation from './ModelLocation/Editlocation';
+import AddLocation from './ModelLocation/AddLocation';
+import type { ILocation, AddLocationRequest } from '@/types/Tour';
+import { addLocation, getAllLocation, updateLocation } from '@/services/tourServices';
 
-const ManagerDestination: React.FC = () => {
+const ManagerLocation: React.FC = () => {
   const [data, setData] = useState<ILocation[]>([]);
   const [searchCity, setSearchCity] = useState('');
   const [openAdd, setOpenAdd] = useState(false);
@@ -22,38 +20,38 @@ const ManagerDestination: React.FC = () => {
   const [editingDest, setEditingDest] = useState<ILocation | null>(null);
 
   const fetchDataLocation = useCallback(async () => {
-      try {
-        const res = await getAllLocation();
-        if (res.code === 1000) {
-          setData(res.result);
-        }
-      } catch (error) {
-        console.error("Failed to fetch tours:", error);
+    try {
+      const res = await getAllLocation();
+      if (res.code === 1000) {
+        setData(res.result);
       }
-    }, []);
-  
-    useEffect(() => {
-      fetchDataLocation();
-    }, [fetchDataLocation]);
+    } catch (error) {
+      console.error("Failed to fetch tours:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDataLocation();
+  }, [fetchDataLocation]);
 
   // Filter dữ liệu
   const filteredData = data.filter(
     (d) =>
-      d.city.toLowerCase().includes(searchCity.toLowerCase()) 
+      d.city.toLowerCase().includes(searchCity.toLowerCase())
   );
 
-  const handleDelete = async (id: number) => {
-    const res = await deleteLocation(id);
-    if (res.code === 1000) {
-      setData((prevData) => prevData.filter((d) => d.id !== id));
-      message.success('Xóa điểm đến thành công');
-    } else {
-      message.error('Xóa thất bại: ');
-    }
-  };
+  // const handleDelete = async (id: number) => {
+  //   const res = await deleteLocation(id);
+  //   if (res.code === 1000) {
+  //     setData((prevData) => prevData.filter((d) => d.id !== id));
+  //     message.success('Xóa điểm đến thành công');
+  //   } else {
+  //     message.error('Xóa thất bại: ');
+  //   }
+  // };
 
   const handleAdd = async (values: any) => {
-    const newLocation: LocationRequest = {
+    const newLocation: AddLocationRequest = {
       city: values.name,
       type: values.type,
     };
@@ -68,12 +66,28 @@ const ManagerDestination: React.FC = () => {
     setOpenAdd(false);
   };
 
-  const handleEdit = (values: any) => {
+  const handleEdit = async (values: any) => {
     if (!editingDest) return;
-    const updatedData = data.map((d) => (d.id === editingDest.id ? { ...d, ...values } : d));
-    setData(updatedData);
-    message.success('Cập nhật điểm đến thành công');
-    setOpenEdit(false);
+
+    const updateData = {
+      ...values,
+      id: editingDest.id,
+    };
+
+    console.log('Data to update:', updateData);
+    const res = await updateLocation(updateData);
+    console.log('API Response:', res);
+
+    if (res.code === 1000) {
+      setData(prev => prev.map(tour =>
+        tour.id === editingDest.id ? { ...tour, ...res.result } : tour
+      ));
+      message.success("Cập nhật điểm đến thành công");
+      setOpenEdit(false);
+      setEditingDest(null);
+    } else {
+      message.error("Cập nhật điểm đến thất bại");
+    }
   };
 
   const columns: ProColumns<ILocation>[] = [
@@ -92,9 +106,9 @@ const ManagerDestination: React.FC = () => {
               setOpenEdit(true);
             }}
           />
-          <Popconfirm title="Bạn có chắc muốn xóa?" onConfirm={() => handleDelete(record.id)}>
+          {/* <Popconfirm title="Bạn có chắc muốn xóa?" onConfirm={() => handleDelete(record.id)}>
             <DeleteOutlined style={{ color: '#ff4d4f', fontSize: 18 }} />
-          </Popconfirm>
+          </Popconfirm> */}
         </Space>
       ),
     },
@@ -145,7 +159,7 @@ const ManagerDestination: React.FC = () => {
         destroyOnClose
         centered
       >
-        <AddDestination onSubmit={handleAdd} />
+        <AddLocation onSubmit={handleAdd} />
       </Modal>
 
       {/* Modal Edit */}
@@ -157,10 +171,10 @@ const ManagerDestination: React.FC = () => {
         destroyOnClose
         centered
       >
-        <EditDestination data={editingDest || {}} onSubmit={handleEdit} />
+        <EditLocation data={editingDest || {}} onSubmit={handleEdit} />
       </Modal>
     </div>
   );
 };
 
-export default ManagerDestination;
+export default ManagerLocation;

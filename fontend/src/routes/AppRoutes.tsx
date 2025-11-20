@@ -16,7 +16,7 @@ import ManagerTour from '../components/Admin/ManagerTour/ManagerTour';
 import ManagerBooking from '../components/Admin/ManagerBooking/ManagerBooking';
 import ManagerPromotion from '../components/Admin/ManagerPomt/ManagerPomt';
 import ManagerSchedule from '../components/Admin/ManagerTour/ManagerSchedule';
-import ManagerDestination from '../components/Admin/ManagerTour/ManagerDestination';
+import ManagerDestination from '../components/Admin/ManagerTour/ManagerLocation';
 import TourDetail from '@/layouts/TourDetail';
 import Booking from '@/pages/Booking/BookingPage';
 import BookingHistory from '@/pages/Booking/HistoryPage';

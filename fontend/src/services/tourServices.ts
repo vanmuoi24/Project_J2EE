@@ -2,19 +2,23 @@ import axiosClient from '@/api/axios';
 import type { AxiosResponse } from '@/types/comment';
 import type { IPaginationResponse } from '@/types/Pagination';
 import type {
-  DepartureDateRequest,
+  AddTourPriceRequest,
   ICity,
   IItinerary,
   ILocation,
-  ItineraryRequest,
+  AddItineraryRequest,
   ITour,
   ITourDeparture,
   ITourPrice,
   IVehicle,
-  LocationRequest,
-  TourPriceRequest,
+  AddLocationRequest,
   TourRequest,
+  UpdateTourPriceRequest,
   UpdateTourRequest,
+  UpdateLocationRequest,
+  UpdateItineraryRequest,
+  AddTourDepartureRequest,
+  UpdateTourDepartureRequest,
 } from '@/types/Tour';
 
 export const searchTours = (
@@ -76,19 +80,19 @@ export const searchLocation = (
   );
 };
 
-export const addLocation = (data: LocationRequest): Promise<AxiosResponse<ILocation>> => {
+export const addLocation = (data: AddLocationRequest): Promise<AxiosResponse<ILocation>> => {
   return axiosClient.post(`/tour/locations`, data);
 };
 
-export const addItinerary = (data: ItineraryRequest): Promise<AxiosResponse<IItinerary>> => {
+export const addItinerary = (data: AddItineraryRequest): Promise<AxiosResponse<IItinerary>> => {
   return axiosClient.post(`tour/itineraries`, data);
 }
 
-export const addPrice = (data: TourPriceRequest): Promise<AxiosResponse<ITourPrice>> => {
+export const addPrice = (data: AddTourPriceRequest): Promise<AxiosResponse<ITourPrice>> => {
   return axiosClient.post(`pricing/prices`, data);
 }
 
-export const addTourDeparture = (data: DepartureDateRequest): Promise<AxiosResponse<ITourDeparture>> => {
+export const addTourDeparture = (data: AddTourDepartureRequest): Promise<AxiosResponse<ITourDeparture>> => {
   return axiosClient.post(`tour/tour-departures`, data);
 }
 
@@ -113,14 +117,19 @@ export const addTour = (data: TourRequest): Promise<AxiosResponse<ITour>> => {
 export const updateTour = (data: UpdateTourRequest): Promise<AxiosResponse<ITour>> => {
   const formData = new FormData();
 
-  // Chỉ gửi các trường có giá trị, không gửi undefined/null
   Object.entries(data).forEach(([key, value]) => {
-    if (value === undefined || value === null || key === "id") return;
-
     if (key === "files" && Array.isArray(value)) {
-      value.forEach((file: File) => formData.append("files", file));
-    } else {
-      formData.append(key, value as any);
+      // Xử lý file mới
+      value.forEach((file: File) => {
+        formData.append("files", file);
+      });
+    } else if (key === "url" && Array.isArray(value)) {
+      // Xử lý url ảnh cần xóa
+      value.forEach((url: string) => {
+        formData.append("url", url);
+      });
+    } else if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
     }
   });
 
@@ -129,9 +138,27 @@ export const updateTour = (data: UpdateTourRequest): Promise<AxiosResponse<ITour
   });
 };
 
+export const updateTourPrice = (data: UpdateTourPriceRequest): Promise<AxiosResponse<ITourPrice>> => {
+  return axiosClient.put(`pricing/prices/${data.id}`, data)
+}
 
-export const deleteLocation = (id: number): Promise<AxiosResponse<any>> => {
-  return axiosClient.delete(`/tour/locations/${id}`);
-};
+export const updateLocation = (data: UpdateLocationRequest): Promise<AxiosResponse<ILocation>> => {
+  return axiosClient.put(`tour/locations/${data.id}`, data)
+}
+
+export const updateItinerary = (data: UpdateItineraryRequest): Promise<AxiosResponse<IItinerary>> => {
+  return axiosClient.put(`tour/itineraries/${data.id}`, data)
+}
+
+export const updateTourDeparture = (data: UpdateTourDepartureRequest): Promise<AxiosResponse<ITourDeparture>> => {
+  return axiosClient.put(`tour/tour-departures/${data.id}`, data)
+}
+
+export const deleteItinerary = (id: number): Promise<AxiosResponse<any>> => {
+  return axiosClient.delete(`tour/itineraries/${id}`)
+}
+
+
+
 
 

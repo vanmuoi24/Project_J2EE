@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { Form, Input, InputNumber, Select, Button, Divider } from 'antd';
+import { Form, InputNumber, Button, Divider, Card, Space } from 'antd';
+import { SaveOutlined } from '@ant-design/icons';
 
 interface EditPriceProps {
-  data?: any; // dữ liệu itinerary để edit
+  data?: any;
   onSubmit?: (values: any) => void;
 }
 
@@ -12,11 +13,11 @@ const EditPrice: React.FC<EditPriceProps> = ({ data, onSubmit }) => {
   useEffect(() => {
     if (data) {
       form.setFieldsValue({
-        tourName: data.tourName,
-        dayNumber: data.dayNumber,
-        title: data.title,
-        description: data.description,
-        meal: data.meal,
+        adultPrice: data.adultPrice,
+        childPrice: data.childPrice,
+        infantPrice: data.infantPrice,
+        toddlerPrice: data.toddlerPrice,
+        singleSupplementPrice: data.singleSupplementPrice,
       });
     } else {
       form.resetFields();
@@ -24,70 +25,113 @@ const EditPrice: React.FC<EditPriceProps> = ({ data, onSubmit }) => {
   }, [data, form]);
 
   const handleFinish = (values: any) => {
-    console.log('Edit Itinerary:', values);
+    console.log('Edit Price:', values);
     if (onSubmit) onSubmit(values);
   };
 
   return (
-    <div
+    <Card
+      title={"Chỉnh sửa Giá Tour"}
+      bordered={false}
       style={{
-        padding: 24,
-        background: '#fff',
-        borderRadius: 8,
+        maxWidth: 600,
+        margin: '0 auto',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        borderRadius: 12,
       }}
     >
-      <h2 style={{ marginBottom: 20, color: '#1890ff' }}>Chỉnh sửa lịch trình</h2>
       <Divider style={{ margin: '12px 0' }} />
       <Form form={form} layout="vertical" onFinish={handleFinish}>
-        <Form.Item
-          label="Tour"
-          name="tourName"
-          rules={[{ required: true, message: 'Vui lòng nhập tên tour' }]}
-        >
-          <Input placeholder="Nhập tên tour" size="large" />
-        </Form.Item>
+        <Space size="large" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Form.Item
+            label="Giá người lớn (VNĐ)"
+            name="adultPrice"
+            style={{ flex: 1 }}
+            rules={[{ required: true, message: 'Vui lòng nhập giá người lớn' }]}
+          >
+            <InputNumber
+              min={0}
+              style={{ width: '100%' }}
+              size="large"
+              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as any}
+              placeholder="0"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Giá trẻ em (VNĐ)"
+            name="childPrice"
+            style={{ flex: 1 }}
+            rules={[{ required: true, message: 'Vui lòng nhập giá trẻ em' }]}
+          >
+            <InputNumber
+              min={0}
+              style={{ width: '100%' }}
+              size="large"
+              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as any}
+              placeholder="0"
+            />
+          </Form.Item>
+        </Space>
+
+        <Space size="large" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Form.Item
+            label="Giá em bé (VNĐ)"
+            name="toddlerPrice"
+            style={{ flex: 1 }}
+            rules={[{ required: true, message: 'Vui lòng nhập giá em bé' }]}
+          >
+            <InputNumber
+              min={0}
+              style={{ width: '100%' }}
+              size="large"
+              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as any}
+              placeholder="0"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Giá sơ sinh (VNĐ)"
+            name="infantPrice"
+            style={{ flex: 1 }}
+            rules={[{ required: true, message: 'Vui lòng nhập giá sơ sinh' }]}
+          >
+            <InputNumber
+              min={0}
+              style={{ width: '100%' }}
+              size="large"
+              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as any}
+              placeholder="0"
+            />
+          </Form.Item>
+        </Space>
 
         <Form.Item
-          label="Ngày thứ"
-          name="dayNumber"
-          rules={[{ required: true, message: 'Vui lòng nhập ngày thứ' }]}
+          label="Phụ thu phòng đơn (VNĐ)"
+          name="singleSupplementPrice"
+          rules={[{ required: true, message: 'Vui lòng nhập phụ thu phòng đơn' }]}
         >
-          <InputNumber min={1} style={{ width: '100%' }} size="large" />
+          <InputNumber
+            min={0}
+            style={{ width: '100%' }}
+            size="large"
+            formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+            parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as any}
+            placeholder="0"
+          />
         </Form.Item>
 
-        <Form.Item
-          label="Tiêu đề"
-          name="title"
-          rules={[{ required: true, message: 'Vui lòng nhập tiêu đề' }]}
-        >
-          <Input placeholder="Nhập tiêu đề lịch trình" size="large" />
-        </Form.Item>
-
-        <Form.Item label="Mô tả" name="description">
-          <Input.TextArea rows={4} placeholder="Nhập mô tả chi tiết" />
-        </Form.Item>
-
-        <Form.Item
-          label="Bữa ăn"
-          name="meal"
-          rules={[{ required: true, message: 'Vui lòng chọn bữa ăn' }]}
-        >
-          <Select placeholder="Chọn bữa ăn" size="large">
-            <Select.Option value="Sáng">Sáng</Select.Option>
-            <Select.Option value="Trưa">Trưa</Select.Option>
-            <Select.Option value="Tối">Tối</Select.Option>
-            <Select.Option value="Sáng, Trưa, Tối">Sáng, Trưa, Tối</Select.Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item style={{ textAlign: 'right', marginTop: 16 }}>
-          <Button type="primary" htmlType="submit" size="large" style={{ minWidth: 140 }}>
-            Lưu thay đổi
+        <Form.Item style={{ textAlign: 'center', marginTop: 24 }}>
+          <Button type="primary" icon={<SaveOutlined />} htmlType="submit" size="large" style={{ minWidth: 160 }}>
+            Cập nhật Giá
           </Button>
         </Form.Item>
       </Form>
-    </div>
+    </Card>
   );
 };
 

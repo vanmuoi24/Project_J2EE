@@ -15,12 +15,21 @@ export interface ITourPrice {
   singleSupplementPrice: number;
 }
 
-export interface TourPriceRequest {
+export interface AddTourPriceRequest {
   adultPrice: number;
   childPrice: number;
   infantPrice: number;
   toddlerPrice: number;
   singleSupplementPrice: number;
+}
+
+export interface UpdateTourPriceRequest {
+  id: number;
+  adultPrice?: number;
+  childPrice?: number;
+  infantPrice?: number;
+  toddlerPrice?: number;
+  singleSupplementPrice?: number;
 }
 
 export interface IVehicle {
@@ -36,11 +45,19 @@ export interface IItinerary {
   meal: string;
 }
 
-export interface ItineraryRequest{
+export interface AddItineraryRequest{
   title: string;
   description: string;
   meal: string;
   tourId: number;
+}
+
+export interface UpdateItineraryRequest{
+  id: number;
+  title?: string;
+  description?: string;
+  meal?: string;
+  tourId?: number;
 }
 
 export interface IDepartureDate {
@@ -60,10 +77,18 @@ export interface IDepartureDate {
   };
 }
 
-export interface DepartureDateRequest {
+export interface AddTourDepartureRequest {
   departureDate: string;
   returnDate: string;
   availableSeats: number;
+  tourId: number;
+}
+
+export interface UpdateTourDepartureRequest {
+  id: number;
+  departureDate?: string;
+  returnDate?: string;
+  availableSeats?: number;
   tourId: number;
 }
 
@@ -107,6 +132,7 @@ export interface UpdateTourRequest {
   basePrice?: number;
   vehicleId?: string;
   tourPriceId?: number;
+  url?: string[];
   files?: File[];
 }
 
@@ -157,9 +183,15 @@ export interface ILocation {
   type: string;
 }
 
-export interface LocationRequest {
+export interface AddLocationRequest {
   city: string;
   type: string;
+}
+
+export interface UpdateLocationRequest {
+  id: number;
+  city?: string;
+  type?: string;
 }
 
 type ToursResponse = AxiosResponse<ITour[]>;

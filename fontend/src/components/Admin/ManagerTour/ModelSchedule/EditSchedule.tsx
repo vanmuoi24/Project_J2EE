@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Form, Input, InputNumber, Select, Button, Divider } from 'antd';
 
 interface EditItineraryProps {
-  data?: any; // dữ liệu itinerary để edit
+  data?: any;
   onSubmit?: (values: any) => void;
 }
 
@@ -12,8 +12,6 @@ const EditItinerary: React.FC<EditItineraryProps> = ({ data, onSubmit }) => {
   useEffect(() => {
     if (data) {
       form.setFieldsValue({
-        tourName: data.tourName,
-        dayNumber: data.dayNumber,
         title: data.title,
         description: data.description,
         meal: data.meal,
@@ -37,25 +35,7 @@ const EditItinerary: React.FC<EditItineraryProps> = ({ data, onSubmit }) => {
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
       }}
     >
-      <h2 style={{ marginBottom: 20, color: '#1890ff' }}>Chỉnh sửa lịch trình</h2>
-      <Divider style={{ margin: '12px 0' }} />
       <Form form={form} layout="vertical" onFinish={handleFinish}>
-        <Form.Item
-          label="Tour"
-          name="tourName"
-          rules={[{ required: true, message: 'Vui lòng nhập tên tour' }]}
-        >
-          <Input placeholder="Nhập tên tour" size="large" />
-        </Form.Item>
-
-        <Form.Item
-          label="Ngày thứ"
-          name="dayNumber"
-          rules={[{ required: true, message: 'Vui lòng nhập ngày thứ' }]}
-        >
-          <InputNumber min={1} style={{ width: '100%' }} size="large" />
-        </Form.Item>
-
         <Form.Item
           label="Tiêu đề"
           name="title"

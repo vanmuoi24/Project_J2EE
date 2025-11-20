@@ -10,7 +10,6 @@ const AddTourDeparture: React.FC<AddTourDepartureProps> = ({ onSubmit }) => {
   const [form] = Form.useForm();
 
   const handleFinish = (values: any) => {
-    // Convert moment -> ISO string
     const payload = {
       ...values,
       departureDate: values.departureDate?.toISOString(),
@@ -48,6 +47,7 @@ const AddTourDeparture: React.FC<AddTourDepartureProps> = ({ onSubmit }) => {
         >
           <DatePicker
             showTime
+            format="DD/MM/YYYY HH:mm"
             style={{ width: '100%' }}
             placeholder="Chọn ngày khởi hành..."
           />
@@ -61,6 +61,7 @@ const AddTourDeparture: React.FC<AddTourDepartureProps> = ({ onSubmit }) => {
         >
           <DatePicker
             showTime
+            format="DD/MM/YYYY HH:mm"
             style={{ width: '100%' }}
             placeholder="Chọn ngày kết thúc..."
           />

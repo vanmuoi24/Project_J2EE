@@ -2,15 +2,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   DeleteOutlined,
   EditOutlined,
-  EyeOutlined,
   PlusOutlined,
-  SearchOutlined,
 } from '@ant-design/icons';
-import { Button, Input, Modal, Form, InputNumber, Select, Space, message } from 'antd';
+import { Button, Modal, Space, message, Tooltip } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
-import type { IItinerary, ItineraryRequest } from '@/types/Tour';
-import { addItinerary, getAllItineraries, getItineraryByTourId } from '@/services/tourServices';
+import type { IItinerary, AddItineraryRequest } from '@/types/Tour';
+import { addItinerary, deleteItinerary, getItineraryByTourId, updateItinerary } from '@/services/tourServices';
 import { useLocation } from 'react-router-dom';
 import AddItinerary from './ModelSchedule/AddSchedule';
 import EditItinerary from './ModelSchedule/EditSchedule';
@@ -39,7 +37,7 @@ const ManagerItinerary: React.FC = () => {
     } catch (error) {
       console.error("Failed to fetch tours:", error);
     }
-  }, []);
+  }, [tourId]);
 
   useEffect(() => {
     fetchDataItinerary();
@@ -52,17 +50,17 @@ const ManagerItinerary: React.FC = () => {
       d.title.toLowerCase().includes(searchTitle.toLowerCase())
   );
 
-  const handleDelete = (id: number) => {
-    setData(data.filter((d) => d.id !== id));
-    message.success('Xóa lịch trình thành công');
-  };
-
   const handleAdd = async (values: any) => {
-    const newLocation: ItineraryRequest = {
+    if (!tourId) {
+      message.error('Không tìm thấy tour ID');
+      return;
+    }
+
+    const newLocation: AddItineraryRequest = {
       title: values.title,
       description: values.description,
       meal: values.meal,
-      tourId: tourId!
+      tourId: tourId
     };
     const res = await addItinerary(newLocation);
     if (res.code === 1000) {
@@ -73,6 +71,57 @@ const ManagerItinerary: React.FC = () => {
       message.error('Thêm lịch trình thất bại: ');
     }
     setOpenAdd(false);
+  };
+
+  const handleEditClick = (record: IItinerary) => {
+    setEditingItinerary(record);
+    setOpenEdit(true);
+  };
+
+  const handleEdit = async (values: any) => {
+    if (!editingItinerary) return;
+
+    const updateData = {
+      ...values,
+      id: editingItinerary.id,
+    };
+
+    const res = await updateItinerary(updateData);
+
+    if (res.code === 1000) {
+      setData(prev => prev.map(tour =>
+        tour.id === editingItinerary.id ? { ...tour, ...res.result } : tour
+      ));
+      message.success("Cập nhật lịch trình thành công");
+      setOpenEdit(false);
+      setEditingItinerary(null);
+    } else {
+      message.error("Cập nhật lịch trình thất bại");
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      Modal.confirm({
+        title: 'Xác nhận xóa',
+        content: 'Bạn có chắc chắn muốn xóa lịch trình này?',
+        okText: 'Xóa',
+        cancelText: 'Hủy',
+        okType: 'danger',
+        onOk: async () => {
+          const res = await deleteItinerary(id);
+          if (res.code === 1000) {
+            setData(data.filter((d) => d.id !== id));
+            message.success('Xóa lịch trình thành công');
+          } else {
+            message.error('Xóa lịch trình thất bại');
+          }
+        },
+      });
+    } catch (error) {
+      console.error('Failed to delete itinerary:', error);
+      message.error('Có lỗi xảy ra khi xóa lịch trình');
+    }
   };
 
   const columns: ProColumns<IItinerary>[] = [
@@ -86,16 +135,12 @@ const ManagerItinerary: React.FC = () => {
       width: 150,
       render: (_, record) => (
         <Space>
-          <EyeOutlined style={{ color: '#faad14', fontSize: 18 }} />
           <EditOutlined
-            style={{ color: '#1890ff', fontSize: 18 }}
-            onClick={() => {
-              setEditingItinerary(record);
-              setOpenEdit(true);
-            }}
+            style={{ color: '#1890ff', fontSize: 18, cursor: 'pointer' }}
+            onClick={() => handleEditClick(record)}
           />
           <DeleteOutlined
-            style={{ color: '#ff4d4f', fontSize: 18 }}
+            style={{ color: '#ff4d4f', fontSize: 18, cursor: 'pointer' }}
             onClick={() => handleDelete(record.id)}
           />
         </Space>
@@ -103,47 +148,44 @@ const ManagerItinerary: React.FC = () => {
     },
   ];
 
+  // Tạo button thêm mới với điều kiện
+  const renderAddButton = () => {
+    if (!tourId) {
+      return (
+        <Tooltip title="Vui lòng chọn tour trước khi thêm lịch trình">
+          <Button
+            key="create"
+            type="primary"
+            icon={<PlusOutlined />}
+            disabled
+          >
+            Thêm mới
+          </Button>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <Button
+        key="create"
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => setOpenAdd(true)}
+      >
+        Thêm mới
+      </Button>
+    );
+  };
+
   return (
     <div>
-      {/* Search */}
-      <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
-        <Input
-          placeholder="Tìm theo tour"
-          value={searchTour}
-          onChange={(e) => setSearchTour(e.target.value)}
-          style={{ width: 200 }}
-        />
-        <Input
-          placeholder="Tìm theo tiêu đề"
-          value={searchTitle}
-          onChange={(e) => setSearchTitle(e.target.value)}
-          style={{ width: 200 }}
-        />
-        <Button
-          type="primary"
-          icon={<SearchOutlined />}
-          onClick={() => message.info('Đang lọc dữ liệu...')}
-        >
-          Tìm kiếm
-        </Button>
-      </div>
-
       <ProTable<IItinerary>
         columns={columns}
         rowKey="id"
         dataSource={filteredData}
         search={false}
         headerTitle="Danh sách lịch trình tour"
-        toolBarRender={() => [
-          <Button
-            key="create"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setOpenAdd(true)}
-          >
-            Thêm mới
-          </Button>,
-        ]}
+        toolBarRender={() => [renderAddButton()]}
         pagination={{ pageSize: 5 }}
       />
 
@@ -168,7 +210,12 @@ const ManagerItinerary: React.FC = () => {
         destroyOnClose
         centered
       >
-        <EditItinerary />
+        {editingItinerary && (
+          <EditItinerary
+            data={editingItinerary}
+            onSubmit={handleEdit}
+          />
+        )}
       </Modal>
     </div>
   );

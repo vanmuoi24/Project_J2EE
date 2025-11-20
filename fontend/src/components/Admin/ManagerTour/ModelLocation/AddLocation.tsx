@@ -2,11 +2,11 @@ import React from 'react';
 import { Form, Input, Button, Select } from 'antd';
 const { Option } = Select;
 
-interface AddDestinationProps {
+interface AddLocationProps {
   onSubmit?: (values: any) => void;
 }
 
-const AddDestination: React.FC<AddDestinationProps> = ({ onSubmit }) => {
+const AddLocation: React.FC<AddLocationProps> = ({ onSubmit }) => {
   const [form] = Form.useForm();
 
   const handleFinish = (values: any) => {
@@ -55,4 +55,4 @@ const AddDestination: React.FC<AddDestinationProps> = ({ onSubmit }) => {
   );
 };
 
-export default AddDestination;
+export default AddLocation;
