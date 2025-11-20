@@ -13,7 +13,16 @@ export default function TourImages({ imageIds }: TourImagesProps) {
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
   const carouselRef = useRef<any>(null);
 
-  const sideImages = imageIds;
+  // Tính toán số lượng ảnh còn lại (trừ đi 3 ảnh đầu tiên)
+  const remainingCount = Math.max(0, imageIds.length - 2);
+  
+  // Chỉ hiển thị 3 ảnh đầu tiên trong cột nhỏ
+  const visibleSideImages = imageIds.slice(0, 2);
+  
+  // Chiều cao của ảnh lớn và các thông số
+  const mainImageHeight = 435;
+  const gutter = 5; // Khoảng cách giữa các ảnh nhỏ
+  const sideImageHeight = (mainImageHeight - gutter * 2) / 3; // Trừ đi 2 gutter (giữa 3 ảnh)
 
   const handleSelectImage = (index: number) => {
     setActiveIndex(index);
@@ -44,30 +53,80 @@ export default function TourImages({ imageIds }: TourImagesProps) {
     <Row gutter={12}>
       {/* Cột nhỏ ảnh */}
       <Col span={6}>
-        <Row gutter={[0, 12]}>
-          {sideImages.map((img, idx) => (
+        <Row gutter={[0, gutter]} style={{ height: mainImageHeight }}>
+          {/* Hiển thị 3 ảnh đầu tiên bình thường */}
+          {visibleSideImages.map((img, idx) => (
             <Col span={24} key={idx}>
-              <Image
-                src={img}
-                height={80}
+              <div
                 style={{
                   width: "100%",
+                  height: sideImageHeight,
+                  overflow: "hidden",
                   borderRadius: 4,
                   cursor: "pointer",
                   border: idx === activeIndex ? "2px solid #0B5DA7" : "2px solid transparent",
-                  objectFit: "cover"
+                  position: "relative"
                 }}
                 onClick={() => handleSelectImage(idx)}
-                preview={{
-                  visible: isPreviewVisible && idx === activeIndex,
-                  onVisibleChange: (visible) => {
-                    if (!visible) handlePreviewClose();
-                  },
-                  mask: null // Ẩn mask trên thumbnail
-                }}
-              />
+              >
+                <Image
+                  src={img}
+                  preview={false}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover"
+                  }}
+                />
+              </div>
             </Col>
           ))}
+          
+          {/* Hiển thị ảnh thứ 4 với overlay và số lượng còn lại (nếu có nhiều hơn 3 ảnh) */}
+          {remainingCount > 0 && (
+            <Col span={24}>
+              <div
+                style={{
+                  width: "100%",
+                  height: sideImageHeight,
+                  overflow: "hidden",
+                  borderRadius: 4,
+                  cursor: "pointer",
+                  position: "relative"
+                }}
+                onClick={() => handleSelectImage(3)} // Chọn ảnh thứ 4
+              >
+                <Image
+                  src={imageIds[3]} // Hiển thị ảnh thứ 4
+                  preview={false}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    filter: "blur(2px) brightness(0.7)"
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "rgba(0, 0, 0, 0.4)",
+                    color: "white",
+                    fontSize: "20px",
+                    fontWeight: "bold"
+                  }}
+                >
+                  +{remainingCount}
+                </div>
+              </div>
+            </Col>
+          )}
         </Row>
       </Col>
 
@@ -80,13 +139,13 @@ export default function TourImages({ imageIds }: TourImagesProps) {
             afterChange={(current) => setActiveIndex(current)}
             arrows={false}
           >
-            {sideImages.map((img, idx) => (
+            {imageIds.map((img, idx) => (
               <div key={idx}>
                 <Image
                   src={img}
-                  height={435}
+                  height={mainImageHeight}
                   width="100%"
-                  style={{ 
+                  style={{
                     borderRadius: 4,
                     objectFit: "cover",
                     cursor: "pointer"
@@ -97,7 +156,7 @@ export default function TourImages({ imageIds }: TourImagesProps) {
                     onVisibleChange: (visible) => {
                       if (!visible) handlePreviewClose();
                     },
-                    mask: null, // Ẩn icon preview mặc định
+                    mask: null,
                     src: img
                   }}
                 />
@@ -171,7 +230,7 @@ export default function TourImages({ imageIds }: TourImagesProps) {
           }
         }}
       >
-        {sideImages.map((img, idx) => (
+        {imageIds.map((img, idx) => (
           <Image key={idx} src={img} style={{ display: 'none' }} />
         ))}
       </Image.PreviewGroup>
