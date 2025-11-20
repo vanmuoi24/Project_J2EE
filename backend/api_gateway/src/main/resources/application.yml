@@ -11,7 +11,7 @@ spring:
     gateway:
       routes:
         - id: auth_service
-          uri: http://localhost:8080
+          uri: http://auth_service:8080
           predicates:
             - Path=${app.api-prefix}/auth/**
           filters:
@@ -36,7 +36,7 @@ spring:
           filters:
             - StripPrefix=2
         - id: pricing_service
-          uri: http://localhost:8084
+          uri: http://pricing_service:8080
           predicates:
             - Path=${app.api-prefix}/pricing/**
           filters:
@@ -48,13 +48,13 @@ spring:
           filters:
             - StripPrefix=2
         - id: tour_service
-          uri: http://localhost:8086
+          uri: http://tour_service:8080
           predicates:
             - Path=${app.api-prefix}/tour/**
           filters:
             - StripPrefix=2
         - id: file-service
-          uri: http://localhost:8087
+          uri: http://file_service:8080
           predicates:
             - Path=${app.api-prefix}/file/**
           filters:
