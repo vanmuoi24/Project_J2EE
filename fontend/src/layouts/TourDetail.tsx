@@ -6,44 +6,20 @@ import TourCard from '@/components/TourDetail/TourCard';
 import TourDetailCard from '@/components/TourDetail/TourDetailCard';
 import TourImages from '@/components/TourDetail/TourImage';
 import { Row, Col, Typography } from 'antd';
-
-import img from '../assets/slide_cb_0_tuiblue-3.webp';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getRandom3Tour, getTourById } from '@/services/tourServices';
 import type { ITour } from '@/types/Tour';
 import Comment from '@/components/Comment/Comment';
 
-
 const { Title } = Typography;
-
-const tours = [
-  {
-    id: 1,
-    imageUrl: img,
-    name: 'Từ Cố Đô Hoa Lư về đất Thăng Long | Hà Nội - Ninh Bình - Hạ Long',
-    departureLocation: 'TP. Hồ Chí Minh',
-    code: 'XV2SGN',
-    price: 11590000,
-    attractions: [
-      'Núi Yên Tử',
-      'Chùa Bái Đính',
-      'Tràng An',
-      'Yên Tử',
-      'Ninh Bình',
-      'Vịnh Hạ Long',
-      'Hà Nội',
-    ],
-    duration: '4N3Đ',
-    transport: 'Máy bay',
-  },
-];
 
 export default function TourDetail() {
   const [dataDetailtour, setDataDetailTour] = useState<ITour | null>(null);
   const [dataRandomTour, setDataRandomTour] = useState<ITour[]>([]);
   const [selectedDepartureId, setSelectedDepartureId] = useState<number | null>(null);
   const { id } = useParams<{ id: string }>();
+  const scheduleRef = useRef<HTMLDivElement>(null);
 
   const fetchDataTourById = async () => {
     if (!id) return;
@@ -70,6 +46,15 @@ export default function TourDetail() {
     }
   };
 
+  const scrollToSchedule = () => {
+    if (scheduleRef.current) {
+      scheduleRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+  
   useEffect(() => {
     fetchDataTourById();
   }, [id]);
@@ -93,7 +78,14 @@ export default function TourDetail() {
           <Row gutter={24}>
             <Col span={17}>
               {dataDetailtour && <TourImages imageIds={dataDetailtour.imageIds} />}
-              {dataDetailtour && <Schedule tourData={dataDetailtour} onSelectDepartureId={handleSelectDeparture}/>}
+              <div ref={scheduleRef}>
+                {dataDetailtour && (
+                  <Schedule 
+                    tourData={dataDetailtour} 
+                    onSelectDepartureId={handleSelectDeparture}
+                  />
+                )}
+              </div>
               <AdditionalInfo />
               <Itinerary tourId={dataDetailtour?.id}/>
               <ImportantInfo />
@@ -107,7 +99,11 @@ export default function TourDetail() {
                   alignSelf: 'flex-start', // đảm bảo sticky tính từ đầu Col
                 }}
               >
-                <TourDetailCard tourData={dataDetailtour} selectedDepartureId={selectedDepartureId}/>
+                <TourDetailCard 
+                  tourData={dataDetailtour} 
+                  selectedDepartureId={selectedDepartureId}
+                  onSelectDeparture={scrollToSchedule} // Truyền hàm xuống
+                />
               </div>
             </Col>
           </Row>

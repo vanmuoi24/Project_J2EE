@@ -10,10 +10,11 @@ const { Text, Title } = Typography;
 interface TourDetailCardProps {
   tourData?: ITour | null;
   selectedDepartureId?: number | null;
+  onSelectDeparture?: () => void;
 }
 
 
-export default function TourDetailCard({ selectedDepartureId, tourData }: TourDetailCardProps) {
+export default function TourDetailCard({ selectedDepartureId, tourData, onSelectDeparture }: TourDetailCardProps) {
   const [dataDetailTourDeparture, setDataDetailTourDeparture] = useState<ITourDeparture | null>(null);
 
   const fetchDataTourDepartureById = async () => {
@@ -27,6 +28,11 @@ export default function TourDetailCard({ selectedDepartureId, tourData }: TourDe
     fetchDataTourDepartureById();
   }, [selectedDepartureId]);
 
+  const handleSelectDepartureClick = () => {
+    if (onSelectDeparture) {
+      onSelectDeparture();
+    }
+  };
 
   return (
     <Card
@@ -162,8 +168,10 @@ export default function TourDetailCard({ selectedDepartureId, tourData }: TourDe
               fontSize: 12,
               width: "100%"
             }}
+            onClick={handleSelectDepartureClick}
           >
             Chọn ngày khởi hành
+            
           </Button>
         </div>
       }

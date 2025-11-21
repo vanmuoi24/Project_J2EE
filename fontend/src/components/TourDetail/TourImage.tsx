@@ -58,27 +58,29 @@ export default function TourImages({ imageIds }: TourImagesProps) {
           {visibleSideImages.map((img, idx) => (
             <Col span={24} key={idx}>
               <div
-                style={{
-                  width: "100%",
-                  height: sideImageHeight,
-                  overflow: "hidden",
-                  borderRadius: 4,
-                  cursor: "pointer",
-                  border: idx === activeIndex ? "2px solid #0B5DA7" : "2px solid transparent",
-                  position: "relative"
-                }}
-                onClick={() => handleSelectImage(idx)}
-              >
-                <Image
-                  src={img}
-                  preview={false}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover"
-                  }}
-                />
-              </div>
+  style={{
+    width: "100%",
+    height: sideImageHeight,
+    overflow: "hidden",
+    borderRadius: 4,
+    cursor: "pointer",
+    border: idx === activeIndex ? "2px solid #0B5DA7" : "2px solid transparent",
+    position: "relative"
+  }}
+  onClick={() => handleSelectImage(idx)}
+>
+  <div style={{ width: "100%", height: "100%" }}>
+    <Image
+      src={img}
+      preview={false}
+      width="100%"
+      height="100%"
+      style={{
+        objectFit: "cover"
+      }}
+    />
+  </div>
+</div>
             </Col>
           ))}
           
