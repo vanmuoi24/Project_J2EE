@@ -41,7 +41,7 @@ public class TourDepartureController {
     }
 
     @PostMapping
-    public ApiResponse<TourDepartureResponse> createTourDeparture(@ModelAttribute TourDepartureRequest request) {
+    public ApiResponse<TourDepartureResponse> createTourDeparture(@RequestBody TourDepartureRequest request) {
         return ApiResponse.<TourDepartureResponse>builder()
                 .result(tourDepartureService.create(request))
                 .message("Created Successfully")
