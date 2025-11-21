@@ -2,9 +2,9 @@ import type { User } from './User.d';
 
 export type CustomerResponse = {
 	fullName: string;
-	birthdate: string; // ISO date string (yyyy-MM-dd)
+	dateOfBirth: string; // ISO date string (yyyy-MM-dd)
 	address?: string;
-	gender?: string;
+	gender?: boolean;
 	status?: string;
 	bookingType?: string;
 	id?: string;

@@ -1,141 +1,206 @@
 import React, { useEffect, useState } from "react";
 import { ProTable } from "@ant-design/pro-components";
 import type { ProColumns } from "@ant-design/pro-components";
-import type { BookingResponse } from "@/types/Booking";
-import type { InvoiceResponse } from "@/types/Invoice";
+import type { BookingResponse, CustomerResponse } from "@/types/Booking";
 import type { UserResponse } from "@/types/comment";
-import bookingServices from "@/services/bookingServices";
-import invoiceServices from "@/services/invoiceServices";
-import { getAllUsers } from "@/services/userServices";
-import { Tag } from "antd";
-import { formatCurrencyVND } from "@/utils";
+import type { ITourDeparture } from "@/types/Tour";
+import type { InvoiceResponse } from "@/types/Invoice";
 
-type BookingWithInvoice = BookingResponse & {
-  invoiceId?: number | null;
-  invoiceAmount?: string | null;
-  paymentMethod?: string | null;
-  invoiceStatus?: string | null;
-  userName?: string | null;
+import bookingServices from "@/services/bookingServices";
+import { sessionService } from "@/services/sessionServices";
+import { getAllDepartures, getAllTourDeparture } from "@/services/tourServices";
+import invoiceServices from "@/services/invoiceServices";
+import { formatCurrencyVND } from "@/utils";
+import { Tag, Modal } from "antd";
+import { formatDatetime } from "@/utils";
+import { Bold } from "lucide-react";
+import { Button } from "antd/lib";
+
+type BookingWithFullInfo = BookingResponse & {
+  userName?: string;
+  tourDeparture?: ITourDeparture | null;
+  listOfCustomers?: CustomerResponse[];
+  invoice?: InvoiceResponse | null;
 };
 
 const ManagerBooking: React.FC = () => {
-  const [data, setData] = useState<BookingWithInvoice[]>([]);
+  const [data, setData] = useState<BookingWithFullInfo[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const [detail, setDetail] = useState<BookingWithFullInfo | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  /**
-   * Load dữ liệu Booking và Invoice, sau đó kết hợp chúng lại với nhau
-   */
+  /** Load toàn bộ dữ liệu */
   const loadData = async () => {
     setLoading(true);
     try {
-      /**
-       * Gọi song song 2 API (Booking và Invoice)
-       */
-      const bookingRes = await bookingServices.getAllBooking();
-      const invoiceRes = await invoiceServices.getAll();
-      const userRes = await getAllUsers();
-      
-      if (!(bookingRes.code === 1000) || !(userRes.code === 1000) || !(invoiceRes.code === 1000)) {
-        console.log(bookingRes)
-        console.log(userRes)
-        console.log(invoiceRes)
-        throw new Error("Lấy dữ liệu thất bại."); 
+      const [bookingRes, tourRes, customerRes, invoiceRes, userSession] =
+        await Promise.all([
+          bookingServices.getAll(),
+          getAllTourDeparture(),
+          bookingServices.getAllCustomers(),
+          invoiceServices.getAll(),
+          sessionService.getUser(),
+        ]);
+
+      if (!userSession) throw new Error("Current user not found");
+
+      if (
+        bookingRes.code === 1000 &&
+        tourRes.code === 1000 &&
+        customerRes.code === 1000 &&
+        invoiceRes.code === 1000
+      ) {
+        const bookings: BookingResponse[] = bookingRes.result || [];
+        const departures: ITourDeparture[] = tourRes.result || [];
+        const customers: CustomerResponse[] = customerRes.result || [];
+        const invoices: InvoiceResponse[] = invoiceRes.result || [];
+        const user: UserResponse = userSession;
+
+        const combined: BookingWithFullInfo[] = bookings.map((booking) => {
+          const matchedDeparture = departures.find(
+            (d) => String(d.id) === String(booking.tourDepartureId)
+          );
+
+          const matchedListCustomers = customers.filter(
+            (c) => String(c.booking?.id) === String(booking.id)
+          );
+
+          const matchedInvoice = invoices.find(
+            (inv) => String(inv.bookingId) === String(booking.id)
+          );
+
+          return {
+            ...booking,
+            userName: String(booking.accountId) === String(user.id)
+              ? user.username
+              : "Unknown",
+            tourDeparture: matchedDeparture || null,
+            listOfCustomers: matchedListCustomers,
+            invoice: matchedInvoice || null,
+          };
+        });
+        console.log(combined)
+        setData(combined);
       }
-
-      /**
-       *  Debug: In ra dữ liệu thô từ API
-       */
-      const bookingsData: BookingResponse[] = Array.isArray(bookingRes?.result) ? bookingRes.result : [];
-      const invoicesData: InvoiceResponse[] = Array.isArray(invoiceRes?.result) ? invoiceRes.result : [];
-      const usersData: UserResponse[] = Array.isArray(userRes.result) ? userRes.result : [];
-
-      /*
-      * Xử lý từng booking và tìm invoice tương ứng
-      */
-      const combined: BookingWithInvoice[] = bookingsData.map((booking) => {
-        /*
-        * Tìm invoice khớp với booking hiện tại
-        * So sánh kỹ càng kiểu dữ liệu để tránh lỗi không khớp
-        */
-        const matchingInvoice = invoicesData.find(invoice => {
-          const bookingIdMatch = String(invoice.bookingId) === String(booking.id);
-          return bookingIdMatch;
-        });
-
-        // 🔹 Tìm user tương ứng với booking
-        const matchingUser = usersData.find(user => {
-          const userResult = String(user.id) === String(booking.id);
-          return userResult;
-        });
-
-        return {
-          ...booking,
-          invoiceId: Number(matchingInvoice?.id) ?? null,
-          invoiceAmount: matchingInvoice?.totalBookingTourExpense
-            ? formatCurrencyVND(Number(matchingInvoice.totalBookingTourExpense))
-            : null,
-          paymentMethod: matchingInvoice
-            ? matchingInvoice.paymentMethodId ? "MOMO" : "Tiền mặt"
-            : null,
-          invoiceStatus: matchingInvoice?.status ?? null,
-          userName: matchingUser?.username
-        } satisfies BookingWithInvoice;
-      });
-
-      console.log(combined)
-      setData(combined);
     } catch (err) {
-      console.error('Error loading data:', err);
+      console.error("Error loading data:", err);
       setData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * Cột — đầu là booking, sau là invoice
-   */
-  const columns: ProColumns<BookingWithInvoice>[] = [
+  /** Cột bảng */
+  const columns: ProColumns<BookingWithFullInfo>[] = [
     { title: "Mã đặt chỗ", dataIndex: "id", width: 90 },
-    { title: "Tên người dùng", dataIndex: "userName" },
-    { title: "Tour khởi hành", dataIndex: "tourDepartureId" },
+    { title: "Tài khoản", dataIndex: "userName", width: 120 },
+    { title: "Tour khởi hành", dataIndex: "tourDepartureId", width: 120 },
     {
       title: "Ngày đặt",
       dataIndex: "createdAt",
       valueType: "dateTime",
     },
     {
-      title: "Ngày khởi hành", dataIndex: "createdAt",
-      valueType: "dateTime",
-    },
-
-    {
-      title: "Trạng thái đặt chỗ",
+      title: "Trạng thái",
       dataIndex: "status",
-      render: (_, record) =>
-        record.status === "UNPAID" ? (
-          <Tag color="red">Đã hủy</Tag>
+      render: (_, row) =>
+        row.status === "CONFIRMED" ? (
+          <Tag color="green">Xác nhận</Tag>
         ) : (
-          <Tag color="green">Xác nhận đặt tour</Tag>
+          <Tag color="red">Đã hủy</Tag>
         ),
+    },
+    {
+      title: "Hành động",
+      valueType: "option",
+      render: (_, record) => [
+        <Button
+          type="link"
+          key="view"
+          onClick={() => {
+            setDetail(record);
+            setModalOpen(true);
+          }}
+        >
+          Xem chi tiết
+        </Button>,
+      ],
     },
   ];
 
   return (
-    <ProTable<BookingWithInvoice>
-      headerTitle="Quản lý đặt chỗ & hóa đơn"
-      columns={columns}
-      loading={loading}
-      dataSource={data}
-      rowKey="id"
-      search={false}
-      pagination={{ pageSize: 10 }}
-      toolBarRender={false}
-    />
+    <>
+      <ProTable<BookingWithFullInfo>
+        headerTitle="Quản lý đặt tour"
+        columns={columns}
+        loading={loading}
+        dataSource={data}
+        rowKey="id"
+        search={false}
+        pagination={{ pageSize: 10 }}
+      />
+
+      {/* Modal chi tiết Booking */}
+      <Modal
+        title={`Chi tiết đặt tour #${detail?.id ?? ""}`}
+        open={modalOpen}
+        onCancel={() => setModalOpen(false)}
+        footer={null}
+      >
+        {detail ? (
+          <div>
+            <p><b>Mã booking:</b> {detail.id}</p>
+            <p><b>Tài khoản:</b> {detail.userName}</p>
+            <p><b>Ngày đặt:</b> {detail.createdAt}</p>
+
+            <p><b>Tour khởi hành:</b></p>
+            {detail.tourDeparture ? (
+              <ul>
+                <li><b>Mã tour:</b> {detail.tourDeparture.id}</li>
+                <li><b>Ngày đi:</b> {detail.tourDeparture.departureDate}</li>
+                <li><b>Ngày về:</b> {detail.tourDeparture.returnDate}</li>
+              </ul>
+            ) : (
+              <i>Không có dữ liệu tour</i>
+            )}
+
+            <p><b>Danh sách khách:</b></p>
+            {detail.listOfCustomers?.length ? (
+              <ul>
+                {detail.listOfCustomers.map((c) => (
+                  <li key={c.id}>
+                    {c.id} - {c.fullName} - {c.bookingType} - {c.status} - {c.dateOfBirth} - {c.address}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <i>Không có khách</i>
+            )}
+
+            <p><b>Hóa đơn:</b></p>
+            {detail.invoice ? (
+              <>
+                <p>Mã hóa đơn: {detail.invoice.id}</p>
+                <p>Số tiền: {formatCurrencyVND(Number(detail.invoice.totalBookingTourExpense))}</p>
+                <p>Ngày thanh toán: {detail.invoice.dayOfPay}</p>
+                <p>Trạng thái hóa đơn: {detail.invoice.status === "PAID" ? "Đã thanh toán" : "Chưa thanh toán"}</p>
+              </>
+            ) : (
+              <i >Chưa tạo hóa đơn</i>
+            )}
+
+            <p><b>Trạng thái đăng ký:</b> {detail.status === "CONFIRMED" ? "Đã xác nhận đặt tour" : "Chưa đăng ký thành công"}</p>
+          </div>
+        ) : (
+          <p>Không có dữ liệu</p>
+        )}
+      </Modal>
+    </>
   );
 };
 

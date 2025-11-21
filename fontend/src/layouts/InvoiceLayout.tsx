@@ -1,99 +1,128 @@
 import { Row, Col, Card, Spin, Alert, Modal, message } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
 
 import InvoiceForm from "@/components/Invoice/InvoiceForm";
 import bookingServices from "@/services/bookingServices";
 import { getTourDepartureById } from "@/services/tourServices";
 import { sessionService } from "@/services/sessionServices";
-
-import type { BookingRequest, BookingResponse, CustomerResponse } from "@/types/Booking";
+import paymentServices from "@/services/paymentServices";
+import type { BookingResponse, CustomerResponse } from "@/types/Booking";
 import type { ITourDeparture } from "@/types/Tour";
-import type { InvoiceRequest, InvoiceResponse } from "@/types/Invoice";
-import type { UserResponse, AxiosResponse } from "@/types/comment";
-import invoiceServices from "@/services/invoiceServices";
+import type { PaymentRequest } from "@/types/Payment"
 
 export default function InvoiceLayout() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<UserResponse>();
-  const [bookingData, setBookingData] = useState<BookingResponse>();
-  const [tourDeparture, setTourDeparture] = useState<ITourDeparture>();
-  const [customers, setCustomers] = useState<CustomerResponse[]>([]);
 
+  const [currentUser, setCurrentUser] = useState<any>();
+  const [bookingResult, setBookingResult] = useState<BookingResponse>();
+  const [tourDepartureResult, setTourDepartureResult] = useState<ITourDeparture>();
+  const [customerResult, setCustomerResult] = useState<CustomerResponse[]>([]);
+
+  /** ---------------------------------------------------------
+   * 🔹 Load toàn bộ dữ liệu: Booking, Customer, TourDeparture
+   ----------------------------------------------------------*/
+  const loadData = useCallback(
+    async (bookingId: number) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const user = sessionService.getUser();
+        if (!user) {
+          throw new Error("Không thể xác định người dùng (session error).");
+        } else {
+          setCurrentUser(user);
+
+          const [bookingRes, customerRes] = await Promise.all([
+            bookingServices.getById(bookingId),
+            bookingServices.getListOfCustomersByBookingId(bookingId),
+          ]);
+
+          if (bookingRes.code === 1000 && customerRes.code === 1000) {
+            const booking = bookingRes?.result as BookingResponse;
+            const customerList = customerRes?.result as CustomerResponse[];
+            const tourRes = await getTourDepartureById(Number(booking.tourDepartureId));
+
+            setBookingResult(booking);
+            setCustomerResult(customerList);
+
+            if (tourRes.code === 1000)
+              setTourDepartureResult(tourRes?.result);
+            else {
+              throw new Error("Lỗi khi fetch dữ liệu tour")
+            }
+          } else {
+            throw new Error("Lỗi khi fetch dữ liệu đặt tour và khách hàng")
+          }
+        }
+      } catch (err: any) {
+        setError(err?.message);
+        console.log(err);
+        message.error(err?.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  /** Call loadData khi id thay đổi */
   useEffect(() => {
-    if (id) loadData(Number(id));
-  }, [id]);
-
-  const loadData = async (bookingId: number) => {
-    setLoading(true);
-    try {
-      const user = sessionService.getUser();
-      if (!user) throw new Error("Không thể xác định người dùng (session error).");
-
-      const [bookingRes, customerRes] = await Promise.all([
-        bookingServices.getBookingById(bookingId),
-        bookingServices.getListOfCustomersByBookingId(bookingId),
-      ]);
-
-      const booking = bookingRes?.result as BookingResponse;
-      const customerList = customerRes?.result as CustomerResponse[];
-
-      setBookingData(booking);
-      setCustomers(customerList);
-      setCurrentUser(user);
-
-      const tourRes = await getTourDepartureById(Number(booking.tourDepartureId));
-      setTourDeparture(tourRes?.result);
-    } catch (err: any) {
-      setError(err?.message || "Không thể tải dữ liệu hóa đơn.");
-      message.error(err?.message);
-    } finally {
-      setLoading(false);
+    if (id) {
+      loadData(Number(id));
     }
-  };
+  }, [id, loadData]);
 
-  /** 🔹 Callback khi nhấn “Thanh toán” */
-  const handleCreateInvoice = async (paymentMethod: string) => {
+  /** ---------------------------------------------------------
+   * 🔹 Xử lý tạo hóa đơn
+   ----------------------------------------------------------*/
+  const handleCreatePayment = async (paymentMethod: string, totalAmount: number) => {
     try {
-      if (!bookingData || !tourDeparture) throw new Error("Thiếu dữ liệu để tạo hóa đơn.");
+      const totalAmountStr = String(totalAmount * 100000)
+      const paymentRequest: PaymentRequest = { amount: totalAmountStr }
+      const paymentResponse = await paymentServices.create(paymentRequest);
 
-      const invoiceRequest = {
-        bookingRequest: {
-          bookingId: String(bookingData.id),
-          userId: String(sessionService.getUser()?.id),
-          tourDepartureId: String(tourDeparture.id),
-          listOfCustomers: customers.map((c) => ({
-            fullName: c.fullName,
-            birthdate: c.birthdate,
-            address: c.address,
-            gender: c.gender,
-            status: c.status,
-            bookingType: c.bookingType,
-          })),
-        },
-      };
-
-      const invoiceResult = await invoiceServices.create(invoiceRequest);
-
-      if (invoiceResult.code === 9999) {
-        throw new Error("Tạo hóa đơn thất bại.");
+      if (paymentResponse) {
+        window.location.href = String(paymentResponse);
+      } else {
+        throw new Error("Không thể tạo url điều hướng đến vnpay");
       }
 
-      Modal.success({
-        title: "Tạo hóa đơn thành công",
-        content: "Hóa đơn đã được khởi tạo. Đang chuyển đến trang thanh toán...",
-        onOk: () => navigate(invoiceResult.result.paymentUrl || "/"),
-      });
-    } catch (error: any) {
-      console.error(error);
-      message.error(error.message || "Lỗi khi tạo hóa đơn.");
-    }
-  };
+      if (bookingResult && tourDepartureResult) {
+        const invoiceRequest = {
+          bookingRequest: {
+            bookingId: String(bookingResult.id),
+            userId: String(currentUser?.id),
+            tourDepartureId: String(tourDepartureResult.id),
+            listOfCustomers: customerResult.map((c) => ({
+              fullName: c.fullName,
+              birthdate: c.dateOfBirth,
+              address: c.address,
+              gender: c.gender,
+              status: c.status,
+              bookingType: c.bookingType,
+            })),
+          },
+        };
 
+        sessionStorage.setItem("invoice_temp", JSON.stringify({
+          invoiceRequest
+        }));
+      } else {
+        throw new Error("Thiếu dữ liệu để tạo hóa đơn.");
+      }
+    } catch (err: any) {
+      setError(err?.message);
+      message.error(err?.message);
+    }
+  }
+
+  /** ---------------------------------------------------------
+   * Render
+   ----------------------------------------------------------*/
   return (
     <div style={{ padding: "24px 10rem", background: "#fff", minHeight: "100vh" }}>
       <Row gutter={[24, 24]} justify="center">
@@ -101,16 +130,17 @@ export default function InvoiceLayout() {
           <Card bordered={false} style={{ borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
             {loading && <Spin />}
             {error && <Alert type="error" message={error} showIcon />}
-            {!loading && !error && bookingData && (
+
+            {!loading && !error && bookingResult && (
               <InvoiceForm
                 account={{
                   fullName: currentUser?.username || "Khách hàng",
                   email: currentUser?.email || "",
                   phone: currentUser?.phone || "",
                 }}
-                customers={customers}
-                tourDeparture={tourDeparture}
-                onCreate={handleCreateInvoice}
+                // customers={customerResult}
+                tourDeparture={tourDepartureResult}
+                onCreate={handleCreatePayment}
               />
             )}
           </Card>

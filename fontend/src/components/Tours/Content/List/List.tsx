@@ -115,7 +115,7 @@ const List = ({ tours }: { tours: ITour[] | null }) => {
           ))
         ) : (
           <div className="flex justify-center items-center h-full">
-            <Empty description="Không có chuyến đi phù hợp" />
+            <Empty description="Không có x`i phù hợp" />
           </div>
         )}
       </div>

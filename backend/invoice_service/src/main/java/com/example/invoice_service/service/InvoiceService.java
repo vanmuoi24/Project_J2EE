@@ -3,9 +3,7 @@ import com.example.invoice_service.client.BookingClient;
 import com.example.invoice_service.client.PaymentClient;
 import com.example.invoice_service.client.TourDepartureClient;
 import com.example.invoice_service.client.UserClient;
-import com.example.invoice_service.dto.request.CustomerRequest;
-import com.example.invoice_service.dto.request.InvoiceRequest;
-import com.example.invoice_service.dto.request.TourDepartureRequest;
+import com.example.invoice_service.dto.request.*;
 import com.example.invoice_service.dto.response.*;
 import com.example.invoice_service.entity.Invoice;
 import com.example.invoice_service.entity.InvoiceStatus;
@@ -13,7 +11,6 @@ import com.example.invoice_service.exception.AppException;
 import com.example.invoice_service.exception.ErrorCode;
 import com.example.invoice_service.mapper.InvoiceMapper;
 import com.example.invoice_service.repository.InvoiceRepository;
-import com.example.invoice_service.dto.request.MoMoRequest;
 import com.example.invoice_service.dto.response.MoMoResponse;
 
 import feign.FeignException;
@@ -25,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -39,28 +37,37 @@ public class InvoiceService {
     private final PaymentClient paymentClient;
 
     /**
-     * -------------- GET METHODS -----------------
+     *
+     * @return
      */
     public List<InvoiceResponse> getAllInvoices(){
         List<Invoice> invoices = invoiceRepository.findAll();
         return invoiceMapper.toInvoiceResponseList(invoices);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     public InvoiceResponse getInvoiceById(Long id){
         Invoice invoice = invoiceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
         return invoiceMapper.toInvoiceResponse(invoice);
     }
 
+    /**
+     *
+     * @param bookingId
+     * @return
+     */
     public InvoiceResponse getInvoiceByBookingId(Long bookingId){
         Invoice invoice = invoiceRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException());
         return invoiceMapper.toInvoiceResponse(invoice);
     }
 
-    /**
-     * -------------- POST METHODS -----------------
-     */
+
     /**
      * 🔹 Hàm tính toán tổng chi phí tour dựa trên số lượng khách và bảng giá
      */
@@ -80,20 +87,22 @@ public class InvoiceService {
         long childrenPrice = new BigDecimal(tourDeparture.getTourPrice().getChildPrice()).longValue();
         long toddlerPrice = new BigDecimal(tourDeparture.getTourPrice().getToddlerPrice()).longValue();
         long infantPrice = new BigDecimal(tourDeparture.getTourPrice().getInfantPrice()).longValue();
+        long supplementFee = new BigDecimal(tourDeparture.getTourPrice().getSingleSupplementPrice()).longValue();
 
         long total = countOfAdult * adultPrice
                 + countOfChildren * childrenPrice
                 + countOfToddler * toddlerPrice
-                + countOfInfant * infantPrice;
-
+                + countOfInfant * infantPrice
+                + supplementFee;
         System.err.println(total);
         return total;
     }
 
-    private long longVal(Object val) {
-        return new BigDecimal(String.valueOf(val)).longValue();
-    }
-
+    /**
+     *
+     * @param tour
+     * @param request
+     */
     private void updateAvailableSeats(TourDepartureResponse tour, InvoiceRequest request) {
         int bookedSeats = request.getBookingRequest().getListOfCustomers().size();
         int available = Integer.parseInt(tour.getAvailableSeats());
@@ -109,6 +118,13 @@ public class InvoiceService {
         tourDepartureClient.updateTourDepartureAvalableSeats(Long.parseLong(tour.getId()), updateReq);
     }
 
+    /**
+     *
+     * @param invoice
+     * @param total
+     * @param message
+     * @return
+     */
     private InvoiceResponse buildInvoiceResponse(
             Invoice invoice, long total, String message) {
             String orderId = UUID.randomUUID().toString();
@@ -131,7 +147,9 @@ public class InvoiceService {
     }
 
     /**
-     * 🔹 Tạo hóa đơn (invoice)
+     *
+     * @param invoiceRequest
+     * @return
      */
     public InvoiceResponse createInvoice(InvoiceRequest invoiceRequest) {
         try {
@@ -144,10 +162,6 @@ public class InvoiceService {
             if (getUserResponse == null) throw new AppException(ErrorCode.USER_NOT_EXISTED);
             if (getTourDepatureResponse == null) throw new AppException(ErrorCode.TOUR_DEPARTURE_NOT_EXISTED);
             if (getBookingResponse == null) throw new AppException(ErrorCode.BOOKING_NOT_EXISTED);
-
-//            System.err.println(getUserResponse);
-//            System.err.println(getTourDepatureResponse);
-//            System.err.println(getBookingResponse);
 
             // --- Tính tổng tiền ---
             long totalExpense = calculateTotalTourExpense(invoiceRequest, getTourDepatureResponse.getResult());
@@ -206,13 +220,8 @@ public class InvoiceService {
      * 🔹 Thực hiện thanh toán và tạo hóa đơn
      */
     public InvoiceResponse payAndCreateInvoice(InvoiceRequest invoiceRequest) {
-        log.info("🔸 Bắt đầu thanh toán MoMo cho booking ID {}", invoiceRequest.getBookingRequest().getBookingId());
         InvoiceResponse invoiceResponse = createInvoice(invoiceRequest);
-
-        log.info("✅ Invoice created successfully for booking ID {}", invoiceRequest.getBookingRequest().getBookingId());
         return invoiceResponse;
     }
-
-
 
 }

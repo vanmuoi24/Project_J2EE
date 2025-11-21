@@ -66,10 +66,6 @@ export interface ITourResponse {
 }
 
 export interface ITourDeparture {
-<<<<<<< HEAD
-
-=======
->>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
   id: string;
   tourCode: string;
   departureDate: string;
@@ -83,8 +79,6 @@ export interface ITourDepartureResponse {
   code: number;
   message?: string;
   result: ITourDeparture;
-<<<<<<< HEAD
-=======
 }
 
 export interface ITourDeparture {
@@ -100,7 +94,6 @@ export interface ITourDeparture {
 export interface IDestination {
   city: string;
   type: number;
->>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
 }
 
 export interface ITourDeparture {
@@ -112,10 +105,6 @@ export interface ITourDeparture {
   tourId: string;
   tourPrice: ITourPrice;
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
 type ToursResponse = AxiosResponse<ITour[]>;
 
 type TourResponse = AxiosResponse<ITour>;

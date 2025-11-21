@@ -1,31 +1,20 @@
-import {
-  Card,
-  Typography,
-  Table,
-  Select,
-  Form,
-  Button,
-  message,
-  Modal,
-  Descriptions,
-  Divider,
-  Alert,
-} from "antd";
+import { Card, Typography, Table, Select, Form, Button, message, Modal, Descriptions, Divider, Alert } from "antd";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatCurrencyVND, formatDatetime } from "@/utils";
 import type { CustomerResponse } from "@/types/Booking";
 import type { ITourDeparture } from "@/types/Tour";
+import type { InvoiceFormProps } from "@/types/Invoice";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-interface InvoiceFormProps {
-  account: { fullName: string; email: string; phone: string };
-  customers?: CustomerResponse[];
-  tourDeparture?: ITourDeparture;
-  onCreate: (paymentMethod: string) => Promise<void>;
-}
+// interface InvoiceFormProps {
+//   account: { fullName: string; email: string; phone: string };
+//   customers?: CustomerResponse[];
+//   tourDeparture?: ITourDeparture;
+//   onCreate: (paymentMethod: string, totalAmount: number) => Promise<void>;
+// }
 
 export default function InvoiceForm({
   account,
@@ -57,6 +46,27 @@ export default function InvoiceForm({
     [baseAmount, tourDeparture]
   );
 
+
+  /** 🔹 Submit handler */
+  const handleSubmit = async (values: { paymentMethod: string }) => {
+    Modal.confirm({
+      title: "Xác nhận thanh toán",
+      content: (
+        <>
+          <p>Bạn có chắc chắn muốn thanh toán hóa đơn này?</p>
+          <p>
+            <b>Tổng thanh toán:</b> {formatCurrencyVND(totalAmount)}
+          </p>
+        </>
+      ),
+      okText: "Thanh toán",
+      cancelText: "Hủy",
+      async onOk() {
+        await onCreate(values.paymentMethod, totalAmount);
+      },
+    });
+  };
+
   const columns = [
     { title: "STT", render: (_: any, __: any, i: number) => i + 1 },
     { title: "Tên khách hàng", dataIndex: "fullName" },
@@ -83,33 +93,6 @@ export default function InvoiceForm({
       },
     },
   ];
-
-  /** 🔹 Submit handler */
-  const handleSubmit = async (values: { paymentMethod: string }) => {
-    Modal.confirm({
-      title: "Xác nhận thanh toán",
-      content: (
-        <>
-          <p>Bạn có chắc chắn muốn thanh toán hóa đơn này?</p>
-          <p>
-            <b>Tổng thanh toán:</b> {formatCurrencyVND(totalAmount)}
-          </p>
-        </>
-      ),
-      okText: "Thanh toán",
-      cancelText: "Hủy",
-      async onOk() {
-        setLoading(true);
-        try {
-          await onCreate(values.paymentMethod);
-        } catch (err: any) {
-          message.error(err?.message || "Thanh toán thất bại");
-        } finally {
-          setLoading(false);
-        }
-      },
-    });
-  };
 
   return (
     <Card loading={loading}>
@@ -173,9 +156,8 @@ export default function InvoiceForm({
         >
           <Select placeholder="Chọn phương thức thanh toán">
             <Option value="cash">Tiền mặt</Option>
-            <Option value="credit_card">Thẻ tín dụng / ghi nợ</Option>
-            <Option value="momo">Ví MoMo</Option>
-            <Option value="bank_transfer">Chuyển khoản ngân hàng</Option>
+            {/* <Option value="momo">Ví MoMo</Option> */}
+            <Option value="vnpay">VN Pay</Option>
           </Select>
         </Form.Item>
 

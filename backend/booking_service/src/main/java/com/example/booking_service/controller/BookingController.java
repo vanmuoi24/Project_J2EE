@@ -15,10 +15,15 @@ import java.util.List;
 @RequestMapping("/book")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class BookingController {
+
     private final BookingService bookingService;
 
+    /*****
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public ApiResponse<BookingResponse> getBookingsById(@PathVariable Long id) {
         return ApiResponse.<BookingResponse>builder()
@@ -27,6 +32,10 @@ public class BookingController {
                 .build();
     }
 
+    /*****
+     *
+     * @return
+     */
     @GetMapping("/all")
     public ApiResponse<List<BookingResponse>> getAllBookings() {
         return ApiResponse.<List<BookingResponse>>builder()
@@ -35,6 +44,11 @@ public class BookingController {
                 .build();
     }
 
+    /*****
+     *
+     * @param request
+     * @return
+     */
     @PostMapping("/create")
     public ApiResponse<BookingResponse> createBooking(
             @RequestBody BookingRequest request) {
@@ -44,11 +58,24 @@ public class BookingController {
                 .build();
     }
 
-    @PutMapping("/{id}/status")
+    /*****
+     *
+     * @param id
+     * @return
+     */
+    @PutMapping("/status/{id}")
     public ApiResponse<BookingResponse> updateBookingStatus(@PathVariable Long id) {
         return ApiResponse.<BookingResponse>builder()
                 .result(bookingService.updateBookingStatus(id))
                 .message("Updated booking status successfully")
+                .build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<BookingResponse> deleteBooking(@PathVariable Long id) {
+        return ApiResponse.<BookingResponse>builder()
+                .result(bookingService.deleteBooking(id))
+                .message("Delete booking successfully")
                 .build();
     }
 }

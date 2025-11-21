@@ -4,6 +4,13 @@ export type InvoiceItem = {
   price: number;
 };
 
+interface InvoiceFormProps {
+  account: { fullName: string; email: string; phone: string };
+  customers?: CustomerResponse[];
+  tourDeparture?: ITourDeparture;
+  onCreate: (paymentMethod: string, totalAmount: number) => Promise<void>;
+}
+
 export type InvoiceRequest = {
   bookingId: string;
   tourDepartureId: string;
@@ -16,13 +23,14 @@ export type CustomerResponse = {
   birthdate?: string;
   gender?: string;
   address?: string;
+  bookingType?: string;
 };
 
 export type InvoiceResponse = {
   id: string;
   userId?: string;
   bookingId?: string;
-  dateOfTransaction?: string;
+  dayOfPay?: string;
   paymentMethodId?: string;
   status?: string;
   message?: string;

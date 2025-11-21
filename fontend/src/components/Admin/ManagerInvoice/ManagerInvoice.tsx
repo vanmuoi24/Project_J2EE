@@ -3,25 +3,26 @@ import { ProTable } from "@ant-design/pro-components";
 import type { ProColumns } from "@ant-design/pro-components";
 import { Tag, Modal, Descriptions } from "antd";
 
-import type { BookingResponse } from "@/types/Booking";
-import type { InvoiceResponse } from "@/types/Invoice";
-import type { UserResponse } from "@/types/comment";
 import bookingServices from "@/services/bookingServices";
 import invoiceServices from "@/services/invoiceServices";
-import { getAllUsers } from "@/services/userServices";
-import { getTourDepartureById } from "@/services/tourServices"; // giả sử có API này
+import { sessionService } from "@/services/sessionServices";
+import { getAllTourDeparture,  } from "@/services/tourServices";
 import { formatCurrencyVND } from "@/utils";
+import type { BookingResponse, CustomerResponse } from "@/types/Booking";
+import type { InvoiceResponse } from "@/types/Invoice";
+import type { ITourDeparture } from "@/types/Tour";
+import type { UserResponse } from "@/types/comment"
+import { formatDatetime } from "@/utils";
+
 
 type BookingWithInvoice = BookingResponse & {
-  invoiceId?: number | null;
-  invoiceAmount?: string | null;
-  paymentMethod?: string | null;
+  userName?: string;
+  tourDeparture?: ITourDeparture | null;
+  listOfCustomers?: CustomerResponse[];
+  invoice?: InvoiceResponse | null;
+  invoiceAmount?: number;
   invoiceStatus?: string | null;
-  userName?: string | null;
-  tour?: {
-    name: string;
-    startDate: string;
-  };
+  paymentMethod?: string | null;
 };
 
 const ManagerInvoice: React.FC = () => {
@@ -44,58 +45,63 @@ const ManagerInvoice: React.FC = () => {
     loadData();
   }, []);
 
+  // ============================
+  // Load All Data
+  // ============================
   const loadData = async () => {
     setLoading(true);
     try {
-      const bookingRes = await bookingServices.getAllBooking();
-      const invoiceRes = await invoiceServices.getAll();
-      const userRes = await getAllUsers();
+      const [bookingRes, invoiceRes, departureRes, userSession] = await Promise.all([
+        bookingServices.getAll(),
+        invoiceServices.getAll(),
+        getAllTourDeparture(),
+        sessionService.getUser(),
+      ]);
 
-      if (!(bookingRes.code === 1000) || !(userRes.code === 1000) || !(invoiceRes.code === 1000)) {
-        throw new Error("Lấy dữ liệu thất bại.");
+      if (!userSession) throw new Error("Current user not found");
+
+      if (
+        bookingRes.code !== 1000 ||
+        invoiceRes.code !== 1000 ||
+        departureRes.code !== 1000
+      ) {
+        throw new Error("Lấy dữ liệu thất bại");
       }
 
-      const bookingsData: BookingResponse[] = Array.isArray(bookingRes.result) ? bookingRes.result : [];
-      const invoicesData: InvoiceResponse[] = Array.isArray(invoiceRes.result) ? invoiceRes.result : [];
-      const usersData: UserResponse[] = Array.isArray(userRes.result) ? userRes.result : [];
+      const bookings: BookingResponse[] = bookingRes.result ?? [];
+      const invoices: InvoiceResponse[] = invoiceRes.result ?? [];
+      const departures: ITourDeparture[] = departureRes.result ?? [];
+      const user: UserResponse = userSession;
 
-      const combined: BookingWithInvoice[] = await Promise.all(
-        bookingsData.map(async (booking) => {
-          const matchingInvoice = invoicesData.find(invoice => String(invoice.bookingId) === String(booking.id));
-          const matchingUser = usersData.find(user => String(user.id) === String(booking.id));
+      // ============================
+      // MAP BOOKING -> FULL RECORD
+      // ============================
+      const mapped: BookingWithInvoice[] = bookings.map((bk) => {
+        const matchedInvoice = invoices.find(
+          (inv) =>
+            String(inv.bookingId) === String(bk.id) 
+        );
 
-          // Lấy thông tin tour nếu cần
-          let tourInfo = undefined;
-          if (booking.tourDepartureId) {
-            try {
-              const tourRes = await getTourDepartureById(Number(booking.tourDepartureId));
-              if (tourRes.code === 1000 && tourRes.result) {
-                tourInfo = {
-                  name: tourRes.result.tourCode ?? "-",
-                  startDate: tourRes.result.departureDate ?? "-",
-                };
-              }
-            } catch (err) {
-              console.error("Lỗi lấy tour:", err);
-            }
-          }
+        const matchedDeparture = departures.find(
+          (dep) => String(dep.id) === String(bk.tourDepartureId)
+        );
 
-          return {
-            ...booking,
-            invoiceId: matchingInvoice ? Number(matchingInvoice.id) : null,
-            invoiceAmount: matchingInvoice?.totalBookingTourExpense
-              ? formatCurrencyVND(Number(matchingInvoice.totalBookingTourExpense))
-              : null,
-            paymentMethod: matchingInvoice
-              ? matchingInvoice.paymentMethodId ? "MOMO" : "Tiền mặt"
-              : null,
-            invoiceStatus: matchingInvoice?.status ?? null,
-            userName: matchingUser?.username ?? null,
-            tour: tourInfo
-          } satisfies BookingWithInvoice;
-        })
-      );
+        return {
+          ...bk,
+          userName: String(bk.accountId) === String(user.id) ? user.username : "Unknown",
+          invoice: matchedInvoice || null,
+          invoiceAmount: Number(matchedInvoice?.totalBookingTourExpense) ?? null,
+          invoiceStatus: matchedInvoice?.status ?? null,
+          paymentMethod: matchedInvoice?.paymentMethodId ?? null,
+          tourDeparture: matchedDeparture || null,
+          listOfCustomers: bk.listOfCustomers ?? [],
+        };
+      });
 
+      // ============================
+      // FILTER CHỈ LẤY invoiceStatus === "PAID"
+      // ============================
+      const combined = mapped.filter((item) => item.invoiceStatus === "PAID");
       setData(combined);
     } catch (err) {
       console.error("Error loading data:", err);
@@ -105,8 +111,11 @@ const ManagerInvoice: React.FC = () => {
     }
   };
 
+  // ============================
+  // Table Columns
+  // ============================
   const columns: ProColumns<BookingWithInvoice>[] = [
-    { title: "Mã hóa đơn", dataIndex: "invoiceId", width: 100 },
+    { title: "Mã hóa đơn", dataIndex: "invoiceId", width: 100, render: (_, r) => r.invoice?.id ?? "-" },
     { title: "Tên người dùng", dataIndex: "userName" },
     { title: "Mã đặt chỗ", dataIndex: "id", width: 90 },
     {
@@ -117,7 +126,7 @@ const ManagerInvoice: React.FC = () => {
     {
       title: "Tổng tiền",
       dataIndex: "invoiceAmount",
-      render: (val) => val ?? "-",
+      render: (val) => val ? `${val.toLocaleString()} đ` : "-",
     },
     {
       title: "Trạng thái thanh toán",
@@ -159,21 +168,14 @@ const ManagerInvoice: React.FC = () => {
         {selectedBooking && (
           <Descriptions column={1} bordered>
             <Descriptions.Item label="Mã đặt chỗ">{selectedBooking.id}</Descriptions.Item>
-            <Descriptions.Item label="Tên người dùng">{selectedBooking.userName ?? "-"}</Descriptions.Item>
-            <Descriptions.Item label="Ngày đặt">{selectedBooking.createdAt ?? "-"}</Descriptions.Item>
-            <Descriptions.Item label="Ngày thanh toán">{selectedBooking.invoiceStatus === "PAID" ? selectedBooking.createdAt : "-"}</Descriptions.Item>
-            <Descriptions.Item label="Mã tour">{selectedBooking.tourDepartureId ?? "-"}</Descriptions.Item>
-            <Descriptions.Item label="Tên tour">{selectedBooking.tour?.name ?? "-"}</Descriptions.Item>
-            <Descriptions.Item label="Ngày khởi hành">{selectedBooking.tour?.startDate ?? "-"}</Descriptions.Item>
+            <Descriptions.Item label="Tên người dùng">{selectedBooking.userName}</Descriptions.Item>
+            <Descriptions.Item label="Ngày đặt">{selectedBooking.createdAt}</Descriptions.Item>
+            <Descriptions.Item label="Mã tour">{selectedBooking.tourDepartureId}</Descriptions.Item>
+            <Descriptions.Item label="Tên tour">{selectedBooking.tourDeparture?.id ?? "-"}</Descriptions.Item>
+            <Descriptions.Item label="Ngày khởi hành">{selectedBooking.tourDeparture?.departureDate ?? "-"}</Descriptions.Item>
             <Descriptions.Item label="Số lượng khách">{selectedBooking.listOfCustomers?.length ?? 0}</Descriptions.Item>
-            <Descriptions.Item label="Danh sách khách hàng">
-              {selectedBooking.listOfCustomers?.length
-                ? selectedBooking.listOfCustomers.map(c => c.fullName).join(", ")
-                : "-"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Tổng tiền">{selectedBooking.invoiceAmount ?? "-"}</Descriptions.Item>
-            <Descriptions.Item label="Phương thức thanh toán">{selectedBooking.paymentMethod ?? "-"}</Descriptions.Item>
-            <Descriptions.Item label="Trạng thái thanh toán">{selectedBooking.invoiceStatus ?? "-"}</Descriptions.Item>
+            <Descriptions.Item label="Tổng tiền">{formatCurrencyVND(Number(selectedBooking.invoiceAmount))}</Descriptions.Item>
+            <Descriptions.Item label="Phương thức thanh toán">{selectedBooking.paymentMethod === "1" ? "VNPAY" : "Tiền mặt"}</Descriptions.Item>
           </Descriptions>
         )}
       </Modal>

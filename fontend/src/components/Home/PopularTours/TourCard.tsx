@@ -23,12 +23,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour, onBooking }) => {
 
   const nightDuration = tour.duration > 0 ? tour.duration - 1 : 0;
 
-<<<<<<< HEAD
-  const displayDate = dayjs().format('DD/MM/YYYY'); // <-- Cần thay thế bằng dữ liệu động
-
-=======
   console.log(tour);
->>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
   return (
     <div className="!py-2 !px-[8px]">
       <div className="shadow-xl rounded-2xl overflow-hidden bg-white">
@@ -48,23 +43,6 @@ const TourCard: React.FC<TourCardProps> = ({ tour, onBooking }) => {
             <NumberOutlined /> <b>ID:</b> {tour.id}
           </p>
           <p className="!px-0 !py-[4px] truncate">
-<<<<<<< HEAD
-            <EnvironmentOutlined /> <b>Departs from:</b> {tour.departureCity.city}
-          </p>
-          <p className="!px-0 !py-[4px] truncate">
-            <CalendarOutlined /> <b>Departure dates:</b> {displayDate}
-          </p>
-          <p className="!px-0 !py-[4px] truncate">
-            <FieldTimeOutlined /> <b>Duration:</b> {tour.duration} ngày {nightDuration} đêm
-          </p>
-
-          <div className="!mt-[12px] flex justify-between items-center">
-            <span className="text-[18px] font-bold text-[#e63946]">
-              {formatCurrencyVND(tour.basePrice)}
-            </span>
-            <Button type="primary" onClick={() => onBooking(tour.id)}>
-              Booking
-=======
             <EnvironmentOutlined /> <b>Khởi hành từ:</b> {tour.departureCity.city}
           </p>
           <p className="!px-0 !py-[4px] truncate">
@@ -91,7 +69,6 @@ const TourCard: React.FC<TourCardProps> = ({ tour, onBooking }) => {
               onClick={() => onBooking(tour.id)}
             >
               Đặt ngay
->>>>>>> fb6f375982862f5228192db8537ae277ed7c4604
             </Button>
           </div>
         </div>
@@ -100,8 +77,4 @@ const TourCard: React.FC<TourCardProps> = ({ tour, onBooking }) => {
   );
 };
 
-<<<<<<< HEAD
 export default memo(TourCard);
-=======
-export default memo(TourCard);
->>>>>>> fb6f375982862f5228192db8537ae277ed7c4604

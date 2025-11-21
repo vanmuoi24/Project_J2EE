@@ -67,7 +67,7 @@ const Info = () => {
           <Input disabled />
         </Form.Item>
 
-        <Form.Item label="Số điện thoại" name="phone">
+        <Form.Item label="Số điện thoại" name="phone" >
           <Input />
         </Form.Item>
 
