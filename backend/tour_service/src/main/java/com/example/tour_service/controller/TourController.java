@@ -33,6 +33,15 @@ public class TourController {
                 .build();
     }
 
+    @GetMapping("/random-3")
+    public ApiResponse<List<TourResponse>> getRandom3Tours() {
+        return ApiResponse.<List<TourResponse>>builder()
+                .result(tourService.getRandom3Tours())
+                .message("Fetched 3 random tours successfully")
+                .build();
+    }
+
+
     @PostMapping()
         public ApiResponse<TourResponse> createTour(@ModelAttribute TourRequest request) {
         return ApiResponse.<TourResponse>builder()

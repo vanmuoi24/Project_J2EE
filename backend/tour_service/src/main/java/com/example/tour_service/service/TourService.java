@@ -1,5 +1,6 @@
 package com.example.tour_service.service;
 
+import com.example.tour_service.dto.request.TourPriceBatchRequest;
 import com.example.tour_service.dto.request.UpdateTourRequest;
 import com.example.tour_service.dto.response.*;
 import com.example.tour_service.repository.httpClient.PricingClient;
@@ -18,6 +19,7 @@ import com.example.tour_service.repository.httpClient.FileClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
 public class TourService {
 
         private final TourRepository tourRepository;
-        private final LocationRepository locationRepository; // cần thêm repo cho Location
+        private final LocationRepository locationRepository;
         private final VehicleRepository vehicleRepository;
         private final PricingClient pricingClient;
         private final FileClient fileClient;
@@ -58,27 +60,111 @@ public class TourService {
         }
 
         public List<TourResponse> getAllTours() {
+                List<Tour> tours = tourRepository.findAll();
+
+                // Batch prices for tours
+                List<Long> priceIds = tours.stream()
+                        .map(Tour::getTourPriceId)
+                        .distinct()
+                        .toList();
+
+                TourPriceBatchRequest priceBatchReq = new TourPriceBatchRequest();
+                priceBatchReq.setIds(priceIds);
+
+                List<TourPriceResponse> priceList = pricingClient.getPricesBatch(priceBatchReq).getResult();
+                Map<Long, TourPriceResponse> priceMap = priceList.stream()
+                        .collect(Collectors.toMap(TourPriceResponse::getId, p -> p));
+
+                // Batch departures for tours
+                List<Integer> tourIds = tours.stream().map(Tour::getId).toList();
+                Map<Integer, List<TourDepartureResponse>> departuresMap =
+                        tourDepartureService.getDeparturesByTourIdsWithPrice(tourIds);
+
                 List<TourFileResponse> fileResponses = fileClient.getAllMedia();
                 Map<String, List<String>> tourImagesMap = fileResponses.stream()
-                                .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
-                                .collect(Collectors.groupingBy(
-                                                TourFileResponse::getTourId,
-                                                Collectors.mapping(TourFileResponse::getUrl, Collectors.toList())));
-                return tourRepository.findAll().stream()
-                                .map(tour -> {
-                                        TourResponse response = toResponse(tour);
-                                        ApiResponse<TourPriceResponse> priceResp = pricingClient
-                                                        .getPriceById(tour.getTourPriceId());
-                                        List<TourDepartureResponse> departures = tourDepartureService
-                                                        .getTourDepartureByTourId(tour.getId());
-                                        response.setDepartures(departures);
-                                        response.setTourPrice(priceResp.getResult());
-                                        List<String> urls = tourImagesMap.get(String.valueOf(tour.getId()));
-                                        response.setImageIds(urls != null ? urls : List.of());
-                                        return response;
-                                })
-                                .collect(Collectors.toList());
+                        .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
+                        .collect(Collectors.groupingBy(
+                                TourFileResponse::getTourId,
+                                Collectors.mapping(TourFileResponse::getUrl, Collectors.toList())
+                        ));
+
+                return tours.stream()
+                        .map(tour -> {
+                                TourResponse response = toResponse(tour);
+                                response.setTourPrice(priceMap.get(tour.getTourPriceId()));
+
+                                List<String> urls = tourImagesMap.get(String.valueOf(tour.getId()));
+                                response.setImageIds(urls != null ? urls : List.of());
+
+                                response.setDepartures(departuresMap.getOrDefault(tour.getId(), List.of()));
+
+                                return response;
+                        })
+                        .toList();
         }
+
+        public List<TourResponse> getRandom3Tours() {
+
+                // Lấy toàn bộ tour trong DB
+                List<Tour> tours = tourRepository.findAll();
+
+                if (tours.isEmpty()) return List.of();
+
+                // Shuffle để ngẫu nhiên
+                Collections.shuffle(tours);
+
+                // Chỉ lấy 3 tour đầu tiên
+                List<Tour> selectedTours = tours.stream()
+                        .limit(3)
+                        .toList();
+
+                // BATCH PRICE
+                List<Long> priceIds = selectedTours.stream()
+                        .map(Tour::getTourPriceId)
+                        .distinct()
+                        .toList();
+
+                TourPriceBatchRequest priceBatchReq = new TourPriceBatchRequest();
+                priceBatchReq.setIds(priceIds);
+
+                Map<Long, TourPriceResponse> priceMap = pricingClient
+                        .getPricesBatch(priceBatchReq)
+                        .getResult()
+                        .stream()
+                        .collect(Collectors.toMap(TourPriceResponse::getId, p -> p));
+
+                // BATCH DEPARTURES
+                List<Integer> tourIds = selectedTours.stream()
+                        .map(Tour::getId)
+                        .toList();
+
+                Map<Integer, List<TourDepartureResponse>> departuresMap =
+                        tourDepartureService.getDeparturesByTourIdsWithPrice(tourIds);
+
+                List<TourFileResponse> fileResponses = fileClient.getAllMedia();
+                Map<String, List<String>> tourImagesMap = fileResponses.stream()
+                        .filter(f -> f.getUrl() != null && !f.getUrl().isEmpty())
+                        .collect(Collectors.groupingBy(
+                                TourFileResponse::getTourId,
+                                Collectors.mapping(TourFileResponse::getUrl, Collectors.toList())
+                        ));
+
+                return selectedTours.stream()
+                        .map(tour -> {
+                                TourResponse response = toResponse(tour);
+
+                                response.setTourPrice(priceMap.get(tour.getTourPriceId()));
+
+                                List<String> urls = tourImagesMap.get(String.valueOf(tour.getId()));
+                                response.setImageIds(urls != null ? urls : List.of());
+
+                                response.setDepartures(departuresMap.getOrDefault(tour.getId(), List.of()));
+
+                                return response;
+                        })
+                        .toList();
+        }
+
 
         public TourResponse createTour(TourRequest request) {
                 Location departure = locationRepository.findById(request.getDepartureLocationId())

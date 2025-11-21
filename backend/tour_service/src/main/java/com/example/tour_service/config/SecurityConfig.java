@@ -20,6 +20,7 @@
 
         private final String[] PUBLIC_URLS = {
             "/tours/list",
+            "/tours/random-3",
             "/tours/**",
             "/tour-departures/tour/**",
             "/tour-departures/**",

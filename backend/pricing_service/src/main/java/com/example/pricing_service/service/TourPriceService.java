@@ -62,6 +62,11 @@ public class TourPriceService {
         return toResponse(tourPrice);
     }
 
+    public List<TourPriceResponse> getPricesBatch(List<Long> ids) {
+        List<TourPrice> prices = repository.findAllById(ids);
+        return prices.stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
     private TourPriceResponse toResponse(TourPrice tourPrice) {
         return TourPriceResponse.builder()
                 .id(tourPrice.getId())
