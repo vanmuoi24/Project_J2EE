@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/customer")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -21,7 +21,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @GetMapping("/{id}")
-    public ApiResponse<CustomerResponse> getBookingsById(@PathVariable Long id) {
+    public ApiResponse<CustomerResponse> getCustomerById(@PathVariable Long id) {
         return ApiResponse.<CustomerResponse>builder()
                 .result(customerService.getCustomerById(id))
                 .message("Got successfully")
@@ -42,6 +42,15 @@ public class CustomerController {
         return ApiResponse.<List<CustomerResponse>>builder()
                 .result(customerService.createCustomers(request))
                 .message("Created successfully")
+                .build();
+    }
+
+    @GetMapping("/booking/{id}")
+    public ApiResponse<List<CustomerResponse>> getListOfCustomersByBookingId(
+            @PathVariable Long id){
+        return ApiResponse.<List<CustomerResponse>>builder()
+                .result(customerService.getListOfCustomersByBookingId(id))
+                .message("Got successfully")
                 .build();
     }
 }

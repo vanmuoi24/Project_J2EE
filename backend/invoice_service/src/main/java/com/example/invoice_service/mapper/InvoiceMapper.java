@@ -4,6 +4,8 @@ import com.example.invoice_service.dto.request.InvoiceRequest;
 import com.example.invoice_service.dto.response.InvoiceResponse;
 import com.example.invoice_service.entity.Invoice;
 import org.mapstruct.Mapper;
+import org.springframework.web.bind.annotation.Mapping;
+
 @Mapper(componentModel = "spring")
 
 public interface InvoiceMapper {

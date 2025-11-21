@@ -1,12 +1,9 @@
 package com.example.invoice_service.service;
 import com.example.invoice_service.client.BookingClient;
-import com.example.invoice_service.client.PricingClient;
+import com.example.invoice_service.client.PaymentClient;
 import com.example.invoice_service.client.TourDepartureClient;
 import com.example.invoice_service.client.UserClient;
-import com.example.invoice_service.dto.request.BookingRequest;
-import com.example.invoice_service.dto.request.CustomerRequest;
-import com.example.invoice_service.dto.request.InvoiceRequest;
-import com.example.invoice_service.dto.request.TourDepartureRequest;
+import com.example.invoice_service.dto.request.*;
 import com.example.invoice_service.dto.response.*;
 import com.example.invoice_service.entity.Invoice;
 import com.example.invoice_service.entity.InvoiceStatus;
@@ -14,152 +11,217 @@ import com.example.invoice_service.exception.AppException;
 import com.example.invoice_service.exception.ErrorCode;
 import com.example.invoice_service.mapper.InvoiceMapper;
 import com.example.invoice_service.repository.InvoiceRepository;
+import com.example.invoice_service.dto.response.MoMoResponse;
+
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final InvoiceMapper invoiceMapper;
     private final UserClient userClient;
     private final TourDepartureClient tourDepartureClient;
     private final BookingClient bookingClient;
+    private final PaymentClient paymentClient;
 
+    /**
+     *
+     * @return
+     */
     public List<InvoiceResponse> getAllInvoices(){
         List<Invoice> invoices = invoiceRepository.findAll();
         return invoiceMapper.toInvoiceResponseList(invoices);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     public InvoiceResponse getInvoiceById(Long id){
         Invoice invoice = invoiceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException());
         return invoiceMapper.toInvoiceResponse(invoice);
     }
 
+    /**
+     *
+     * @param bookingId
+     * @return
+     */
+    public InvoiceResponse getInvoiceByBookingId(Long bookingId){
+        Invoice invoice = invoiceRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new RuntimeException());
+        return invoiceMapper.toInvoiceResponse(invoice);
+    }
+
+
+    /**
+     * 🔹 Hàm tính toán tổng chi phí tour dựa trên số lượng khách và bảng giá
+     */
+    private long calculateTotalTourExpense(InvoiceRequest invoiceRequest, TourDepartureResponse tourDeparture) {
+        long countOfAdult = 0, countOfChildren = 0, countOfToddler = 0, countOfInfant = 0;
+
+        for (CustomerRequest cusReq : invoiceRequest.getBookingRequest().getListOfCustomers()) {
+            switch (cusReq.getBookingType().toUpperCase()) {
+                case "ADULT" -> countOfAdult++;
+                case "CHILD" -> countOfChildren++;
+                case "TODDLER" -> countOfToddler++;
+                case "INFANT" -> countOfInfant++;
+            }
+        }
+
+        long adultPrice = new BigDecimal(tourDeparture.getTourPrice().getAdultPrice()).longValue();
+        long childrenPrice = new BigDecimal(tourDeparture.getTourPrice().getChildPrice()).longValue();
+        long toddlerPrice = new BigDecimal(tourDeparture.getTourPrice().getToddlerPrice()).longValue();
+        long infantPrice = new BigDecimal(tourDeparture.getTourPrice().getInfantPrice()).longValue();
+        long supplementFee = new BigDecimal(tourDeparture.getTourPrice().getSingleSupplementPrice()).longValue();
+
+        long total = countOfAdult * adultPrice
+                + countOfChildren * childrenPrice
+                + countOfToddler * toddlerPrice
+                + countOfInfant * infantPrice
+                + supplementFee;
+        System.err.println(total);
+        return total;
+    }
+
+    /**
+     *
+     * @param tour
+     * @param request
+     */
+    private void updateAvailableSeats(TourDepartureResponse tour, InvoiceRequest request) {
+        int bookedSeats = request.getBookingRequest().getListOfCustomers().size();
+        int available = Integer.parseInt(tour.getAvailableSeats());
+        int remaining = available - bookedSeats;
+
+        TourDepartureRequest updateReq = TourDepartureRequest.builder()
+                .departureDate(tour.getDepartureDate())
+                .returnDate(tour.getReturnDate())
+                .tourId(tour.getTourId())
+                .availableSeats(String.valueOf(remaining))
+                .build();
+
+        tourDepartureClient.updateTourDepartureAvalableSeats(Long.parseLong(tour.getId()), updateReq);
+    }
+
+    /**
+     *
+     * @param invoice
+     * @param total
+     * @param message
+     * @return
+     */
+    private InvoiceResponse buildInvoiceResponse(
+            Invoice invoice, long total, String message) {
+            String orderId = UUID.randomUUID().toString();
+            String orderInfo = "Thanh toan hoa don";
+            String requestId = UUID.randomUUID().toString();
+            String extraData = "";
+            long amount = total;
+
+        return InvoiceResponse.builder()
+                .id(String.valueOf(invoice.getId()))
+                .accountId(String.valueOf(invoice.getAccountId()))
+                .bookingId(String.valueOf(invoice.getBookingId()))
+                .paymentMethodId(String.valueOf(invoice.getPaymentMethodId()))
+                .dayOfPay(String.valueOf(invoice.getDayOfPay()))
+                .status(invoice.getStatus().name())
+                .totalBookingTourExpense(String.valueOf(total))
+                .moMoResponse(createMomoQR(orderId, orderInfo, requestId, extraData, amount))
+                .message(message)
+                .build();
+    }
+
+    /**
+     *
+     * @param invoiceRequest
+     * @return
+     */
     public InvoiceResponse createInvoice(InvoiceRequest invoiceRequest) {
-        System.err.println(invoiceRequest);
-
         try {
-            // --- GỌI CÁC SERVICE ---
-            ApiResponse<UserResponse> getUserResponse = userClient.getUserById(
-                    Long.parseLong(invoiceRequest.getBookingRequest().getUserId()));
-
-            ApiResponse<TourDepartureResponse> getTourDepatureResponse = tourDepartureClient.getTourDepartureById(
-                    Long.parseLong(invoiceRequest.getBookingRequest().getTourDepartureId()));
-
-            ApiResponse<BookingResponse> getBookingResponse = bookingClient.getBookingById(
-                    Long.parseLong(invoiceRequest.getBookingRequest().getBookingId()));
+            // --- Lấy dữ liệu từ các service ---
+            ApiResponse<UserResponse> getUserResponse = userClient.getUserById(Long.parseLong(invoiceRequest.getBookingRequest().getUserId()));
+            ApiResponse<TourDepartureResponse> getTourDepatureResponse = tourDepartureClient.getTourDepartureById(Long.parseLong(invoiceRequest.getBookingRequest().getTourDepartureId()));
+            ApiResponse<BookingResponse> getBookingResponse = bookingClient.getBookingById(Long.parseLong(invoiceRequest.getBookingRequest().getBookingId()));
 
             // --- KIỂM TRA DỮ LIỆU ---
-            if (getUserResponse == null) {
-                throw new AppException(ErrorCode.USER_NOT_EXISTED);
-            }
-            if (getTourDepatureResponse == null) {
-                throw new AppException(ErrorCode.TOUR_DEPARTURE_NOT_EXISTED);
-            }
-            if (getBookingResponse == null) {
-                throw new AppException(ErrorCode.BOOKING_NOT_EXISTED);
-            }
+            if (getUserResponse == null) throw new AppException(ErrorCode.USER_NOT_EXISTED);
+            if (getTourDepatureResponse == null) throw new AppException(ErrorCode.TOUR_DEPARTURE_NOT_EXISTED);
+            if (getBookingResponse == null) throw new AppException(ErrorCode.BOOKING_NOT_EXISTED);
 
-            System.err.println(getUserResponse);
-            System.err.println(getTourDepatureResponse);
-            System.err.println(getBookingResponse);
-
-            String getUserId = getUserResponse.getResult().getId();
-            String getTourDepartureId = getTourDepatureResponse.getResult().getId();
-            String getBookingId = getBookingResponse.getResult().getId();
-            String getAvalableSeat = getTourDepatureResponse.getResult().getAvailableSeats();
-
-            // --- TÍNH TOÁN SỐ LƯỢNG KHÁCH ---
-            int countOfAdult = 0;
-            int countOfChildren = 0;
-            int countOfToddler = 0;
-            int countOfInfant = 0;
-
-            for (CustomerRequest cusReq : invoiceRequest.getBookingRequest().getListOfCustomers()) {
-                switch (cusReq.getBookingType().toUpperCase()) {
-                    case "ADULT" -> countOfAdult++;
-                    case "CHILD" -> countOfChildren++;
-                    case "TODDLER" -> countOfToddler++;
-                    case "INFANT" -> countOfInfant++;
-                }
-            }
-
-            int totalCountOfBooking = countOfAdult + countOfChildren + countOfToddler + countOfInfant;
-
-            // --- TÍNH GIÁ TOUR ---
-            Float adultPrice = Float.parseFloat(getTourDepatureResponse.getResult().getTourPrice().getAdultPrice());
-            Float childrenPrice = Float.parseFloat(getTourDepatureResponse.getResult().getTourPrice().getChildPrice());
-            Float toddlerPrice = Float.parseFloat(getTourDepatureResponse.getResult().getTourPrice().getToddlerPrice());
-            Float infantPrice = Float.parseFloat(getTourDepatureResponse.getResult().getTourPrice().getInfantPrice());
-
-            Float totalPriceOfAdult = countOfAdult * adultPrice;
-            Float totalPriceOfChildren = countOfChildren * childrenPrice;
-            Float totalPriceOfToddler = countOfToddler * toddlerPrice;
-            Float totalPriceOfInfant = countOfInfant * infantPrice;
-            Float totalTourDepartureExpense = totalPriceOfAdult + totalPriceOfChildren + totalPriceOfToddler + totalPriceOfInfant;
+            // --- Tính tổng tiền ---
+            long totalExpense = calculateTotalTourExpense(invoiceRequest, getTourDepatureResponse.getResult());
 
             // --- TẠO VÀ LƯU INVOICE ---
             Invoice invoice = invoiceMapper.toInvoice(invoiceRequest);
-            invoice.setAccountId(Integer.parseInt(getUserId));
+            invoice.setAccountId(Integer.parseInt(getUserResponse.getResult().getId()));
+            invoice.setBookingId(Integer.parseInt(getBookingResponse.getResult().getId()));
             invoice.setStatus(InvoiceStatus.PAID);
             invoice.setDayOfPay(LocalDateTime.now());
-            invoice.setPaymentMethorId(1);
-            invoice.setTotalBookingTourExpense(totalTourDepartureExpense);
-            invoice.setBookingId(Integer.parseInt(getBookingId));
-
+            invoice.setPaymentMethodId(1);
+            invoice.setTotalBookingTourExpense(totalExpense);
             invoiceRepository.save(invoice);
 
-            // --- GIẢM SỐ GHẾ CÒN LẠI ---
-            int requestedSeats = invoiceRequest.getBookingRequest().getListOfCustomers().size();
-            int avalableSeat = Integer.parseInt(getAvalableSeat);
-            int theRestOfAvalaibleSeats = avalableSeat - requestedSeats;
+            updateAvailableSeats(getTourDepatureResponse.getResult(), invoiceRequest);
 
-            TourDepartureRequest updateTourDepartureReq = new TourDepartureRequest();
-            updateTourDepartureReq.setDepartureDate(getTourDepatureResponse.getResult().getDepartureDate());
-            updateTourDepartureReq.setReturnDate(getTourDepatureResponse.getResult().getReturnDate());
-            updateTourDepartureReq.setTourId(getTourDepatureResponse.getResult().getTourId());
-            updateTourDepartureReq.setAvailableSeats(String.valueOf(theRestOfAvalaibleSeats));
-            System.err.println(updateTourDepartureReq);
-
-            tourDepartureClient.updateTourDepartureAvalableSeats(
-                    Long.parseLong(getTourDepartureId),
-                    updateTourDepartureReq);
-
+            List<CustomerRequest> listOfCustomerRequests = invoiceRequest.getBookingRequest().getListOfCustomers();
             // --- TRẢ VỀ RESPONSE ---
-            return InvoiceResponse.builder()
-                    .userId(String.valueOf(invoice.getAccountId()))
-                    .bookingId(getBookingResponse.getResult().getId())
-                    .status(invoice.getStatus().toString())
-                    .dateOfTransaction(invoice.getDayOfPay().toString())
-                    .paymentMethodId(String.valueOf(invoice.getPaymentMethorId()))
-                    .totalCountOfAdult(String.valueOf(countOfAdult))
-                    .totalCountOfChildren(String.valueOf(countOfChildren))
-                    .totalCountOfToddler(String.valueOf(countOfToddler))
-                    .totalCountOfInfant(String.valueOf(countOfInfant))
-                    .totalChargeOfAdult(String.valueOf(totalPriceOfAdult))
-                    .totalChargeOfChildren(String.valueOf(totalPriceOfChildren))
-                    .totalChargeOfToddler(String.valueOf(totalPriceOfToddler))
-                    .totalChargeOfInfant(String.valueOf(totalPriceOfInfant))
-                    .totalBookingTourExpense(String.valueOf(totalTourDepartureExpense))
-                    .message(String.valueOf("Thanh toán thành công, hóa đơn đã được tạo."))
-                    .build();
-
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ID không hợp lệ", e);
-        } catch (FeignException.NotFound e) {
-            throw new IllegalArgumentException("Không tìm thấy tài nguyên: " + e.getMessage(), e);
-        } catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("Lỗi khi lưu dữ liệu invoice", e);
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi lấy dữ liệu người dùng hoặc tour", e);
+            return buildInvoiceResponse(invoice, totalExpense, "Hoá đơn được tạo thành công");
+        }
+        catch (FeignException.NotFound e) {
+            throw new AppException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new AppException(ErrorCode.DATA_INTEGRITY_ERROR);
+        }
+        catch (Exception e) {
+            log.error("Lỗi khi tạo hóa đơn: {}", e.getMessage());
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
         }
     }
+
+    /**
+     * 🔹 Hàm thanh toán MOMO
+     */
+    public MoMoResponse createMomoQR(String orderId, String orderInfo, String requestId, String extraData, long amount){
+        MoMoRequest momoRequest = MoMoRequest.builder()
+                .orderId(orderId)
+                .orderInfo(orderInfo)
+                .requestId(requestId)
+                .extraData(extraData)
+                .amount(amount)
+                .build();
+
+        MoMoResponse momoResp;
+        try {
+            momoResp = paymentClient.createMoMoPayment(momoRequest).getResult();
+            return momoResp;
+        } catch (Exception ex) {
+            log.error("MoMo payment failed: {}", ex.getMessage());
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+    }
+
+    /**
+     * 🔹 Thực hiện thanh toán và tạo hóa đơn
+     */
+    public InvoiceResponse payAndCreateInvoice(InvoiceRequest invoiceRequest) {
+        InvoiceResponse invoiceResponse = createInvoice(invoiceRequest);
+        return invoiceResponse;
+    }
+
 }

@@ -19,6 +19,7 @@ public enum ErrorCode {
     EMAIL_IS_REQUIRED(1009, "Email is required", HttpStatus.BAD_REQUEST),
     INVALID_TOKEN(1010, "Invalid token", HttpStatus.UNAUTHORIZED),
     EXPIRED_TOKEN(1011, "Token is expired", HttpStatus.UNAUTHORIZED),
+    BOOKING_NOT_EXISTED(1012, "Booking not existed", HttpStatus.NOT_FOUND)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

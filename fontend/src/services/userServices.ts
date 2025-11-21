@@ -27,6 +27,9 @@ export const updateProfile = (
   });
 };
 
+export const getAllUsers = (): Promise<AxiosResponse> => {
+  return axiosClient.get(`auth/users/list`);
+}
 export const getListUser = (): Promise<AxiosResponse> => {
   return axiosClient.get('auth/users/list');
 };

@@ -19,17 +19,41 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
-    public List<CustomerResponse> getAllCustomers(){
+    /*****
+     *
+     * @return
+     */
+    public List<CustomerResponse> getAllCustomers() {
         List<Customer> customers = customerRepository.findAll();
         return customerMapper.toCustomerResponseList(customers);
     }
 
+    /*****
+     *
+     * @param id
+     * @return
+     */
+    public List<CustomerResponse> getListOfCustomersByBookingId(Long id){
+        List<Customer> customers = customerRepository.findCustomersByBookingId(id);
+        return customerMapper.toCustomerResponseList(customers);
+    }
+
+    /*****
+     *
+     * @param id
+     * @return
+     */
     public CustomerResponse getCustomerById(Long id){
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return customerMapper.toCustomerResponse(customer);
     }
 
+    /******
+     *
+     * @param customerRequests
+     * @return
+     */
     public List<CustomerResponse> createCustomers(List<CustomerRequest> customerRequests){
         List<Customer> customers = customerRequests.stream()
                 .map(customerMapper::toCustomer)

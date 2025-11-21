@@ -4,7 +4,7 @@ import { CalendarOutlined, ClockCircleOutlined, EnvironmentOutlined, TagOutlined
 import { Card, Typography, Button, List } from "antd";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-
+import { useNavigate } from "react-router-dom";
 const { Text, Title } = Typography;
 
 interface TourDetailCardProps {
@@ -15,7 +15,7 @@ interface TourDetailCardProps {
 
 export default function TourDetailCard({ selectedDepartureId, tourData }: TourDetailCardProps) {
   const [dataDetailTourDeparture, setDataDetailTourDeparture] = useState<ITourDeparture | null>(null);
-
+  const navigate = useNavigate()
   const fetchDataTourDepartureById = async () => {
     if (!selectedDepartureId) return;
     const res = await getTourDepartureById(selectedDepartureId);
@@ -27,6 +27,9 @@ export default function TourDetailCard({ selectedDepartureId, tourData }: TourDe
     fetchDataTourDepartureById();
   }, [selectedDepartureId]);
 
+  function accessBookingPage(){
+    navigate(`/booking`);
+  }
 
   return (
     <Card
@@ -147,6 +150,7 @@ export default function TourDetailCard({ selectedDepartureId, tourData }: TourDe
               fontSize: 12,
               width: "100%"
             }}
+            onClick={accessBookingPage}
           >
             Đặt ngay
           </Button>

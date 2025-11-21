@@ -12,6 +12,7 @@ import {
   EnvironmentOutlined,
   UsergroupAddOutlined,
   SafetyOutlined,
+  GiftOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Space, Avatar, Button, message } from 'antd';
 import type { MenuProps } from 'antd';
@@ -150,6 +151,14 @@ const AdminSidebar: React.FC = () => {
       key: '/admin/role',
       icon: <SafetyOutlined />,
       label: <Link to="/admin/role">Quản lý vai trò</Link>,
+    });
+  }
+
+  if (hasPermissionForModules('ROLES')) {
+    menuItems.push({
+      key: '/admin/managerInvoice',
+      icon: <GiftOutlined />,
+      label: <Link to="/admin/managerInvoice">Quản lý hóa đơn</Link>,
     });
   }
 

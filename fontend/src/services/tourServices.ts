@@ -3,11 +3,11 @@ import type { AxiosResponse } from '@/types/comment';
 import type { IPaginationResponse } from '@/types/Pagination';
 import type {
   ICity,
-  IDeparture,
   IDestination,
   IItinerary,
   ITour,
   ITourDeparture,
+  ITourDepartureResponse,
   IVehicle,
 } from '@/types/Tour';
 
@@ -29,6 +29,10 @@ export const getDepartureByTourId = (id: number): Promise<AxiosResponse<ITourDep
   return axiosClient.get(`/tour/tour-departures/tour/${id}`);
 };
 
+export const getAllTourDeparture = (): Promise<AxiosResponse<ITourDeparture[]>> =>{
+  return axiosClient.get(`/tour/tour-departures/list`);
+}
+
 export const getTourDepartureById = (id: number): Promise<AxiosResponse<ITourDeparture>> => {
   return axiosClient.get(`/tour/tour-departures/${id}`);
 };
@@ -37,7 +41,7 @@ export const getItineraryByTourId = (id: number): Promise<AxiosResponse<IItinera
   return axiosClient.get(`/tour/itineraries/tour/${id}`);
 };
 
-export const getAllDepartures = (): Promise<AxiosResponse<IDeparture[]>> => {
+export const getAllDepartures = (): Promise<AxiosResponse<ITourDeparture[]>> => {
   return axiosClient.get(`/tour/locations/departures`);
 };
 

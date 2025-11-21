@@ -19,11 +19,13 @@ import ManagerSchedule from '../components/Admin/ManagerTour/ManagerSchedule';
 import ManagerDestination from '../components/Admin/ManagerTour/ManagerDestination';
 import TourDetail from '@/layouts/TourDetail';
 import Booking from '@/pages/Booking/BookingPage';
-import BookingHistory from '@/pages/Booking/HistoryPage';
 import Invoice from '@/pages/Invoice/InvoicePage';
+import MoMoQRPage from '@/pages/Payment/MoMoQRPage';
+import ManagerInvoice from '@/components/Admin/ManagerInvoice/ManagerInvoice';
 import ManagerReViewTour from '@/components/Admin/ManagerTour/ManagerReViewTour';
 import ManagerRole from '@/components/Admin/ManagerTour/ManagerRole';
 import ManagerRoleUser from '@/components/Admin/ManagerRoleUser/ManagerRoleUser';
+import VnPayCallback from '@/pages/Payment/VnPayCallback';
 
 export default function AppRoutes() {
   return (
@@ -35,9 +37,9 @@ export default function AppRoutes() {
           <Route path="/tours/*" element={<Tours />} />
 
           <Route path="/booking" element={<Booking />} />
-          <Route path="/booking/history" element={<BookingHistory />} />
-          {/* <Route path="/invoice/user/:userId/booking/:bookingId" element={<Invoice />} /> */}
-          <Route path="/invoice" element={<Invoice />} />
+          <Route path="/invoice/booking/:id" element={<Invoice />} />
+          <Route path="/payment/momo" element={<MoMoQRPage />} />
+          <Route path="/payment/vnpay/callback" element={<VnPayCallback />} />
           <Route path="/tours" element={<Tours />} />
           <Route path="/tours/detail/:id" element={<TourDetail />} />
           <Route element={<RouteGuard isPrivate />}>
@@ -69,6 +71,7 @@ export default function AppRoutes() {
           <Route path="/admin/managerTour/reviews" element={<ManagerReViewTour />} />
           <Route path="/admin/role" element={<ManagerRole />} />
           <Route path="/admin/managerRole" element={<ManagerRoleUser />} />
+          <Route path="/admin/managerInvoice" element={<ManagerInvoice />} />
         </Route>
       </Routes>
     </BrowserRouter>

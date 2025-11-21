@@ -95,9 +95,15 @@ export interface IDestination {
   city: string;
   type: number;
 }
-export interface IDeparture {
-  city: string;
-  type: number;
+
+export interface ITourDeparture {
+  id: int;
+  tourCode: string;
+  departureDate: string;
+  returnDate: string;
+  availableSeats: string;
+  tourId: string;
+  tourPrice: ITourPrice;
 }
 type ToursResponse = AxiosResponse<ITour[]>;
 
@@ -108,6 +114,7 @@ type TourDeparturesResponse = AxiosResponse<ITourDeparture[]>;
 type TourDepartureResponse = AxiosResponse<ITourDeparture>;
 
 type ItineraryResponse = AxiosResponse<IItinerary[]>;
+
 export interface ITourDepartureResponse {
   code: number;
   message?: string;

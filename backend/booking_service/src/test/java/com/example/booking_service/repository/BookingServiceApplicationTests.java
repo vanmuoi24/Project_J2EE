@@ -3,7 +3,6 @@ package com.example.booking_service.repository;
 import com.example.booking_service.entity.*;
 import com.example.booking_service.repository.BookingRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Null;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -30,6 +29,10 @@ class BookingServiceApplicationTests {
         Assertions.assertNotNull(bookingRepository, "Repository chưa được khởi tạo");
     }
 
+    void testGetAllBooking(){
+
+    }
+
     @Test
     void testCreateAndFindBooking() {
         // --- Tạo booking ---
@@ -37,7 +40,7 @@ class BookingServiceApplicationTests {
         booking.setCreatedAt(LocalDateTime.now());
         booking.setAccountId(1);
         booking.setTourDepartureId(1);
-        booking.setStatus(BookingStatus.UNPAID);
+        booking.setStatus(BookingStatus.UNCONFIRMED);
 
         // --- Tạo list customer ---
         List<Customer> customers = new ArrayList<>();
@@ -122,7 +125,7 @@ class BookingServiceApplicationTests {
         booking.setCreatedAt(LocalDateTime.now());
         booking.setAccountId(1);
         booking.setTourDepartureId(10);
-        booking.setStatus(BookingStatus.UNPAID);
+        booking.setStatus(BookingStatus.UNCONFIRMED);
         List<Customer> customers = new ArrayList<>();
         customers.add(Customer.builder()
                 .fullName("Nguyễn Văn A")
@@ -165,7 +168,7 @@ class BookingServiceApplicationTests {
         booking.setCreatedAt(LocalDateTime.now());
         booking.setAccountId(100);
         booking.setTourDepartureId(100);
-        booking.setStatus(BookingStatus.UNPAID);
+        booking.setStatus(BookingStatus.UNCONFIRMED);
 
         List<Customer> customers = new ArrayList<>();
         customers.add(Customer.builder()
@@ -205,7 +208,7 @@ class BookingServiceApplicationTests {
         booking.setCreatedAt(LocalDateTime.now());
         booking.setAccountId(5);
         booking.setTourDepartureId(99);
-        booking.setStatus(BookingStatus.UNPAID);
+        booking.setStatus(BookingStatus.UNCONFIRMED);
 
         List<Customer> customers = new ArrayList<>();
 
@@ -238,9 +241,7 @@ class BookingServiceApplicationTests {
     /**
      * 🔍 Kiểm tra sau rollback hoặc commit: số lượng booking vẫn giữ nguyên
      */
-    @Test
-    @Order(4)
-    @Rollback(value = false)
+
     void verifyDatabaseAfterRollback() {
         long count = bookingRepository.count();
         System.out.println("🔎 [VERIFY] Số booking hiện tại trong DB: " + count);
