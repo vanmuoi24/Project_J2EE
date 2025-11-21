@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Select, Card, Image, Tag, Row, Col, Divider } from 'antd';
+import { Form, Card, Image, Tag, Row, Col, Divider } from 'antd';
 import { EnvironmentOutlined, CarOutlined, DollarOutlined, CalendarOutlined } from '@ant-design/icons';
 import type { ILocation, ITourPrice, IVehicle } from '@/types/Tour';
 import { getAllDepartures, getAllDestinations, getAllPrice, getAllVehicles } from '@/services/tourServices';
-
-const { TextArea } = Input;
-const { Option } = Select;
 
 interface WatchTourProps {
   data?: any;

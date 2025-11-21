@@ -31,6 +31,10 @@ export const getAllTours = (): Promise<AxiosResponse<ITour[]>> => {
   return axiosClient.get('/tour/tours/list');
 };
 
+export const getRandom3Tour = (): Promise<AxiosResponse<ITour[]>> => {
+  return axiosClient.get('/tour/tours/random-3');
+};
+
 export const getTourById = (id: number): Promise<AxiosResponse<ITour>> => {
   return axiosClient.get(`/tour/tours/${id}`);
 };
