@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  DeleteOutlined,
   EditOutlined,
-  EyeOutlined,
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
@@ -44,21 +42,30 @@ const ManagerTourDeparture: React.FC = () => {
   }, [fetchDataTourDeparture]);
 
   const handleAdd = async (values: any) => {
-    const newLocation: AddTourDepartureRequest = {
-      departureDate: values.departureDate,
-      returnDate: values.returnDate,
-      availableSeats: values.availableSeats,
-      tourId: tourId!
-    };
-    const res = await addTourDeparture(newLocation);
-    if (res.code === 1000) {
-      setData([res.result, ...data]);
-      message.success('Thêm ngày khởi hành thành công');
-      setOpenAdd(false);
-    } else {
-      message.error('Thêm ngày khởi hành thất bại: ');
+    try {
+      const newLocation: AddTourDepartureRequest = {
+        departureDate: values.departureDate,
+        returnDate: values.returnDate,
+        availableSeats: values.availableSeats,
+        tourId: tourId!
+      };
+      console.log("📤 Data gửi lên backend:", newLocation);
+      const res = await addTourDeparture(newLocation);
+
+      if (res.code === 1000) {
+        setData([res.result, ...data]);
+        message.success("Thêm ngày khởi hành thành công");
+        setOpenAdd(false);
+      } else {
+        message.error(`Thêm ngày khởi hành thất bại: ${res.result}`);
+      }
+    } catch (error: any) {
+
+      const backendMsg = error.response?.data?.message || "Lỗi không xác định";
+      message.error(`Lỗi: ${backendMsg}`);
+
+      console.error("ERROR API:", error);
     }
-    setOpenAdd(false);
   };
 
   const handleEditClick = (record: ITourDeparture) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, InputNumber, Select, Button, Card, Space } from 'antd';
+import { Form, Input, Select, Button, Card, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 interface AddItineraryProps {
@@ -55,7 +55,8 @@ const AddItinerary: React.FC<AddItineraryProps> = ({ onSubmit }) => {
             <Select.Option value="Sáng">Sáng</Select.Option>
             <Select.Option value="Trưa">Trưa</Select.Option>
             <Select.Option value="Tối">Tối</Select.Option>
-            <Select.Option value="Sáng, Trưa, Tối">Sáng, Trưa, Tối</Select.Option>
+            <Select.Option value="Tối">Trưa, Chiều</Select.Option>
+            <Select.Option value="Sáng, Trưa, Tối">Sáng, Trưa, Chiều</Select.Option>
           </Select>
         </Form.Item>
 

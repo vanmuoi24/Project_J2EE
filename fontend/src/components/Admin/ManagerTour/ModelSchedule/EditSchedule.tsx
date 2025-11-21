@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Form, Input, InputNumber, Select, Button, Divider } from 'antd';
+import { Form, Input, Select, Button } from 'antd';
 
 interface EditItineraryProps {
   data?: any;
@@ -57,7 +57,8 @@ const EditItinerary: React.FC<EditItineraryProps> = ({ data, onSubmit }) => {
             <Select.Option value="Sáng">Sáng</Select.Option>
             <Select.Option value="Trưa">Trưa</Select.Option>
             <Select.Option value="Tối">Tối</Select.Option>
-            <Select.Option value="Sáng, Trưa, Tối">Sáng, Trưa, Tối</Select.Option>
+            <Select.Option value="Tối">Trưa, Chiều</Select.Option>
+            <Select.Option value="Sáng, Trưa, Tối">Sáng, Trưa, Chiều</Select.Option>
           </Select>
         </Form.Item>
 

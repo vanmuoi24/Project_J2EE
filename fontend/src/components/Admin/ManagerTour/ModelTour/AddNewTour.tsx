@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Form, Input, InputNumber, Button, Select, Upload, message, Space, Card, Tooltip } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, InputNumber, Button, Select, Upload, Space, Card, Tooltip } from 'antd';
 import { UploadOutlined, SaveOutlined } from '@ant-design/icons';
 import type { ILocation, ITourPrice, IVehicle } from '@/types/Tour';
 import { getAllDepartures, getAllDestinations, getAllPrice, getAllVehicles } from '@/services/tourServices';
@@ -92,11 +92,11 @@ const AddNewTour: React.FC<AddTourProps> = ({ onSubmit }) => {
         onFinish={handleFinish}
       >
         <Form.Item
-          label="Tên chương trình"
+          label="Mã chương trình"
           name="tourProgram"
           rules={[{ required: true, message: 'Vui lòng nhập tên tour!' }]}
         >
-          <Input placeholder="VD: Hành trình miền Trung di sản" />
+          <Input />
         </Form.Item>
 
         <Form.Item

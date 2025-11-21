@@ -12,13 +12,14 @@ const AddTourDeparture: React.FC<AddTourDepartureProps> = ({ onSubmit }) => {
   const handleFinish = (values: any) => {
     const payload = {
       ...values,
-      departureDate: values.departureDate?.toISOString(),
-      returnDate: values.returnDate?.toISOString(),
+      departureDate: values.departureDate?.format('YYYY-MM-DDTHH:mm:ss'),
+      returnDate: values.returnDate?.format('YYYY-MM-DDTHH:mm:ss'),
     };
 
     if (onSubmit) onSubmit(payload);
     form.resetFields();
   };
+
 
   return (
     <Card
