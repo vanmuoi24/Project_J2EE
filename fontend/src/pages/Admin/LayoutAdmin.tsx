@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   BugOutlined,
-  GiftOutlined,
   UserOutlined,
   GlobalOutlined,
   ScheduleOutlined,
@@ -11,13 +10,16 @@ import {
   UnorderedListOutlined,
   CalendarOutlined,
   EnvironmentOutlined,
-  DollarOutlined,
-  TeamOutlined,
+  UsergroupAddOutlined,
   SafetyOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Dropdown, Space, Avatar, Button } from 'antd';
+import { Layout, Menu, Dropdown, Space, Avatar, Button, message } from 'antd';
 import type { MenuProps } from 'antd';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import type { RootState } from '@/store';
+import { ALL_PERMISSIONS } from '@/config/permissions';
+import { logoutUser } from '@/store/slices/authSlice';
 
 const { Content, Sider } = Layout;
 
@@ -26,60 +28,132 @@ const AdminSidebar: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState('/admin');
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAppSelector((state: RootState) => state.auth);
+  const dispatch = useAppDispatch();
 
-  // Cập nhật menu active theo route
   useEffect(() => {
     setActiveMenu(location.pathname || '/admin');
   }, [location.pathname]);
 
-  // Menu bên sidebar
-  const menuItems: MenuProps['items'] = [
-    {
+  const permissions = user?.role?.permissions || [];
+  const isAdmin = user?.role?.name === 'ADMIN';
+
+  // Tạo Set permission từ role (giả sử backend trả về method + apiPath)
+  const userPermissionSet = useMemo(() => {
+    return new Set(permissions.map((p: any) => `${p.method?.toUpperCase()}:${p.apiPath}`));
+  }, [permissions]);
+
+  // Lấy list permission theo module (hoặc nhiều module)
+  const getPermissionListByModules = (modules: string | string[]) => {
+    const moduleArr = Array.isArray(modules) ? modules : [modules];
+    const list: { method: string; apiPath: string }[] = [];
+
+    moduleArr.forEach((m) => {
+      const modulePerms = (ALL_PERMISSIONS as any)[m];
+      if (modulePerms) {
+        Object.values(modulePerms).forEach((perm: any) => {
+          list.push({ method: perm.method, apiPath: perm.apiPath });
+        });
+      }
+    });
+
+    return list;
+  };
+
+  // Check xem user có quyền với 1 hoặc nhiều module không
+  const hasPermissionForModules = (modules: string | string[]) => {
+    if (isAdmin) return true; // ADMIN full quyền
+
+    const perms = getPermissionListByModules(modules);
+    return perms.some((perm) =>
+      userPermissionSet.has(`${perm.method?.toUpperCase()}:${perm.apiPath}`)
+    );
+  };
+
+  // Xây menu theo quyền
+  const menuItems: MenuProps['items'] = [];
+
+  // Quản lý người dùng (module USERS)
+  if (hasPermissionForModules('USERS')) {
+    menuItems.push({
       key: '/admin/managerUser',
       icon: <UserOutlined />,
       label: <Link to="/admin/managerUser">Quản lý người dùng</Link>,
-    },
-    {
+    });
+  }
+
+  // Quản lý tour du lịch: gộp nhiều module liên quan
+  const tourChildren: MenuProps['items'] = [];
+
+  if (hasPermissionForModules('TOURS')) {
+    tourChildren.push({
+      key: '/admin/managerTour/list',
+      icon: <UnorderedListOutlined />,
+      label: <Link to="/admin/managerTour/list">Danh sách tour</Link>,
+    });
+  }
+
+  if (hasPermissionForModules('ITINERARIES')) {
+    tourChildren.push({
+      key: '/admin/managerTour/itinerary',
+      icon: <CalendarOutlined />,
+      label: <Link to="/admin/managerTour/itinerary">Lịch trình</Link>,
+    });
+  }
+
+  if (hasPermissionForModules('LOCATIONS')) {
+    tourChildren.push({
+      key: '/admin/managerTour/destination',
+      icon: <EnvironmentOutlined />,
+      label: <Link to="/admin/managerTour/destination">Địa điểm</Link>,
+    });
+  }
+
+  if (hasPermissionForModules('REVIEWS')) {
+    tourChildren.push({
+      key: '/admin/managerTour/reviews',
+      icon: <StarOutlined />,
+      label: <Link to="/admin/managerTour/reviews">Đánh giá tour</Link>,
+    });
+  }
+
+  if (tourChildren.length > 0) {
+    menuItems.push({
       key: '/admin/managerTour',
       icon: <GlobalOutlined />,
       label: 'Quản lý tour du lịch',
-      children: [
-        {
-          key: '/admin/managerTour/list',
-          icon: <UnorderedListOutlined />,
-          label: <Link to="/admin/managerTour/list">Danh sách tour</Link>,
-        },
-        {
-          key: '/admin/managerTour/itinerary',
-          icon: <CalendarOutlined />,
-          label: <Link to="/admin/managerTour/itinerary">Lịch trình</Link>,
-        },
-        {
-          key: '/admin/managerTour/destination',
-          icon: <EnvironmentOutlined />,
-          label: <Link to="/admin/managerTour/destination">địa điểm</Link>,
-        },
+      children: tourChildren,
+    });
+  }
 
-        {
-          key: '/admin/managerTour/reviews',
-          icon: <StarOutlined />,
-          label: <Link to="/admin/managerTour/reviews">Đánh giá tour</Link>,
-        },
-      ],
-    },
-    {
+  // Quản lý đặt chỗ (BOOKINGS, CUSTOMERS)
+  if (hasPermissionForModules(['BOOKINGS', 'CUSTOMERS'])) {
+    menuItems.push({
       key: '/admin/managerBooking',
       icon: <ScheduleOutlined />,
       label: <Link to="/admin/managerBooking">Quản lý đặt chỗ</Link>,
-    },
-    {
+    });
+  }
+
+  // Quản lý quyền hạn (PERMISSIONS)
+  if (hasPermissionForModules('PERMISSIONS')) {
+    menuItems.push({
+      key: '/admin/managerRole',
+      icon: <UsergroupAddOutlined />,
+      label: <Link to="/admin/managerRole">Quản lý quyền hạn</Link>,
+    });
+  }
+
+  // Quản lý vai trò (ROLES)
+  if (hasPermissionForModules('ROLES')) {
+    menuItems.push({
       key: '/admin/role',
       icon: <SafetyOutlined />,
-      label: <Link to="/admin/role">Quản lý Phân Quyền</Link>,
-    },
-  ];
+      label: <Link to="/admin/role">Quản lý vai trò</Link>,
+    });
+  }
 
-  // Menu dropdown account
+  // Dropdown account
   const itemsDropdown: MenuProps['items'] = [
     {
       key: 'home',
@@ -88,15 +162,17 @@ const AdminSidebar: React.FC = () => {
     {
       key: 'logout',
       label: (
-        <span
-          style={{ cursor: 'pointer' }}
+        <Button
+          type="text"
+          style={{ cursor: 'pointer', right: 15 }}
           onClick={() => {
-            localStorage.clear();
-            navigate('/login', { replace: true });
+            dispatch(logoutUser());
+            message.success('Đăng xuất thành công');
+            navigate('/login');
           }}
         >
           Đăng xuất
-        </span>
+        </Button>
       ),
     },
   ];
@@ -109,8 +185,8 @@ const AdminSidebar: React.FC = () => {
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
-        width={250} // 👉 chiều rộng khi mở
-        collapsedWidth={80} //
+        width={250}
+        collapsedWidth={80}
       >
         <div
           style={{
@@ -153,7 +229,7 @@ const AdminSidebar: React.FC = () => {
           />
           <Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
             <Space style={{ cursor: 'pointer' }}>
-              Welcome Admin <Avatar>A</Avatar>
+              Welcome {user?.username || 'Admin'} <Avatar>{(user?.username || 'A')[0]}</Avatar>
             </Space>
           </Dropdown>
         </div>
@@ -177,7 +253,6 @@ const AdminSidebar: React.FC = () => {
             className="custom-scrollbar"
           >
             {location.pathname === '/' ? (
-              // 👇 Banner chữ chạy
               <div
                 style={{
                   whiteSpace: 'nowrap',
@@ -195,55 +270,50 @@ const AdminSidebar: React.FC = () => {
                 >
                   🚀 Chào mừng bạn đến với trang quản trị – Quản lý dữ liệu dễ dàng 🚀
                 </div>
-
-                {/* CSS cho animation chữ chạy và ẩn scrollbar */}
                 <style>
                   {`
                     @keyframes marquee {
                       0% { transform: translateX(100%); }
                       100% { transform: translateX(-100%); }
                     }
-                    
+
                     .custom-scrollbar {
                       scrollbar-width: none !important;
                       -ms-overflow-style: none !important;
                     }
-                    
+
                     .custom-scrollbar::-webkit-scrollbar {
                       display: none !important;
                       width: 0 !important;
                       height: 0 !important;
                     }
-                    
+
                     .custom-scrollbar::-webkit-scrollbar-track {
                       display: none !important;
                     }
-                    
+
                     .custom-scrollbar::-webkit-scrollbar-thumb {
                       display: none !important;
                     }
-                    
-                    /* Đảm bảo modal có mask đẹp và vẫn scroll được */
+
                     .ant-modal-wrap {
                       overflow: auto !important;
                     }
-                    
+
                     .ant-modal-mask {
                       position: fixed !important;
                       background-color: rgba(0, 0, 0, 0.5) !important;
                     }
-                    
+
                     .ant-modal {
                       position: fixed !important;
                     }
-                    
-                    /* Đảm bảo body vẫn có thể scroll khi modal mở */
+
                     body.ant-scrolling-effect {
                       overflow: auto !important;
                       padding-right: 0 !important;
                     }
-                    
-                    /* Ngăn body bị lock khi modal mở */
+
                     .ant-modal-open {
                       overflow: auto !important;
                     }

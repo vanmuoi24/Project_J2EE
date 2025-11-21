@@ -18,7 +18,15 @@ const Navbar: React.FC = () => {
         key: 'profile',
         label: (
           <Button type="link" onClick={() => navigate('/profile')}>
-            {user.username}
+            Trang cá nhân
+          </Button>
+        ),
+      },
+      {
+        key: 'quản trị',
+        label: (
+          <Button type="link" onClick={() => navigate('/admin')}>
+            Trang quản trị
           </Button>
         ),
       },

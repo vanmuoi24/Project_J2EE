@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   Form,
@@ -12,176 +12,40 @@ import {
   Space,
   Row,
   Col,
+  message,
 } from 'antd';
+import { getPermissions } from '@/services/permissionService';
+import { createRole } from '@/services/rolesServices';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
 
-interface PermissionItem {
+interface Permission {
   name: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   path: string;
   enabled: boolean;
+  id: number;
 }
 
 interface PermissionGroup {
-  group: string;
-  permissions: PermissionItem[];
+  name: string;
+  permissions: Permission[];
 }
 
 interface ModalAddNewRoleProps {
   open: boolean;
   setOpen: (v: boolean) => void;
+  fetchRoles: () => void;
 }
 
-const ModalAddNewRole: React.FC<ModalAddNewRoleProps> = ({ open, setOpen }) => {
+const ModalAddNewRole: React.FC<ModalAddNewRoleProps> = ({ open, setOpen, fetchRoles }) => {
   const [form] = Form.useForm();
 
   // Dữ liệu mẫu nhóm quyền
-  const [permissions, setPermissions] = useState<PermissionGroup[]>([
-    {
-      group: 'Quản lý người dùng',
-      permissions: [
-        {
-          name: 'Xem danh sách người dùng',
-          method: 'GET',
-          path: '/api/v1/users',
-          enabled: false,
-        },
-        {
-          name: 'Tạo người dùng mới',
-          method: 'POST',
-          path: '/api/v1/users',
-          enabled: false,
-        },
-        {
-          name: 'Cập nhật người dùng',
-          method: 'PUT',
-          path: '/api/v1/users/:id',
-          enabled: false,
-        },
-        {
-          name: 'Xóa người dùng',
-          method: 'DELETE',
-          path: '/api/v1/users/:id',
-          enabled: false,
-        },
-      ],
-    },
-    {
-      group: 'Quản lý khách hàng',
-      permissions: [
-        {
-          name: 'Xem danh sách khách hàng',
-          method: 'GET',
-          path: '/api/v1/customers',
-          enabled: false,
-        },
-        {
-          name: 'Thêm khách hàng',
-          method: 'POST',
-          path: '/api/v1/customers',
-          enabled: false,
-        },
-        {
-          name: 'Cập nhật thông tin khách hàng',
-          method: 'PUT',
-          path: '/api/v1/customers/:id',
-          enabled: false,
-        },
-        {
-          name: 'Xóa khách hàng',
-          method: 'DELETE',
-          path: '/api/v1/customers/:id',
-          enabled: false,
-        },
-      ],
-    },
-    {
-      group: 'Quản lý sản phẩm',
-      permissions: [
-        {
-          name: 'Xem danh sách sản phẩm',
-          method: 'GET',
-          path: '/api/v1/products',
-          enabled: false,
-        },
-        {
-          name: 'Thêm sản phẩm',
-          method: 'POST',
-          path: '/api/v1/products',
-          enabled: false,
-        },
-        {
-          name: 'Cập nhật sản phẩm',
-          method: 'PUT',
-          path: '/api/v1/products/:id',
-          enabled: false,
-        },
-        {
-          name: 'Xóa sản phẩm',
-          method: 'DELETE',
-          path: '/api/v1/products/:id',
-          enabled: false,
-        },
-      ],
-    },
-    {
-      group: 'Quản lý đơn hàng',
-      permissions: [
-        {
-          name: 'Xem danh sách đơn hàng',
-          method: 'GET',
-          path: '/api/v1/orders',
-          enabled: false,
-        },
-        {
-          name: 'Tạo đơn hàng mới',
-          method: 'POST',
-          path: '/api/v1/orders',
-          enabled: false,
-        },
-        {
-          name: 'Cập nhật đơn hàng',
-          method: 'PUT',
-          path: '/api/v1/orders/:id',
-          enabled: false,
-        },
-        {
-          name: 'Hủy đơn hàng',
-          method: 'DELETE',
-          path: '/api/v1/orders/:id',
-          enabled: false,
-        },
-      ],
-    },
-    {
-      group: 'Báo cáo & thống kê',
-      permissions: [
-        {
-          name: 'Xem báo cáo doanh thu',
-          method: 'GET',
-          path: '/api/v1/reports/revenue',
-          enabled: false,
-        },
-        {
-          name: 'Xem báo cáo tồn kho',
-          method: 'GET',
-          path: '/api/v1/reports/inventory',
-          enabled: false,
-        },
-        {
-          name: 'Xuất báo cáo PDF',
-          method: 'POST',
-          path: '/api/v1/reports/export',
-          enabled: false,
-        },
-      ],
-    },
-  ]);
-  // Xử lý toggle quyền
+
   const togglePermission = (groupIndex: number, permIndex: number, checked: boolean) => {
-    setPermissions((prev) =>
+    setDataPermissions((prev) =>
       prev.map((g, gi) =>
         gi === groupIndex
           ? {
@@ -194,17 +58,73 @@ const ModalAddNewRole: React.FC<ModalAddNewRoleProps> = ({ open, setOpen }) => {
       )
     );
   };
+  const [dataPermissions, setDataPermissions] = useState<PermissionGroup[]>([]);
 
+  const fetchPermissions = async () => {
+    try {
+      const response = await getPermissions();
+
+      if (response.code === 200) {
+        const raw = response.result;
+
+        // Group theo module
+        const groups: Record<string, PermissionGroup> = {};
+
+        raw.forEach((item: any) => {
+          if (!groups[item.module]) {
+            groups[item.module] = {
+              name: item.module,
+              permissions: [],
+            };
+          }
+
+          groups[item.module].permissions.push({
+            name: item.name,
+            method: item.method,
+            path: item.apiPath,
+            enabled: false,
+            id: item.id,
+          });
+        });
+
+        // Convert object → array
+        const formatted = Object.values(groups);
+
+        setDataPermissions(formatted);
+      }
+    } catch (error) {
+      console.error(error);
+      message.error('Lấy danh sách quyền thất bại');
+    }
+  };
+
+  useEffect(() => {
+    fetchPermissions();
+  }, []);
   // Lưu vai trò
-  const handleSubmit = () => {
-    form.validateFields().then((values) => {
-      const activePermissions = permissions.flatMap((g) => g.permissions.filter((p) => p.enabled));
+  const handleSubmit = async () => {
+    form.validateFields().then(async (values) => {
+      const activePermissions = dataPermissions.flatMap((g) =>
+        g.permissions.filter((p) => p.enabled)
+      );
       console.log('Vai trò mới:', {
         ...values,
         permissions: activePermissions,
       });
-      setOpen(false);
-      form.resetFields();
+
+      let dataRole = {
+        name: values.name,
+        description: values.description,
+        active: values.active,
+        permissions: activePermissions,
+      };
+      let res = await createRole(dataRole as any);
+      if (res.code === 201) {
+        message.success('Thêm vai trò thành công');
+        setOpen(false);
+        form.resetFields();
+        fetchRoles();
+      }
     });
   };
 
@@ -256,70 +176,101 @@ const ModalAddNewRole: React.FC<ModalAddNewRoleProps> = ({ open, setOpen }) => {
         <Divider />
         <h4>Quyền hạn</h4>
         <Collapse accordion>
-          {permissions.map((group, gi) => (
-            <Panel header={group.group} key={group.group}>
-              <Space direction="vertical" style={{ width: '100%' }} size="middle">
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: 12,
-                  }}
-                >
-                  {group.permissions.map((perm, pi) => (
-                    <div
-                      key={pi}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        background: '#fafafa',
-                        borderRadius: 8,
-                        padding: '8px 12px',
-                        border: '1px solid #f0f0f0',
+          {dataPermissions.map((group, gi) => {
+            const allEnabled = group.permissions.every((p) => p.enabled);
+
+            return (
+              <Panel
+                key={group.name}
+                header={
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <strong>{group.name}</strong>
+
+                    {/* 🔥 SWITCH MASTER */}
+                    <Switch
+                      checked={allEnabled}
+                      onChange={(checked) => {
+                        const newData = [...dataPermissions];
+                        newData[gi].permissions = newData[gi].permissions.map((p) => ({
+                          ...p,
+                          enabled: checked,
+                        }));
+                        setDataPermissions(newData);
                       }}
-                    >
-                      <div>
-                        <Text strong>{perm.name}</Text>
-                        <div
-                          style={{
-                            fontSize: 14,
-                            color: '#888',
-                          }}
-                        >
-                          <Tag
-                            color={
-                              perm.method === 'GET'
-                                ? 'blue'
-                                : perm.method === 'POST'
-                                  ? 'green'
-                                  : perm.method === 'PUT'
-                                    ? 'orange'
-                                    : 'red'
-                            }
+                    />
+                  </div>
+                }
+              >
+                <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 12,
+                    }}
+                  >
+                    {group.permissions.map((perm, pi) => (
+                      <div
+                        key={pi}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          background: '#fafafa',
+                          borderRadius: 8,
+                          padding: '8px 12px',
+                          border: '1px solid #f0f0f0',
+                        }}
+                      >
+                        <div>
+                          <Text strong>{perm.name}</Text>
+                          <div
                             style={{
-                              marginRight: 8,
-                              fontWeight: 700,
-                              textTransform: 'uppercase',
-                              letterSpacing: 0.5,
+                              fontSize: 14,
+                              color: '#888',
                             }}
                           >
-                            {perm.method}
-                          </Tag>
-                          {perm.path}
+                            <Tag
+                              color={
+                                perm.method === 'GET'
+                                  ? 'blue'
+                                  : perm.method === 'POST'
+                                    ? 'green'
+                                    : perm.method === 'PUT'
+                                      ? 'orange'
+                                      : 'red'
+                              }
+                              style={{
+                                marginRight: 8,
+                                fontWeight: 700,
+                                textTransform: 'uppercase',
+                                letterSpacing: 0.5,
+                              }}
+                            >
+                              {perm.method}
+                            </Tag>
+                            {perm.path}
+                          </div>
                         </div>
-                      </div>
 
-                      <Switch
-                        checked={perm.enabled}
-                        onChange={(checked) => togglePermission(gi, pi, checked)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </Space>
-            </Panel>
-          ))}
+                        {/* 🔘 SWITCH CHILD */}
+                        <Switch
+                          checked={perm.enabled}
+                          onChange={(checked) => togglePermission(gi, pi, checked)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </Space>
+              </Panel>
+            );
+          })}
         </Collapse>
       </Form>
     </Modal>

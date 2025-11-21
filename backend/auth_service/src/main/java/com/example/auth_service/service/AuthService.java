@@ -20,6 +20,7 @@ import com.example.auth_service.dto.request.RefreshRequest;
 import com.example.auth_service.dto.response.AuthenticationResponse;
 import com.example.auth_service.dto.response.IntrospectResponse;
 import com.example.auth_service.entity.InvalidatedToken;
+import com.example.auth_service.entity.Permission;
 import com.example.auth_service.entity.User;
 import com.example.auth_service.exception.AppException;
 import com.example.auth_service.exception.ErrorCode;
@@ -101,6 +102,7 @@ public class AuthService {
                 .expirationTime(new Date(
                         Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
+                .claim("scope", buildScope(user))
                
                 .build();
 
@@ -142,6 +144,21 @@ public class AuthService {
         }
 
         return IntrospectResponse.builder().valid(isValid).build();
+    }
+
+    private String buildScope(User user) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if (user.getRole() != null) {
+            stringJoiner.add("ROLE_" + user.getRole().getName());
+            if (user.getRole().getPermissions() != null) {
+                for (Permission permission : user.getRole().getPermissions()) {
+                    if (permission != null && permission.getName() != null) {
+                        stringJoiner.add(permission.getName());
+                    }
+                }
+            }
+        }
+        return stringJoiner.toString();
     }
 
     private SignedJWT verifyToken(String token, boolean isRefresh)

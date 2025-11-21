@@ -23,6 +23,7 @@ import BookingHistory from '@/pages/Booking/HistoryPage';
 import Invoice from '@/pages/Invoice/InvoicePage';
 import ManagerReViewTour from '@/components/Admin/ManagerTour/ManagerReViewTour';
 import ManagerRole from '@/components/Admin/ManagerTour/ManagerRole';
+import ManagerRoleUser from '@/components/Admin/ManagerRoleUser/ManagerRoleUser';
 
 export default function AppRoutes() {
   return (
@@ -67,6 +68,7 @@ export default function AppRoutes() {
           <Route path="/admin/managerTour/destination" element={<ManagerDestination />} />
           <Route path="/admin/managerTour/reviews" element={<ManagerReViewTour />} />
           <Route path="/admin/role" element={<ManagerRole />} />
+          <Route path="/admin/managerRole" element={<ManagerRoleUser />} />
         </Route>
       </Routes>
     </BrowserRouter>

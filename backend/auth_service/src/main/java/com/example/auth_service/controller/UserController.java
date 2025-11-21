@@ -36,7 +36,6 @@ public class UserController {
 
     @PostMapping("/register")
         ApiResponse<UserResponse> createUser(@RequestBody UserCreationRequest request) {
-            System.err.println(request);
         return ApiResponse.<UserResponse>builder()
                 .result(userService.createUser(request))
                 .build();
@@ -68,7 +67,7 @@ public class UserController {
     public ApiResponse<UserResponse> updateUser(
             @PathVariable Long id,
             @ModelAttribute UserUpdate request) {
-                System.out.println(request);
+
         return ApiResponse.<UserResponse>builder().result(userService.updateUser(id, request))
                 .build();
     }
@@ -79,6 +78,12 @@ public class UserController {
             @RequestPart("file") MultipartFile file) throws IOException{
                  FileResponse response = userService.uploadAvatar(id, file);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ApiResponse.<Void>builder().build();
     }
  
 }

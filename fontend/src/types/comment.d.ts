@@ -5,6 +5,8 @@ export interface UserResponse {
   address: string;
   email: string;
   phone: string;
+  role: Role;
+  permissions: Permission[];
 }
 
 export interface ReviewResponse {
@@ -15,8 +17,9 @@ export interface ReviewResponse {
   rating: number;
   createdAt: string;
 }
-interface AxiosResponse<T = any> {
+export interface AxiosResponse<T = any> {
   result: T;
+  message: string;
   code: number;
 }
 export interface CreateCommentRequest {

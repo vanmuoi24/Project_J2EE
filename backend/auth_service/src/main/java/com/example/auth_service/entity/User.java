@@ -33,7 +33,11 @@ public class User {
 
     @Column
     private String address;
-    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    private Role role;
+
 
 
 }
+    
