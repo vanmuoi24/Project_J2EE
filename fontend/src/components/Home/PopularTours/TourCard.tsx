@@ -23,7 +23,6 @@ const TourCard: React.FC<TourCardProps> = ({ tour, onBooking }) => {
 
   const nightDuration = tour.duration > 0 ? tour.duration - 1 : 0;
 
-  console.log(tour);
   return (
     <div className="!py-2 !px-[8px]">
       <div className="shadow-xl rounded-2xl overflow-hidden bg-white">

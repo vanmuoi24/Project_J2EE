@@ -53,4 +53,7 @@ public class Tour {
     @Column(name = "image_id")
     private List<String> imageIds;
 
+    @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TourDeparture> tourDepartures;
+
 }

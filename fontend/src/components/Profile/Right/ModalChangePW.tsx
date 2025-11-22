@@ -1,9 +1,10 @@
 import { changePW } from '@/services/authServices';
 import type { RootState } from '@/store';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { logoutUser } from '@/store/slices/authSlice';
 import { LockOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Modal } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 interface IProps {
   visible: boolean;
@@ -14,6 +15,7 @@ const ModalChangePW = ({ visible, onClose }: IProps) => {
   const { token } = useAppSelector((state: RootState) => state.auth);
 
   const [form] = Form.useForm();
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (values: any) => {
     if (!values.currentPassword || !values.newPassword || !values.confirmPassword) {
@@ -31,12 +33,18 @@ const ModalChangePW = ({ visible, onClose }: IProps) => {
       confirmPassword,
       token: token ?? '',
     };
-    console.log('>>>>>>>>>>', dataChangPW);
 
-    const res = await changePW(dataChangPW);
-    if (res.code === 1000) {
-      message.success('Cập nhật mật khẩu thành công!');
-    } else {
+    try {
+      const res = await changePW(dataChangPW);
+
+      if (res.code === 1000) {
+        message.success('Cập nhật mật khẩu thành công! Vui lòng đăng nhập lại');
+        dispatch(logoutUser());
+      } else {
+        message.error('Cập nhật thất bại.');
+      }
+    } catch (error) {
+      console.log(error);
       message.error('Cập nhật thất bại.');
     }
   };

@@ -3,7 +3,7 @@ import Explore from '@/components/Home/Explore/Explore';
 import PopularTours from '@/components/Home/PopularTours/PopularTours';
 import Highlights from '@/components/Home/Highlights/Highlights';
 import Slide from '@/components/Home/Slide/Slide';
-import Achievements from '@/components/Home/Highlights/Achievement';
+import Rating from '@/components/Home/Rating/Rating';
 
 const HomePage = () => {
   return (
@@ -12,8 +12,8 @@ const HomePage = () => {
       <Slide />
       <Explore />
       <PopularTours />
+      <Rating />
       <Highlights />
-      <Achievements />
     </>
   );
 };

@@ -37,9 +37,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     @NonFinal
     private String[] publicEndpoints = {
             "/auth/users/login",
+            "/auth/users/googleDockerfile",
             "/auth/users/register",
             "/auth/users/refresh",
             "/auth/users/introspect",
+            "/auth/reviews/high-rating",
             "/notification/email/send",
             "/file/media/download/.*",
             "/pricing/prices/.*",

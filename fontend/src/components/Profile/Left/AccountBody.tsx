@@ -1,4 +1,4 @@
-import { FileTextOutlined, HeartOutlined, UserOutlined } from '@ant-design/icons';
+import { FileTextOutlined, UserOutlined } from '@ant-design/icons';
 import { Card } from 'antd';
 
 interface IProps {

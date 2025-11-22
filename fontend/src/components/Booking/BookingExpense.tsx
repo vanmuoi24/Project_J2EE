@@ -1,4 +1,4 @@
-import { Card, Typography, Row, Col, Button, Modal, message } from 'antd';
+import { Typography, Row, Col, Button, Modal, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getTourDepartureById } from '@/services/tourServices';

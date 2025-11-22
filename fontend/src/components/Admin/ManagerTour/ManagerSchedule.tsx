@@ -6,7 +6,7 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import { Button, Input, Modal, Form, InputNumber, Select, Space, message } from 'antd';
+import { Button, Input, Modal, Space, message } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 import AddItinerary from './ModelSchedule/AddSchedule';
@@ -69,6 +69,8 @@ const ManagerItinerary: React.FC = () => {
     setData(data.filter((d) => d.id !== id));
     message.success('Xóa lịch trình thành công');
   };
+
+  console.log(editingItinerary);
 
   const columns: ProColumns<Itinerary>[] = [
     { title: 'STT', key: 'index', width: 60, align: 'center', render: (_, __, index) => index + 1 },

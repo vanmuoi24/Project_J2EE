@@ -1,6 +1,11 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import type { AuthState, LoginRequest } from '@/types/Auth.d';
-import { loginService, logoutService, refreshTokenService } from '@/services/authServices';
+import {
+  loginService,
+  loginWithGGService,
+  logoutService,
+  refreshTokenService,
+} from '@/services/authServices';
 import { sessionService } from '@/services/sessionServices';
 import type { IUserUpdate, User } from '@/types/User';
 import { updateAvt, updateProfile } from '@/services/userServices';
@@ -19,6 +24,18 @@ export const loginUser = createAsyncThunk(
   async (dataLogin: LoginRequest, { rejectWithValue }) => {
     try {
       const res = await loginService(dataLogin);
+      return res;
+    } catch (err: unknown) {
+      if (err instanceof Error) return rejectWithValue(err.message);
+      return rejectWithValue('Đăng nhập thất bại');
+    }
+  }
+);
+export const loginUserWithGG = createAsyncThunk(
+  'auth/loginUserWithGG',
+  async (ggToken: string, { rejectWithValue }) => {
+    try {
+      const res = await loginWithGGService(ggToken);
       return res;
     } catch (err: unknown) {
       if (err instanceof Error) return rejectWithValue(err.message);
@@ -116,6 +133,21 @@ const authSlice = createSlice({
         state.expiryTime = action.payload?.result.expiryTime;
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = typeof action.payload === 'string' ? action.payload : 'Đăng nhập thất bại';
+      })
+      .addCase(loginUserWithGG.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUserWithGG.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuth = true;
+        state.user = action.payload?.result.user;
+        state.token = action.payload?.result.token;
+        state.expiryTime = action.payload?.result.expiryTime;
+      })
+      .addCase(loginUserWithGG.rejected, (state, action) => {
         state.loading = false;
         state.error = typeof action.payload === 'string' ? action.payload : 'Đăng nhập thất bại';
       })

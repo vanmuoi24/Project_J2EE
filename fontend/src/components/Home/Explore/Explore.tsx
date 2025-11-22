@@ -1,7 +1,4 @@
 import Container from '@/components/Share/Container';
-import { getAllDestinations } from '@/services/tourServices';
-import type { IDestination } from '@/types/Tour';
-import { useState } from 'react';
 import Slider, { type Settings } from 'react-slick';
 
 const VouchersSlider: React.FC = () => {
@@ -49,7 +46,7 @@ const VouchersSlider: React.FC = () => {
   ];
 
   return (
-    <div className="py-10 bg-gray-50 !mb-20">
+    <div className="py-10  !mb-20">
       <Container>
         {/* Title */}
         <div className="!mb-3">

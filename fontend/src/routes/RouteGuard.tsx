@@ -6,17 +6,12 @@ type IRouteGuardProps = {
   redirectPath?: string;
 };
 
-export default function RouteGuard({ isPrivate, redirectPath }: IRouteGuardProps) {
+export default function RouteGuard({ isPrivate }: IRouteGuardProps) {
   const { isAuth } = useAppSelector((state: any) => state.auth);
 
   // Nếu là private route nhưng chưa login → về login
   if (isPrivate && !isAuth) {
     return <Navigate to="/login" replace />;
-  }
-
-  // Nếu là public route nhưng đã login → về dashboard
-  if (!isPrivate && isAuth) {
-    return <Navigate to={redirectPath || '/dashboard'} replace />;
   }
 
   return <Outlet />;

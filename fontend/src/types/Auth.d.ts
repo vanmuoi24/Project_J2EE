@@ -1,3 +1,4 @@
+import type { UserResponse } from './comment';
 import type { User } from './User.d';
 
 export type AuthState = {
@@ -47,4 +48,13 @@ export type ChangePWReq = {
   newPassword: string;
   confirmPassword: string;
   token: string;
+};
+
+export type ReviewResponse = {
+  id: number;
+  tourId: number;
+  user: UserResponse;
+  content: string;
+  rating: number;
+  createdAt: string;
 };

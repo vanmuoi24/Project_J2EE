@@ -2,7 +2,6 @@ import AppRoutes from '@routes/AppRoutes';
 
 import { ConfigProvider } from 'antd';
 import viVN from 'antd/locale/vi_VN';
-import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import { Bounce, ToastContainer } from 'react-toastify';
 export default function App() {

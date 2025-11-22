@@ -58,5 +58,14 @@ public class AuthController {
         return ApiResponse.<Void>builder().message("Change password successfully").build();
     }
 
+    @PostMapping("/google")
+    ApiResponse<AuthenticationResponse>  loginWithGG(@RequestHeader("Authorization") String header) throws Exception {
+        var result = authService.authenticatedWithGG(header);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(result).build();
+    }
+
+
+
 
 }

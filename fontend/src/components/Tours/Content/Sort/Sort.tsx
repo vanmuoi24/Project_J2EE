@@ -9,7 +9,7 @@ interface IProps {
   setSearchParams: ReturnType<typeof useSearchParams>[1];
 }
 
-const Sort = ({ tours, searchParams, setSearchParams }: IProps) => {
+const Sort = ({ searchParams, setSearchParams }: IProps) => {
   // 4. Hàm xử lý khi người dùng chọn sắp xếp
   const handleSortChange = (value: string) => {
     // Tạo bản sao của các params hiện tại (như filter, page...)

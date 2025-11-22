@@ -69,7 +69,6 @@ const ToursPage = () => {
     });
     fetchTours();
   }, [searchParams]);
-
   return (
     <div className="">
       <Container>
@@ -103,7 +102,7 @@ const ToursPage = () => {
           <div className="flex-11">
             <List tours={tours} />
             <div className="flex justify-center !mt-8 !mb-[80px]">
-              {tours && tours?.length > 0 && (
+              {tours && totalElements > PAGE_SIZE && tours?.length > 0 && (
                 <Pagination
                   current={searchParams.get('page') ? Number(searchParams.get('page')) + 1 : 1}
                   pageSize={PAGE_SIZE}

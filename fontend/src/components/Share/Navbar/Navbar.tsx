@@ -1,8 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Dropdown, Menu, message } from 'antd';
+import { Avatar, Button, Dropdown, message } from 'antd';
 import brand from '@/assets/images/logo.png';
 import Container from '@/components/Share/Container';
-import { SettingOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store';
 import { logoutUser } from '@/store/slices/authSlice';
@@ -11,7 +10,6 @@ const Navbar: React.FC = () => {
   const { user } = useAppSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
   const userMenu = (user &&
     user !== null && [
       {
@@ -118,7 +116,11 @@ const Navbar: React.FC = () => {
           <div className="flex items-center justify-center gap-[12px]">
             <Dropdown menu={{ items: userMenu }} placement="bottomRight" arrow>
               {user != null && user.username ? (
-                <SettingOutlined className="text-[20px] text-black cursor-pointer" />
+                <Avatar
+                  size={40}
+                  src={user?.avatar}
+                  className="border-2 border-gray-200 cursor-pointer"
+                />
               ) : (
                 // <UserOutlined className="text-[20px] text-black cursor-pointer" />
                 <button className=" bg-[#7BBCB0] rounded-[6px] !px-2 !py-2 transition hover:bg-[#87b0eb]">

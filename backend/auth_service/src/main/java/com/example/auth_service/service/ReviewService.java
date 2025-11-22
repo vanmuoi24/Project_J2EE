@@ -5,7 +5,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.corundumstudio.socketio.SocketIOServer;
@@ -116,4 +121,28 @@ public List<ReviewGroupResponse> getAllReviewsGroupedByTour() {
     return new ArrayList<>(grouped.values());
 }
 
+    public List<ReviewResponse> getHighRatings(Integer size) {
+
+        // 1. Tạo một đối tượng Pageable để yêu cầu database
+        // - Trang 0 (trang đầu tiên)
+        // - 'size' (số lượng bản ghi mong muốn)
+        // - Sắp xếp: ưu tiên 1 là "rating" giảm dần (DESC), ưu tiên 2 là "createdAt" giảm dần
+        Pageable pageable = PageRequest.of(
+                0,
+                size,
+                Sort.by("rating").descending().and(Sort.by("createdAt").descending())
+        );
+
+        // 2. Gọi repository với Pageable
+        // Giả sử bạn muốn lấy các đánh giá có rating >= 4
+        // (Nếu bạn không có phương thức này, bạn có thể dùng `reviewRepository.findAll(pageable)`)
+        Page<Review> reviewPage = reviewRepository.findByRatingGreaterThanEqual(4, pageable);
+
+        // 3. Chuyển đổi Page<Review> thành List<ReviewResponse>
+
+        return reviewPage.getContent().stream()
+                .map(reviewMapper::toResponse) // Hoặc logic chuyển đổi của bạn
+                .collect(Collectors.toList());
+
+    }
 }

@@ -1,11 +1,9 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { loginUser } from '@/store/slices/authSlice';
+import { loginUser, loginUserWithGG } from '@/store/slices/authSlice';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Card, Typography, message, Divider, Space, Alert } from 'antd';
 import { Navigate, useNavigate } from 'react-router-dom';
-import logo from '@/assets/images/logo.png';
-import SubNavbar from '@/components/Share/SubNavbar';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, type GoogleCredentialResponse } from '@react-oauth/google';
 import { sessionService } from '@/services/sessionServices';
 import type { RootState } from '@/store';
 
@@ -20,6 +18,19 @@ export default function LoginPage() {
       sessionService.setSession(res.result.token, res.result.user);
       message.success('Đăng nhập thành công!', 3);
       navigate('/admin');
+    } else message.error('Đăng nhập thất bại!', 3);
+  };
+
+  const handleGGLogin = async (credentialResponse: GoogleCredentialResponse) => {
+    const googleToken = credentialResponse.credential || '';
+
+    const res = await dispatch(loginUserWithGG(googleToken)).unwrap();
+    if (res.code === 1000) {
+      sessionService.setSession(res.result.token, res.result.user);
+      message.success('Đăng nhập thành công!', 3);
+      navigate('/admin');
+    } else {
+      message.error('Đăng nhập thất bại!', 3);
     }
   };
 
@@ -78,28 +89,16 @@ export default function LoginPage() {
 
               <Space direction="vertical" className="w-full">
                 <GoogleLogin
-                  onSuccess={(credentialResponse) => {
-                    console.log('Google Login Success:', credentialResponse);
-                    // credentialResponse.credential = JWT token
-                    // gửi về backend để xác thực
-                  }}
+                  useOneTap={true}
+                  onSuccess={handleGGLogin}
                   onError={() => {
                     console.log('Login Failed');
                   }}
                 />
-                {/* <FacebookLogin
-                      appId="YOUR_FACEBOOK_APP_ID"
-                      autoLoad={false}
-                      fields="name,email,picture"
-                      callback={handleFacebookResponse}
-                      textButton="Đăng nhập với Facebook"
-                      icon={<FacebookOutlined />}
-                      cssClass="ant-btn ant-btn-default ant-btn-block"
-                    /> */}
               </Space>
 
               <Typography.Paragraph className="text-center !mb-0">
-                Chưa có thành viên?{' '}
+                Chưa có tài khoản?{' '}
                 <Button
                   type="link"
                   onClick={() => navigate('/register')}

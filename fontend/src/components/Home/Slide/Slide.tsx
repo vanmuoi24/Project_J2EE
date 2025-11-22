@@ -1,12 +1,4 @@
-import { Flex } from 'antd';
 import Container from '@/components/Share/Container';
-import Tag from './Tag';
-import tag1 from '@/assets/images/tag1.webp';
-import tag2 from '@/assets/images/tag2.webp';
-import tag3 from '@/assets/images/tag3.webp';
-import tag4 from '@/assets/images/tag4.webp';
-import tag5 from '@/assets/images/tag5.webp';
-import tag6 from '@/assets/images/tag6.webp';
 import VouchersSlider from './VoucherSlider';
 
 const Slide = () => {

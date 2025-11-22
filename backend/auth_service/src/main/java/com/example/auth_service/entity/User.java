@@ -38,6 +38,10 @@ public class User {
     private Role role;
 
 
+    @Column
+    private String googleId;   // id duy nhất từ Google
+
+    private String provider = "LOCAL";
 
 }
     

@@ -74,10 +74,10 @@ public class UserController {
 
 
     @PostMapping ("/updateAvtUser/{id}")
-    public ResponseEntity<FileResponse>  updateAvtUser( @PathVariable("id") String id,
+    public ApiResponse<FileResponse>  updateAvtUser( @PathVariable("id") String id,
             @RequestPart("file") MultipartFile file) throws IOException{
                  FileResponse response = userService.uploadAvatar(id, file);
-        return ResponseEntity.ok(response);
+        return ApiResponse.<FileResponse>builder().result(response).build();
     }
 
     @DeleteMapping("/{id}")
