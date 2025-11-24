@@ -13,9 +13,8 @@ import com.example.auth_service.entity.Review;
 @Mapper(componentModel = "spring")
 public interface ReviewMapper {
 
-    @Mapping(source = "user", target = "user")
-    @Mapping(source = "createdAt", target = "createdAt", qualifiedByName = "formatDateTime") // ✅ convert LocalDateTime
-                                                                                             // -> String
+    @Mapping(target = "user", source = "user")
+    @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "formatDateTime")
     ReviewResponse toResponse(Review review);
 
     List<ReviewResponse> toResponseList(List<Review> reviews);

@@ -3,10 +3,7 @@ package com.example.booking_service.service;
 import com.example.booking_service.client.TourDepartureClient;
 import com.example.booking_service.client.UserClient;
 import com.example.booking_service.dto.request.BookingRequest;
-import com.example.booking_service.dto.response.ApiResponse;
-import com.example.booking_service.dto.response.BookingResponse;
-import com.example.booking_service.dto.response.TourDepartureResponse;
-import com.example.booking_service.dto.response.UserResponse;
+import com.example.booking_service.dto.response.*;
 import com.example.booking_service.entity.*;
 import com.example.booking_service.exception.AppException;
 import com.example.booking_service.exception.ErrorCode;
@@ -22,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,29 +32,46 @@ public class BookingService {
     private final BookingMapper bookingMapper;
     private final CustomerMapper customerMapper;
 
+    /*****
+     *
+     * @return
+     */
     public List<BookingResponse> getAllBookings() {
+
         List<Booking> bookings = bookingRepository.findAll();
         return bookingMapper.toBookingResponseList(bookings);
     }
 
+    /*****
+     *
+     * @param id
+     * @return
+     */
     public BookingResponse getBookingById(Long id){
         Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_EXISTED));
         return bookingMapper.toBookingResponse(booking);
     }
 
+    /***
+     *
+     * @param bookingRequest
+     * @return
+     */
     public BookingResponse createBooking(BookingRequest bookingRequest) {
         System.err.println(bookingRequest);
 
         try {
-            // --- GỌI CÁC SERVICE ---
+            /*****
+             * SEND REQUEST TO USER API AND TOUR DEPARTURE API FOR GETTING ID
+             */
             ApiResponse<UserResponse> userResponse = userClient.getUserById(
                     Long.parseLong(bookingRequest.getUserId()));
 
             ApiResponse<TourDepartureResponse> departureResponse = tourDepartureClient.getTourDepartureById(
                     Long.parseLong(bookingRequest.getTourDepartureId()));
 
-            // --- KIỂM TRA DỮ LIỆU ---
+
             if (userResponse == null || userResponse.getResult() == null) {
                 throw new IllegalArgumentException("User không tồn tại với ID: " + bookingRequest.getUserId());
             }
@@ -65,76 +80,82 @@ public class BookingService {
                 throw new IllegalArgumentException("TourDeparture không tồn tại với ID: " + bookingRequest.getTourDepartureId());
             }
 
-            // --- LẤY SỐ GHẾ CÒN LẠI ---
+            /*****
+             * CHECKING FOR THE REST OF TOUR DEPARTURE TICKET
+             */
             int availableSeats = departureResponse.getResult().getAvailableSeats();
             int requestedSeats = bookingRequest.getListOfCustomers().size();
 
             if(availableSeats == 0){
                 return BookingResponse.builder()
                         .message("Tour đã hết chỗ.")
-                        .tourDepartureResponse(departureResponse.getResult())
                         .build();
             }
 
             if (requestedSeats > availableSeats) {
                 return BookingResponse.builder()
                         .message("Tour chỉ còn lại: " + availableSeats)
-                        .tourDepartureResponse(departureResponse.getResult())
                         .build();
             }
 
-            // --- TẠO BOOKING ---
+            /*****
+             * GENERATE BOOKING INSTANCE FOR SAVING TO DATABASE
+             */
             Booking booking = bookingMapper.toBooking(bookingRequest);
-            booking.setStatus(BookingStatus.UNPAID);
+            booking.setStatus(BookingStatus.CONFIRMED);
             booking.setAccountId(Integer.parseInt(bookingRequest.getUserId()));
             booking.setCreatedAt(LocalDateTime.now());
             booking.setTourDepartureId(Integer.parseInt(bookingRequest.getTourDepartureId()));
 
-            // Lưu booking trước để có ID (nếu có quan hệ FK)
+            /*****
+             * GENERATE LIST OF CUSTOMERS FOR SAVING TO BOOKING INSTANCE
+             */
+            List<Customer> customers = new ArrayList<>();
+
+            for (var cusReq : bookingRequest.getListOfCustomers()) {
+                LocalDate birthdate = LocalDate.parse(cusReq.getBirthdate());
+                int age = Period.between(birthdate, LocalDate.now()).getYears();
+                boolean genderValue = cusReq.getGender().equalsIgnoreCase("Male");
+
+                BookingType bookingType;
+                if (age < 2) {
+                    bookingType = BookingType.INFANT;
+                } else if (age <=4) {
+                    bookingType = BookingType.TODDLER;
+                } else if (age <= 11) {
+                    bookingType = BookingType.CHILD;
+                } else {
+                    bookingType = BookingType.ADULT;
+                }
+
+                Customer customer = Customer.builder()
+                        .fullName(cusReq.getFullName())
+                        .address(cusReq.getAddress())
+                        .dateOfBirth(birthdate)
+                        .status(CustomerStatus.BOOKED)
+                        .gender(genderValue)
+                        .bookingType(bookingType)
+                        .booking(booking)
+                        .build();
+
+                booking.getCustomers().add(customer);
+                customers.add(customer);
+
+            }
+
             bookingRepository.save(booking);
 
-            // --- TẠO DANH SÁCH KHÁCH HÀNG ---
-            List<Customer> customers = bookingRequest.getListOfCustomers().stream()
-                    .map(cusReq -> {
-                        LocalDate birthdate = LocalDate.parse(cusReq.getBirthdate());
-                        int age = Period.between(birthdate, LocalDate.now()).getYears();
-                        boolean genderValue = cusReq.getGender().equalsIgnoreCase("Male");
 
-                        BookingType bookingType;
-                        if (age < 2) {
-                            bookingType = BookingType.INFANT;
-                        } else if (age >= 2 && age <= 4) {
-                            bookingType = BookingType.TODDLER;
-                        } else if (age >= 5 && age <= 11) {
-                            bookingType = BookingType.CHILD;
-                        } else {
-                            bookingType = BookingType.ADULT;
-                        }
-
-                        return Customer.builder()
-                                .fullName(cusReq.getFullName())
-                                .address(cusReq.getAddress())
-                                .dateOfBirth(birthdate)
-                                .status(CustomerStatus.BOOKED)
-                                .gender(genderValue)
-                                .bookingType(bookingType)
-                                .booking(booking) // nếu Customer có quan hệ ManyToOne Booking
-                                .build();
-                    }).toList();
-
-
-            // --- Lưu danh sách khách hàng --- //
-            customerRepository.saveAll(customers);
-
-            // --- TRẢ KẾT QUẢ ---
+            /*****
+             * RETURN BOOKING GENERATED RESULT
+             */
             return BookingResponse.builder()
                     .id(String.valueOf(booking.getId()))
                     .createdAt(String.valueOf(booking.getCreatedAt()))
                     .accountId(String.valueOf(booking.getAccountId()))
-                    .listOfCustomers(customerMapper.toCustomerResponseList(customers))
-                    .tourDepartureResponse(departureResponse.getResult())
                     .status(String.valueOf(booking.getStatus()))
-                    .message(String.valueOf("Đặt tour thành công"))
+                    .message("Đặt tour thành công")
+                    .tourDepartureId(bookingRequest.getTourDepartureId())
                     .build();
 
         } catch (DataIntegrityViolationException exception) {
@@ -148,17 +169,26 @@ public class BookingService {
         }
     }
 
+    /****
+     *
+     * @param id
+     * @return
+     */
     public BookingResponse updateBookingStatus(Long id) {
-        // --- Lấy booking hiện tại ---
+        /*****
+         * GET CURRENT BOOKING BY ID
+         */
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
 
-        booking.setStatus(BookingStatus.CONFIRMED);
+        /*****
+         * SAVE CURRENT BOOKING INSTANCE
+         */
+        booking.setStatus(BookingStatus.UNCONFIRMED);
         booking.setCreatedAt(LocalDateTime.now());
 
         bookingRepository.save(booking);
 
-        // --- Ánh xạ dữ liệu phản hồi ---
         return BookingResponse.builder()
                 .id(String.valueOf(booking.getId()))
                 .accountId(String.valueOf(booking.getAccountId()))
@@ -168,5 +198,21 @@ public class BookingService {
                 .build();
     }
 
+    public BookingResponse deleteBooking(Long id){
+        /*****
+         * GET CURRENT BOOKING BY ID
+         */
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
+
+        /*****
+         * DELETE CURRENT BOOKING INSTANCE
+         */
+        bookingRepository.deleteById(id);
+
+        return BookingResponse.builder()
+                .message("Xóa booking thành công.")
+                .build();
+    }
 
 }

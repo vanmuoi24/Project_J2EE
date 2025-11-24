@@ -10,25 +10,32 @@ import {
 import { Card, Typography, Button, List, message } from 'antd';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store';
-
 const { Text, Title } = Typography;
 
 interface TourDetailCardProps {
   tourData?: ITour | null;
   selectedDepartureId?: number | null;
+  onSelectDeparture?: () => void;
 }
 
-export default function TourDetailCard({ selectedDepartureId, tourData }: TourDetailCardProps) {
+export default function TourDetailCard({
+  selectedDepartureId,
+  tourData,
+  onSelectDeparture,
+}: TourDetailCardProps) {
   const [dataDetailTourDeparture, setDataDetailTourDeparture] = useState<ITourDeparture | null>(
     null
   );
-
+  let navi = useNavigate();
   const fetchDataTourDepartureById = async () => {
     if (!selectedDepartureId) return;
+
     const res = await getTourDepartureById(selectedDepartureId);
     const data: TourDepartureResponse = res;
+
     setDataDetailTourDeparture(data.result);
   };
 
@@ -45,6 +52,15 @@ export default function TourDetailCard({ selectedDepartureId, tourData }: TourDe
   useEffect(() => {
     fetchDataTourDepartureById();
   }, [selectedDepartureId]);
+
+  function accessBookingPage() {
+    navi(`/booking`);
+  }
+  const handleSelectDepartureClick = () => {
+    if (onSelectDeparture) {
+      onSelectDeparture();
+    }
+  };
 
   return (
     <Card
@@ -201,7 +217,7 @@ export default function TourDetailCard({ selectedDepartureId, tourData }: TourDe
               fontSize: 12,
               width: '100%',
             }}
-            onClick={handleBookTour}
+            onClick={accessBookingPage}
           >
             Đặt ngay
           </Button>
@@ -218,6 +234,7 @@ export default function TourDetailCard({ selectedDepartureId, tourData }: TourDe
               fontSize: 12,
               width: '100%',
             }}
+            onClick={handleSelectDepartureClick}
           >
             Chọn ngày khởi hành
           </Button>

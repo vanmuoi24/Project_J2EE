@@ -43,12 +43,12 @@ public class TourPriceService {
         return toResponse(repository.save(existing));
     }
 
-    public void deletePrice(Long id) {
-        if (!repository.existsById(id)) {
-            throw new AppException(ErrorCode.INVALID_KEY);
-        }
-        repository.deleteById(id);
-    }
+//    public void deletePrice(Long id) {
+//        if (!repository.existsById(id)) {
+//            throw new AppException(ErrorCode.INVALID_KEY);
+//        }
+//        repository.deleteById(id);
+//    }
 
     public List<TourPriceResponse> getAllPrices() {
         return repository.findAll().stream()
@@ -60,6 +60,11 @@ public class TourPriceService {
         TourPrice tourPrice = repository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
         return toResponse(tourPrice);
+    }
+
+    public List<TourPriceResponse> getPricesBatch(List<Long> ids) {
+        List<TourPrice> prices = repository.findAllById(ids);
+        return prices.stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     private TourPriceResponse toResponse(TourPrice tourPrice) {

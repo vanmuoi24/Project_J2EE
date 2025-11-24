@@ -1,5 +1,6 @@
 package com.example.tour_service.service;
 
+import com.example.tour_service.dto.request.TourPriceBatchRequest;
 import com.example.tour_service.repository.httpClient.PricingClient;
 import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourDepartureRequest;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,18 +39,30 @@ public class TourDepartureService {
         return response;
     }
 
-    public List<TourDepartureResponse> getAllTourDeparture(){
-        return tourDepartureRepository.findAll().stream()
-                .map(tourDeparture -> {
-                    TourDepartureResponse response = toResponse(tourDeparture);
-                    ApiResponse<TourPriceResponse> priceResp =
-                            pricingClient.getPriceById(tourDeparture.getTour().getTourPriceId());
-                    response.setTourPrice(priceResp.getResult());
+    public List<TourDepartureResponse> getAllTourDeparture() {
+        List<TourDeparture> allDepartures = tourDepartureRepository.findAll();
 
-                    return response;
+        List<Long> departurePriceIds = allDepartures.stream()
+                .map(td -> td.getTour().getTourPriceId())
+                .distinct()
+                .toList();
+
+        TourPriceBatchRequest depPriceBatchReq = new TourPriceBatchRequest();
+        depPriceBatchReq.setIds(departurePriceIds);
+        List<TourPriceResponse> depPriceList = pricingClient.getPricesBatch(depPriceBatchReq).getResult();
+
+        Map<Long, TourPriceResponse> depPriceMap = depPriceList.stream()
+                .collect(Collectors.toMap(TourPriceResponse::getId, p -> p));
+
+        return allDepartures.stream()
+                .map(td -> {
+                    TourDepartureResponse tdResp = toResponse(td);
+                    tdResp.setTourPrice(depPriceMap.get(td.getTour().getTourPriceId()));
+                    return tdResp;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
+
 
     public List<TourDepartureResponse> getTourDepartureByTourId(int id){
         return tourDepartureRepository.findByTourId(id).stream()
@@ -64,6 +78,34 @@ public class TourDepartureService {
                 })
                 .collect(Collectors.toList());
     }
+
+    public Map<Integer, List<TourDepartureResponse>> getDeparturesByTourIdsWithPrice(List<Integer> tourIds) {
+        List<TourDeparture> allDepartures = tourDepartureRepository.findByTourIdIn(tourIds).stream()
+                .filter(td -> td.getDepartureDate().isAfter(LocalDateTime.now()))
+                .toList();
+
+        List<Long> departurePriceIds = allDepartures.stream()
+                .map(td -> td.getTour().getTourPriceId())
+                .distinct()
+                .toList();
+
+        TourPriceBatchRequest depPriceBatchReq = new TourPriceBatchRequest();
+        depPriceBatchReq.setIds(departurePriceIds);
+        List<TourPriceResponse> depPriceList = pricingClient.getPricesBatch(depPriceBatchReq).getResult();
+
+        Map<Long, TourPriceResponse> depPriceMap = depPriceList.stream()
+                .collect(Collectors.toMap(TourPriceResponse::getId, p -> p));
+
+        return allDepartures.stream()
+                .map(td -> {
+                    TourDepartureResponse tdResp = toResponse(td);
+                    tdResp.setTourPrice(depPriceMap.get(td.getTour().getTourPriceId()));
+                    return tdResp;
+                })
+                .collect(Collectors.groupingBy(TourDepartureResponse::getTourId));
+    }
+
+
 
     public TourDepartureResponse create(TourDepartureRequest tourDepartureRequest) {
         Tour tour = tourRepository.findById(tourDepartureRequest.getTourId())
@@ -109,13 +151,13 @@ public class TourDepartureService {
         return toResponse(saved);
     }
 
-    public void delete(int id) {
-        if (!tourDepartureRepository.existsById(id)) {
-            throw new AppException(ErrorCode.INVALID_KEY);
-        }
-
-        tourDepartureRepository.deleteById(id);
-    }
+//    public void delete(int id) {
+//        if (!tourDepartureRepository.existsById(id)) {
+//            throw new AppException(ErrorCode.INVALID_KEY);
+//        }
+//
+//        tourDepartureRepository.deleteById(id);
+//    }
 
 
     //Ham dem so luong Tour Departure cua Tour

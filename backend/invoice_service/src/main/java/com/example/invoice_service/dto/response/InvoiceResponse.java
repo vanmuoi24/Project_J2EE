@@ -11,23 +11,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class InvoiceResponse {
-    private String userId;
+    private String id;
+    private String accountId;
     private String bookingId;
-    private String dateOfTransaction;
+    private String dayOfPay;
     private String paymentMethodId;
     private String status;
     private String message;
-    private String totalCountOfAdult;
-    private String totalCountOfChildren;
-    private String totalCountOfToddler;
-    private String totalCountOfInfant;
-    private String totalChargeOfAdult;
-    private String totalChargeOfChildren;
-    private String totalChargeOfToddler;
-    private String totalChargeOfInfant;
     private String totalExtraFee;
     private String totalBookingTourExpense;
-    private List<CustomerResponse> customerResponseList;
+    private MoMoResponse moMoResponse;
 }

@@ -42,11 +42,18 @@ public class LocationService {
         return toResponse(updated);
     }
 
-    public void deleteLocation(int id) {
-        if (!locationRepository.existsById(id)) {
-            throw new RuntimeException("Location not found with id: " + id);
-        }
-        locationRepository.deleteById(id);
+//    public void deleteLocation(int id) {
+//        if (!locationRepository.existsById(id)) {
+//            throw new RuntimeException("Location not found with id: " + id);
+//        }
+//        locationRepository.deleteById(id);
+//    }
+
+    public List<LocationResponse> getAllLocation() {
+        return locationRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     public List<LocationResponse> getAllDepartureLocations() {

@@ -1,106 +1,148 @@
-import { Row, Col, Card, Spin, Alert, Modal } from 'antd';
-import InvoiceForm from '@/components/Invoice/InvoiceForm';
+import { Row, Col, Card, Spin, Alert, Modal, message } from 'antd';
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { createInvoice, getInvoiceById } from '@/services/invoiceServices';
+import { useEffect, useState, useCallback } from 'react';
+
+import InvoiceForm from '@/components/Invoice/InvoiceForm';
+import bookingServices from '@/services/bookingServices';
+import { getTourDepartureById } from '@/services/tourServices';
+import { sessionService } from '@/services/sessionServices';
+import paymentServices from '@/services/paymentServices';
+import type { BookingResponse, CustomerResponse } from '@/types/Booking';
+import type { ITourDeparture } from '@/types/Tour';
+import type { PaymentRequest } from '@/types/Payment';
 
 export default function InvoiceLayout() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [invoiceData, setInvoiceData] = useState<any | null>(null);
 
-  useEffect(() => {
-    const load = async () => {
-      if (!id) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await getInvoiceById(id as string);
-        setInvoiceData(res.result || null);
-      } catch (err: any) {
-        setError(err?.message || 'Failed to load invoice');
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [id]);
+  const [currentUser, setCurrentUser] = useState<any>();
+  const [bookingResult, setBookingResult] = useState<BookingResponse>();
+  const [tourDepartureResult, setTourDepartureResult] = useState<ITourDeparture>();
+  const [customerResult, setCustomerResult] = useState<CustomerResponse[]>([]);
 
-  // CREATE INVOICE handler called from InvoiceForm
-  const handleCreateInvoice = async (values: { paymentMethod: string; items: any[] }) => {
+  /** ---------------------------------------------------------
+   * 🔹 Load toàn bộ dữ liệu: Booking, Customer, TourDeparture
+   ----------------------------------------------------------*/
+  const loadData = useCallback(async (bookingId: number) => {
     setLoading(true);
     setError(null);
+
     try {
-      const invoice = JSON.parse(sessionStorage.getItem('invoice') || '{}');
-      console.log(invoice);
+      const user = sessionService.getUser();
+      if (!user) {
+        throw new Error('Không thể xác định người dùng (session error).');
+      } else {
+        setCurrentUser(user);
 
-      const bookingId = invoice?.bookingId || id || '';
-      const payload = {
-        bookingId: bookingId as string,
-        paymentMethod: values.paymentMethod,
-        items: values.items,
-      };
+        const [bookingRes, customerRes] = await Promise.all([
+          bookingServices.getById(bookingId),
+          bookingServices.getListOfCustomersByBookingId(bookingId),
+        ]);
 
-      const res = await createInvoice(payload as any);
-      Modal.success({ title: 'Tạo hóa đơn thành công', content: res.message || 'Invoice created' });
+        if (bookingRes.code === 1000 && customerRes.code === 1000) {
+          const booking = bookingRes?.result as BookingResponse;
+          const customerList = customerRes?.result as CustomerResponse[];
+          const tourRes = await getTourDepartureById(Number(booking.tourDepartureId));
 
-      // const newInvoiceId = (res as any)?.result?.id || undefined;
-      // console.log(res)
+          setBookingResult(booking);
+          setCustomerResult(customerList);
 
-      // if (newInvoiceId) {
-      //   navigate(`/invoice/${newInvoiceId}`);
-      // } else {
-      //   // reload current invoice if exists
-      //   if (id) {
-      //     const getRes = await getInvoiceById(id as string);
-      //     setInvoiceData(getRes.result || null);
-      //   }
-      // }
+          if (tourRes.code === 1000) setTourDepartureResult(tourRes?.result);
+          else {
+            throw new Error('Lỗi khi fetch dữ liệu tour');
+          }
+        } else {
+          throw new Error('Lỗi khi fetch dữ liệu đặt tour và khách hàng');
+        }
+      }
     } catch (err: any) {
-      setError(err?.message || 'Tạo hóa đơn thất bại');
-      Modal.error({ title: 'Lỗi', content: err?.message || 'Tạo hóa đơn thất bại' });
-      throw err;
+      setError(err?.message);
+      console.log(err);
+      message.error(err?.message);
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  /** Call loadData khi id thay đổi */
+  useEffect(() => {
+    if (id) {
+      loadData(Number(id));
+    }
+  }, [id, loadData]);
+
+  /** ---------------------------------------------------------
+   * 🔹 Xử lý tạo hóa đơn
+   ----------------------------------------------------------*/
+  const handleCreatePayment = async (paymentMethod: string, totalAmount: number) => {
+    try {
+      const totalAmountStr = String(totalAmount * 100000);
+      const paymentRequest: PaymentRequest = { amount: totalAmountStr };
+      const paymentResponse = await paymentServices.create(paymentRequest);
+
+      if (paymentResponse) {
+        window.location.href = String(paymentResponse);
+      } else {
+        throw new Error('Không thể tạo url điều hướng đến vnpay');
+      }
+
+      if (bookingResult && tourDepartureResult) {
+        const invoiceRequest = {
+          bookingRequest: {
+            bookingId: String(bookingResult.id),
+            userId: String(currentUser?.id),
+            tourDepartureId: String(tourDepartureResult.id),
+            listOfCustomers: customerResult.map((c) => ({
+              fullName: c.fullName,
+              birthdate: c.dateOfBirth,
+              address: c.address,
+              gender: c.gender,
+              status: c.status,
+              bookingType: c.bookingType,
+            })),
+          },
+        };
+
+        sessionStorage.setItem(
+          'invoice_temp',
+          JSON.stringify({
+            invoiceRequest,
+          })
+        );
+      } else {
+        throw new Error('Thiếu dữ liệu để tạo hóa đơn.');
+      }
+    } catch (err: any) {
+      setError(err?.message);
+      message.error(err?.message);
+    }
   };
 
+  /** ---------------------------------------------------------
+   * Render
+   ----------------------------------------------------------*/
   return (
     <div style={{ padding: '24px 10rem', background: '#fff', minHeight: '100vh' }}>
-      <Row gutter={[24, 24]} justify="center" align="top">
+      <Row gutter={[24, 24]} justify="center">
         <Col xs={24} lg={16}>
           <Card
             bordered={false}
-            style={{ borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', marginBottom: 16 }}
+            style={{ borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
           >
             {loading && <Spin />}
-            {error && <Alert type="error" message={error} />}
-            {!id && (
+            {error && <Alert type="error" message={error} showIcon />}
+
+            {!loading && !error && bookingResult && (
               <InvoiceForm
                 account={{
-                  fullName: 'Khách hàng',
-                  email: 'guest@example.com',
-                  phone: '0123456789',
+                  fullName: currentUser?.username || 'Khách hàng',
+                  email: currentUser?.email || '',
+                  phone: currentUser?.phone || '',
                 }}
-                customers={[{ name: 'Nguyễn Văn A', dob: '1990-01-01', price: 1000000 }]}
-                onCreate={handleCreateInvoice}
-              />
-            )}
-            {id && invoiceData && (
-              // Map invoiceData to InvoiceForm props
-              <InvoiceForm
-                account={{
-                  fullName: invoiceData.userId || 'Khách hàng',
-                  email: '',
-                  phone: '',
-                }}
-                customers={(invoiceData.customerResponseList || []).map((c: any) => ({
-                  name: c.fullName,
-                  dob: c.birthdate,
-                  price: Number(c.bookingType) || 0,
-                }))}
-                onCreate={handleCreateInvoice}
+                // customers={customerResult}
+                tourDeparture={tourDepartureResult}
+                onCreate={handleCreatePayment}
               />
             )}
           </Card>

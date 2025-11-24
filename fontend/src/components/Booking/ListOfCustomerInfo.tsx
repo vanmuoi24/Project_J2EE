@@ -1,27 +1,29 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Form, Input, DatePicker, Select, Row, Col, Button, Divider, Typography } from 'antd';
+import dayjs from 'dayjs';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 export default function ListOfCustomerInfo({
   onFormReady,
-
+  personalFormGetter,
   onCustomersChange,
 }: {
   onFormReady?: (form: any) => void;
   /** optional getter function provided by parent to read personal info form values */
-  personalFormGetter?: () => any;
+  personalFormGetter?: (form: any) => any;
   /** notify parent when customers change */
   onCustomersChange?: (customers: any[]) => void;
 }) {
   const [form] = Form.useForm();
-  // expose to parent
+
   if (onFormReady) onFormReady(form);
   const idCounter = useRef(1);
 
-  const addCustomer = (type: 'adult' | 'child' | 'baby') => {
+  const addCustomer = (type: 'ADULT' | 'CHILD' | 'TODDLER' | 'INFANT') => {
     const customers = form.getFieldValue('customers') || [];
+
     idCounter.current += 1;
     const newItem = {
       id: idCounter.current,
@@ -33,23 +35,6 @@ export default function ListOfCustomerInfo({
     };
     form.setFieldsValue({ customers: [...customers, newItem] });
   };
-
-  // // add default customer from personal info as first adult
-  // const addDefaultCustomer = () => {
-  //   const personal = personalFormGetter ? personalFormGetter() : null;
-  //   const customers = form.getFieldValue("customers") || [];
-  //   if (!personal) return;
-  //   idCounter.current += 1;
-  //   const item = {
-  //     id: idCounter.current,
-  //     type: "adult",
-  //     fullName: personal.fullName || "",
-  //     gender: personal.gender || undefined,
-  //     birthDate: personal.birthDate || null,
-  //     address: personal.address || personal?.address || "",
-  //   };
-  //   form.setFieldsValue({ customers: [item, ...customers] });
-  // };
 
   return (
     <div>
@@ -71,7 +56,7 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Người lớn</p>
                 <p className="text-xs text-gray-500">Từ 12 tuổi trở lên</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer('adult')}>
+              <Button type="primary" onClick={() => addCustomer('ADULT')}>
                 + Thêm
               </Button>
             </div>
@@ -80,9 +65,20 @@ export default function ListOfCustomerInfo({
             <div className="flex justify-between items-center rounded p-2">
               <div>
                 <p className="font-medium">Trẻ em</p>
-                <p className="text-xs text-gray-500">Từ 2 - 11 tuổi</p>
+                <p className="text-xs text-gray-500">Từ 5 - 11 tuổi</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer('child')}>
+              <Button type="primary" onClick={() => addCustomer('CHILD')}>
+                + Thêm
+              </Button>
+            </div>
+          </Col>
+          <Col span={8}>
+            <div className="flex justify-between items-center rounded p-2">
+              <div>
+                <p className="font-medium">Trẻ nhỏ</p>
+                <p className="text-xs text-gray-500">Từ 2 - 4 tuổi</p>
+              </div>
+              <Button type="primary" onClick={() => addCustomer('TODDLER')}>
                 + Thêm
               </Button>
             </div>
@@ -93,7 +89,7 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Em bé</p>
                 <p className="text-xs text-gray-500">Dưới 2 tuổi</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer('baby')}>
+              <Button type="primary" onClick={() => addCustomer('INFANT')}>
                 + Thêm
               </Button>
             </div>
@@ -124,11 +120,13 @@ export default function ListOfCustomerInfo({
                           <>{/* will render type label via value */}</>
                         </Form.Item>
                         <span>
-                          {form.getFieldValue(['customers', name, 'type']) === 'adult'
+                          {form.getFieldValue(['customers', name, 'type']) === 'ADULT'
                             ? 'Người lớn'
-                            : form.getFieldValue(['customers', name, 'type']) === 'child'
+                            : form.getFieldValue(['customers', name, 'type']) === 'CHILD'
                               ? 'Trẻ em'
-                              : 'Em bé'}
+                              : form.getFieldValue(['customers', name, 'type']) === 'TODDLER'
+                                ? 'Trẻ nhỏ'
+                                : 'Em bé'}
                         </span>
                       </p>
                     </Col>
@@ -168,7 +166,50 @@ export default function ListOfCustomerInfo({
                         {...restField}
                         name={[name, 'birthDate']}
                         label="Ngày sinh"
-                        rules={[{ required: true, message: 'Chọn ngày sinh' }]}
+                        rules={[
+                          { required: true, message: 'Chọn ngày sinh' },
+                          {
+                            validator: (_, value) => {
+                              if (!value) return Promise.resolve();
+
+                              const type = form.getFieldValue(['customers', name, 'type']);
+                              const today = dayjs();
+                              const age = today.diff(value, 'year');
+
+                              // Không cho phép ngày sinh trong tương lai
+                              if (value.isAfter(today)) {
+                                return Promise.reject('Ngày sinh không được lớn hơn ngày hiện tại');
+                              }
+
+                              // Validate theo từng loại
+                              switch (type) {
+                                case 'ADULT':
+                                  if (age < 12)
+                                    return Promise.reject('Người lớn phải từ 12 tuổi trở lên');
+                                  break;
+
+                                case 'CHILD':
+                                  if (age < 5 || age > 11)
+                                    return Promise.reject('Trẻ em phải từ 5 đến 11 tuổi');
+                                  break;
+
+                                case 'TODDLER':
+                                  if (age < 2 || age > 4)
+                                    return Promise.reject('Trẻ nhỏ phải từ 2 đến 4 tuổi');
+                                  break;
+
+                                case 'INFANT':
+                                  if (age >= 2) return Promise.reject('Em bé phải dưới 2 tuổi');
+                                  break;
+
+                                default:
+                                  break;
+                              }
+
+                              return Promise.resolve();
+                            },
+                          },
+                        ]}
                       >
                         <DatePicker format="DD/MM/YYYY" style={{ width: '100%' }} />
                       </Form.Item>

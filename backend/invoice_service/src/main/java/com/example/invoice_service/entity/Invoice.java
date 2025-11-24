@@ -22,13 +22,13 @@ public class Invoice {
     private int accountId;
 
     @Column(name = "booking_id", nullable = false)
-    private int bookingId;
+    private int bookingId;;
 
     @Column(name = "day_of_pay", nullable = false)
     private LocalDateTime dayOfPay;
 
     @Column(name = "pay_method_id", nullable = false)
-    private int paymentMethorId;
+    private int paymentMethodId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

@@ -120,4 +120,14 @@ public class FileService {
                 .build();
     }
 
+    public void deleteMultipleTourImagesByUrl(List<String> urls) {
+        for (String url : urls) {
+            var file = fileMgmtRepository.findByUrl(url)
+                    .orElseThrow(() -> new AppException(ErrorCode.FILE_NOT_FOUND));
+
+            fileRepository.delete(file);
+            fileMgmtRepository.delete(file);
+        }
+    }
+
 }

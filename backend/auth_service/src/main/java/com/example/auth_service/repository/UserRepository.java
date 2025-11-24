@@ -10,8 +10,10 @@ import com.example.auth_service.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
-
+    boolean existsByEmail(String email);
     Optional<User> findByEmail(String email);
+    Optional<User> findByUsername(String username);
+    
 
     Optional<User> findByGoogleId(String googleId);
 

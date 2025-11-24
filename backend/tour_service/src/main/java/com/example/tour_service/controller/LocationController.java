@@ -32,11 +32,19 @@ public class LocationController {
                 .build();
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> deleteLocation(@PathVariable int id) {
-        locationService.deleteLocation(id);
-        return ApiResponse.<Void>builder()
-                .message("Deleted Successfully")
+//    @DeleteMapping("/{id}")
+//    public ApiResponse<Void> deleteLocation(@PathVariable int id) {
+//        locationService.deleteLocation(id);
+//        return ApiResponse.<Void>builder()
+//                .message("Deleted Successfully")
+//                .build();
+//    }
+
+    @GetMapping("/all")
+    public ApiResponse<List<LocationResponse>> getAllLocation() {
+        return ApiResponse.<List<LocationResponse>>builder()
+                .result(locationService.getAllLocation())
+                .message("Fetched All Locations")
                 .build();
     }
 

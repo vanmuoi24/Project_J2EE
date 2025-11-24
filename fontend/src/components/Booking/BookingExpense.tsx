@@ -3,33 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getTourDepartureById } from '@/services/tourServices';
 import { formatCurrencyVND } from '@/utils/index';
-
 const { Title, Text } = Typography;
 
-type ExpenseItem = {
-  label: string;
-  quantity: number;
-  price: number;
-};
-
 type BookingExpenseProps = {
-  total: number;
-  items: ExpenseItem[];
-  singleRoomSurcharge?: number;
+  items: { label: string; quantity: number; price: number; }[]
   onConfirm?: () => void | Promise<void>;
   tourDepartureId?: number | string;
 };
 
 export default function BookingExpense({
-  total,
-  singleRoomSurcharge = 0,
   items,
   onConfirm,
   tourDepartureId,
 }: BookingExpenseProps) {
   const navigate = useNavigate();
   const [tourPrice, setTourPrice] = useState<any | null>(null);
-  const [calculatedTotal, setCalculatedTotal] = useState<number>(total || 0);
+  const [calculatedTotal, setCalculatedTotal] = useState<number>(0);
 
   useEffect(() => {
     const load = async () => {
@@ -49,22 +38,25 @@ export default function BookingExpense({
     const priceFromLabel = (label: string, defaultPrice: number) => {
       if (!tourPrice) return defaultPrice;
       const l = label.toLowerCase();
-      if (l.includes('người lớn') || l.includes('nguoi lon') || l.includes('adult'))
+      if (l.includes('người lớn'))
         return tourPrice.adultPrice;
-      if (l.includes('trẻ em') || l.includes('tre em') || l.includes('child'))
+      if (l.includes('trẻ em'))
         return tourPrice.childPrice;
-      if (l.includes('em bé') || l.includes('em be') || l.includes('infant') || l.includes('baby'))
-        return tourPrice.infantPrice ?? defaultPrice;
+      if (l.includes('trẻ nhỏ'))
+        return tourPrice.toddlerPrice;
+      if (l.includes('em bé'))
+        return tourPrice.infantPrice;
       return defaultPrice;
     };
-
     const itemsTotal = items.reduce((sum, it) => {
       const unit = priceFromLabel(it.label, it.price);
       return sum + unit * it.quantity;
     }, 0);
 
-    setCalculatedTotal(itemsTotal + (singleRoomSurcharge || 0));
-  }, [tourPrice, items, singleRoomSurcharge]);
+    const singleRoomSurcharge = tourPrice?.singleSupplementPrice ?? 0;
+
+    setCalculatedTotal(itemsTotal + singleRoomSurcharge);
+  }, [tourPrice, items]);
 
   const handleConfirm = () => {
     Modal.confirm({
@@ -87,10 +79,10 @@ export default function BookingExpense({
     <>
       <Row justify="space-between" align="middle">
         <Col>
-          <Title level={5}>KHÁCH HÀNG + PHỤ THU</Title>
+          <Title level={4}>KHÁCH HÀNG + PHỤ THU</Title>
         </Col>
         <Col>
-          <Title level={4} style={{ color: 'red', margin: 0 }}>
+          <Title level={3} style={{ fontFamily:'sans-serif', color: 'blue', margin: 0, fontWeight:'bold'}}>
             {formatCurrencyVND(calculatedTotal)}
           </Title>
         </Col>
@@ -101,17 +93,14 @@ export default function BookingExpense({
           const unitPrice = ((): number => {
             if (!tourPrice) return item.price;
             const l = item.label.toLowerCase();
-            if (l.includes('người lớn') || l.includes('nguoi lon') || l.includes('adult'))
+            if (l.includes('người lớn'))
               return tourPrice.adultPrice;
-            if (l.includes('trẻ em') || l.includes('tre em') || l.includes('child'))
+            if (l.includes('trẻ em'))
               return tourPrice.childPrice;
-            if (
-              l.includes('em bé') ||
-              l.includes('em be') ||
-              l.includes('infant') ||
-              l.includes('baby')
-            )
-              return tourPrice.infantPrice ?? item.price;
+            if (l.includes('trẻ nhỏ'))
+              return tourPrice.toddlerPrice;
+            if (l.includes('em bé'))
+              return tourPrice.infantPrice;
             return item.price;
           })();
           return (
@@ -133,16 +122,16 @@ export default function BookingExpense({
             <Text>Phụ thu phòng đơn</Text>
           </Col>
           <Col>
-            <Text>{formatCurrencyVND(singleRoomSurcharge)}</Text>
+            <Text>{formatCurrencyVND(tourPrice?.singleSupplementPrice ?? 0)}</Text>
           </Col>
         </Row>
       </div>
       <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
-        <Button type="link" block size="large" onClick={() => navigate('/booking/history')}>
+        <Button type="link" block size="large" onClick={() => navigate('/profile')}>
           Lịch sử đặt tour
         </Button>
         <Button type="primary" block size="large" onClick={handleConfirm}>
-          Xác nhận đặt tour
+          Thanh toán
         </Button>
       </div>
     </>

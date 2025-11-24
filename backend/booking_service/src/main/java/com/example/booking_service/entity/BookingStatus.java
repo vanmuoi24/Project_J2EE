@@ -2,5 +2,5 @@ package com.example.booking_service.entity;
 
 public enum BookingStatus {
     CONFIRMED,
-    UNPAID
+    UNCONFIRMED
 }
