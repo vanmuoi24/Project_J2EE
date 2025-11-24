@@ -30,19 +30,32 @@ public class FileService {
 
     FileMgmtMapper fileMgmtMapper;
 
-   public FileResponse uploadFile(MultipartFile file) throws IOException {
-    var fileInfo = fileRepository.store(file);
-    var fileMgmt = fileMgmtMapper.toFileMgmt(fileInfo);
-    fileMgmt.setId(UUID.randomUUID().toString());
-    String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-    fileMgmt.setOwnerId(userId);
-    fileMgmt.setTourId("null");
-    fileMgmtRepository.save(fileMgmt);
-    return FileResponse.builder()
+    public FileResponse uploadFile(MultipartFile file) throws IOException {
+        var fileInfo = fileRepository.store(file);
+        var fileMgmt = fileMgmtMapper.toFileMgmt(fileInfo);
+        fileMgmt.setId(UUID.randomUUID().toString());
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        fileMgmt.setOwnerId(userId);
+        fileMgmt.setTourId("null");
+        fileMgmtRepository.save(fileMgmt);
+        return FileResponse.builder()
             .originalFileName(file.getOriginalFilename())
             .url(fileInfo.getUrl())
             .build();
-}
+    }
+    public FileResponse uploadFile(MultipartFile file, Integer locationId) throws IOException {
+        var fileInfo = fileRepository.store(file);
+        var fileMgmt = fileMgmtMapper.toFileMgmt(fileInfo);
+        fileMgmt.setOwnerId("null");
+        fileMgmt.setTourId("null");
+        fileMgmt.setLocationId(locationId);
+        fileMgmtRepository.save(fileMgmt);
+        return FileResponse.builder()
+                .originalFileName(file.getOriginalFilename())
+                .url(fileInfo.getUrl())
+                .build();
+    }
+
     public FileData download(String fileId) throws IOException {
         var fileMgmt = fileMgmtRepository.findById(fileId).orElseThrow(
                 () -> new AppException(ErrorCode.FILE_NOT_FOUND));
