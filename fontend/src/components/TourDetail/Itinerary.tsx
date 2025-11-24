@@ -25,8 +25,7 @@ const Itinerary: React.FC<ItineraryProps> = ({ tourId }) => {
   const [dataItinerary, setDataItinerary] = useState<IItinerary[]>([]);
 
   const fechDataItineraryByTourId = async () => {
-    const res = await getItineraryByTourId(Number(tourId));
-    const data: ItineraryResponse = res;
+    const res = await getItineraryByTourId(1)
     setDataItinerary(data.result);
   };
 
@@ -42,7 +41,6 @@ const Itinerary: React.FC<ItineraryProps> = ({ tourId }) => {
       >
         LỊCH TRÌNH
       </Title>
-
       <Collapse
         expandIconPosition="end"
         bordered={false}

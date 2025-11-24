@@ -13,4 +13,6 @@ public interface FileMgmtRepository extends JpaRepository<FileMgmt, String> {
     Optional<FileMgmt> findByOwnerId(String ownerId);
     List<FileMgmt> findAll();
 List<FileMgmt> findByTourId(String tourId);
+    Optional<FileMgmt> findByUrl(String url);
+
 }

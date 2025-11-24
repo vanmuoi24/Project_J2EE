@@ -1,7 +1,6 @@
 'use client';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Input, message, Row, Col, Select, Typography } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
 
 import { getListUser } from '@/services/userServices';
 import { getRoles } from '@/services/rolesServices';

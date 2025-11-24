@@ -10,6 +10,9 @@ import ModelViewRole from './ModelRole/ModelViewRole';
 import { getRoles, deleteRole } from '@/services/rolesServices';
 import { toast } from 'react-toastify';
 
+import { ALL_PERMISSIONS } from '@/config/permissions';
+import { useHasPermission } from '@/config/useHasPermission';
+
 interface Permission {
   id: number;
   name: string;
@@ -35,11 +38,23 @@ const ManagerRoleTour: React.FC = () => {
   const [openView, setOpenView] = useState(false);
   const [viewingRole, setViewingRole] = useState<Role | null>(null);
 
+  // ========= QUYỀN =========
+  const canList = useHasPermission(ALL_PERMISSIONS.ROLES.GET_LIST);
+  const canView = useHasPermission(ALL_PERMISSIONS.ROLES.GET_DETAIL);
+  const canCreate = useHasPermission(ALL_PERMISSIONS.ROLES.CREATE);
+  const canUpdate = useHasPermission(ALL_PERMISSIONS.ROLES.UPDATE);
+  const canDelete = useHasPermission(ALL_PERMISSIONS.ROLES.DELETE);
+
   const reloadTable = () => {
     actionRef.current?.reload();
   };
 
   const handleDelete = async (id: number) => {
+    if (!canDelete) {
+      toast.error('Bạn không có quyền xóa vai trò');
+      return;
+    }
+
     try {
       const res = await deleteRole(id);
       if (res.code === 200) {
@@ -110,32 +125,45 @@ const ManagerRoleTour: React.FC = () => {
       search: false,
       render: (_, record) => (
         <Space>
-          <EyeOutlined
-            style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
-            onClick={() => {
-              setViewingRole(record);
-              setOpenView(true);
-            }}
-          />
-          <EditOutlined
-            style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
-            onClick={() => {
-              setEditingRole(record);
-              setOpenEdit(true);
-            }}
-          />
-          <Popconfirm
-            title="Bạn có chắc muốn xóa vai trò này?"
-            okText="Xóa"
-            cancelText="Hủy"
-            onConfirm={() => handleDelete(record.role_id)}
-          >
-            <DeleteOutlined style={{ color: '#ff4d4f', fontSize: 18, cursor: 'pointer' }} />
-          </Popconfirm>
+          {canView && (
+            <EyeOutlined
+              style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
+              onClick={() => {
+                setViewingRole(record);
+                setOpenView(true);
+              }}
+            />
+          )}
+
+          {canUpdate && (
+            <EditOutlined
+              style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
+              onClick={() => {
+                setEditingRole(record);
+                setOpenEdit(true);
+              }}
+            />
+          )}
+
+          {canDelete && (
+            <Popconfirm
+              title="Bạn có chắc muốn xóa vai trò này?"
+              okText="Xóa"
+              cancelText="Hủy"
+              onConfirm={() => handleDelete(record.role_id)}
+            >
+              <DeleteOutlined style={{ color: '#ff4d4f', fontSize: 18, cursor: 'pointer' }} />
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
   ];
+
+  // Không có quyền xem danh sách thì chặn luôn
+  if (!canList) {
+    return <div>Bạn không có quyền quản lý vai trò.</div>;
+  }
 
   return (
     <div style={{ padding: 24 }}>
@@ -149,6 +177,10 @@ const ManagerRoleTour: React.FC = () => {
         loading={loading}
         request={async (params) => {
           try {
+            if (!canList) {
+              return { data: [], success: true, total: 0 };
+            }
+
             setLoading(true);
             const res = await getRoles();
             if (res.code !== 200) {
@@ -197,17 +229,19 @@ const ManagerRoleTour: React.FC = () => {
           }
         }}
         toolBarRender={() => [
-          <Button
-            type="primary"
-            key="add"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setEditingRole(null);
-              setOpenAddEdit(true);
-            }}
-          >
-            Thêm vai trò
-          </Button>,
+          canCreate && (
+            <Button
+              type="primary"
+              key="add"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setEditingRole(null);
+                setOpenAddEdit(true);
+              }}
+            >
+              Thêm vai trò
+            </Button>
+          ),
         ]}
       />
 

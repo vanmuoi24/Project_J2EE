@@ -26,6 +26,24 @@ export const ALL_PERMISSIONS = {
       module: 'AUTH',
     },
   },
+  PRICE: {
+    GET_LIST: {
+      method: 'GET',
+      apiPath: '/api/v1/pricing/prices',
+      module: 'PRICE',
+    },
+    UPDATE: {
+      method: 'POST',
+      apiPath: '/api/v1/pricing/prices/{id}',
+      module: 'PRICE',
+    },
+
+    CREATE: {
+      method: 'POST',
+      apiPath: '/api/v1/pricing/prices',
+      module: 'PRICE',
+    },
+  },
   USERS: {
     REGISTER: {
       method: 'POST',
@@ -45,6 +63,11 @@ export const ALL_PERMISSIONS = {
     UPDATE: {
       method: 'POST',
       apiPath: '/api/v1/auth/users/UpdateUser/{id}',
+      module: 'USERS',
+    },
+    DELETE: {
+      method: 'DELETE',
+      apiPath: '/api/v1/auth/users/{id}',
       module: 'USERS',
     },
   },

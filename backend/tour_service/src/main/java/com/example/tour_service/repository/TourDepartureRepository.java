@@ -10,4 +10,6 @@ import java.util.List;
 public interface TourDepartureRepository extends JpaRepository<TourDeparture, Integer> {
     int countByTourId(int tourId);
     List<TourDeparture> findByTourId(int tourId);
+    List<TourDeparture> findByTourIdIn(List<Integer> tourIds);
+
 }

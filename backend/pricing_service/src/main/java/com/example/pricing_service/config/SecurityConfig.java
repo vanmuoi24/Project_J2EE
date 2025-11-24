@@ -20,6 +20,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_URLS = {
         "prices/**",
+        "/prices/batch"
     };
 
     private final CustomJwtDecoder customJwtDecoder;
@@ -30,8 +31,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request -> request
-                .requestMatchers(HttpMethod.GET , PUBLIC_URLS)
-                .permitAll()
+                .requestMatchers(HttpMethod.GET, PUBLIC_URLS).permitAll()
+                .requestMatchers(HttpMethod.POST, PUBLIC_URLS).permitAll()
                 .anyRequest()
                 .authenticated());
 

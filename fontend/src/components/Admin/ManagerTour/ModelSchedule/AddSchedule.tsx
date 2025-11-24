@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, InputNumber, Select, Button, Card, Space } from 'antd';
+import { Form, Input, Select, Button, Card, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 interface AddItineraryProps {
@@ -35,22 +35,6 @@ const AddItinerary: React.FC<AddItineraryProps> = ({ onSubmit }) => {
         style={{ marginTop: 8 }}
       >
         <Form.Item
-          label="Tên Tour"
-          name="tourName"
-          rules={[{ required: true, message: 'Vui lòng nhập tên tour' }]}
-        >
-          <Input placeholder="Nhập tên tour..." allowClear />
-        </Form.Item>
-
-        <Form.Item
-          label="Ngày thứ"
-          name="dayNumber"
-          rules={[{ required: true, message: 'Vui lòng nhập ngày thứ' }]}
-        >
-          <InputNumber min={1} style={{ width: '100%' }} placeholder="Nhập số thứ tự ngày..." />
-        </Form.Item>
-
-        <Form.Item
           label="Tiêu đề"
           name="title"
           rules={[{ required: true, message: 'Vui lòng nhập tiêu đề lịch trình' }]}
@@ -71,7 +55,8 @@ const AddItinerary: React.FC<AddItineraryProps> = ({ onSubmit }) => {
             <Select.Option value="Sáng">Sáng</Select.Option>
             <Select.Option value="Trưa">Trưa</Select.Option>
             <Select.Option value="Tối">Tối</Select.Option>
-            <Select.Option value="Sáng, Trưa, Tối">Sáng, Trưa, Tối</Select.Option>
+            <Select.Option value="Tối">Trưa, Chiều</Select.Option>
+            <Select.Option value="Sáng, Trưa, Tối">Sáng, Trưa, Chiều</Select.Option>
           </Select>
         </Form.Item>
 

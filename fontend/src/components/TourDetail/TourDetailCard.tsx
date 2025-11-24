@@ -18,17 +18,24 @@ const { Text, Title } = Typography;
 interface TourDetailCardProps {
   tourData?: ITour | null;
   selectedDepartureId?: number | null;
+  onSelectDeparture?: () => void;
 }
 
-export default function TourDetailCard({ selectedDepartureId, tourData }: TourDetailCardProps) {
+export default function TourDetailCard({
+  selectedDepartureId,
+  tourData,
+  onSelectDeparture,
+}: TourDetailCardProps) {
   const [dataDetailTourDeparture, setDataDetailTourDeparture] = useState<ITourDeparture | null>(
     null
   );
-  const navigate = useNavigate();
+  let navi = useNavigate();
   const fetchDataTourDepartureById = async () => {
     if (!selectedDepartureId) return;
+
     const res = await getTourDepartureById(selectedDepartureId);
     const data: TourDepartureResponse = res;
+
     setDataDetailTourDeparture(data.result);
   };
 
@@ -47,8 +54,13 @@ export default function TourDetailCard({ selectedDepartureId, tourData }: TourDe
   }, [selectedDepartureId]);
 
   function accessBookingPage() {
-    navigate(`/booking`);
+    navi(`/booking`);
   }
+  const handleSelectDepartureClick = () => {
+    if (onSelectDeparture) {
+      onSelectDeparture();
+    }
+  };
 
   return (
     <Card
@@ -222,6 +234,7 @@ export default function TourDetailCard({ selectedDepartureId, tourData }: TourDe
               fontSize: 12,
               width: '100%',
             }}
+            onClick={handleSelectDepartureClick}
           >
             Chọn ngày khởi hành
           </Button>

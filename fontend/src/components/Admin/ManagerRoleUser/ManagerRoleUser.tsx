@@ -1,3 +1,4 @@
+'use client';
 import React, { useRef, useState, useEffect } from 'react';
 import {
   PageContainer,
@@ -8,9 +9,12 @@ import {
 import { Tag, Button, Space, Popconfirm, message } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import { getPermissions } from '@/services/permissionService';
-import AddNewPermission from './Model/AddNewPermisson'; // đường dẫn tùy thư mục của bạn
+import AddNewPermission from './Model/AddNewPermisson';
 import EditPermission from './Model/EditPermission';
 import ModelViewPermission from './Model/ModelViewPermission';
+
+import { ALL_PERMISSIONS } from '@/config/permissions';
+import { useHasPermission } from '@/config/useHasPermission';
 
 // ==== Types ====
 interface Role {
@@ -31,11 +35,12 @@ interface Permission {
 const ManagerRoleUser: React.FC = () => {
   const actionRef = useRef<ActionType>(null);
   const [data, setData] = useState<Permission[]>([]);
-  const [openModal, setOpenModal] = useState(false);
+  const [openModal, setOpenModal] = useState(false); // modal edit
   const [editingPermission, setEditingPermission] = useState<Permission | null>(null);
-  const [isAddNewPermission, setIsAddNewPermission] = useState<boolean>(false);
+  const [isAddNewPermission, setIsAddNewPermission] = useState<boolean>(false); // modal add mới
   const [viewingPermission, setViewingPermission] = useState<Permission | null>(null);
   const [openView, setOpenView] = useState(false);
+
   // Nếu sau này bạn có API lấy role thì thay vào đây
   const [allRoles] = useState<Role[]>([
     { id: 1, name: 'ADMIN' },
@@ -43,11 +48,25 @@ const ManagerRoleUser: React.FC = () => {
     { id: 3, name: 'USER' },
   ]);
 
+  // ===== QUYỀN =====
+  const canList = useHasPermission(ALL_PERMISSIONS.PERMISSIONS.GET_LIST);
+  const canView = useHasPermission(ALL_PERMISSIONS.PERMISSIONS.GET_DETAIL);
+  const canCreate = useHasPermission(ALL_PERMISSIONS.PERMISSIONS.CREATE);
+  const canUpdate = useHasPermission(ALL_PERMISSIONS.PERMISSIONS.UPDATE);
+  const canDelete = useHasPermission(ALL_PERMISSIONS.PERMISSIONS.DELETE);
+
   const getPermissionsData = async () => {
+    if (!canList) {
+      setData([]);
+      return;
+    }
+
     try {
       const response = await getPermissions();
       if (response.code === 200) {
         setData(response.result);
+      } else {
+        message.error('Lấy danh sách quyền thất bại');
       }
     } catch (error) {
       console.error(error);
@@ -57,9 +76,13 @@ const ManagerRoleUser: React.FC = () => {
 
   useEffect(() => {
     getPermissionsData();
-  }, []);
+  }, [canList]);
 
   const handleDelete = (id: number) => {
+    if (!canDelete) {
+      message.error('Bạn không có quyền xóa quyền này');
+      return;
+    }
     // TODO: gọi API delete permission tại đây
     setData((prev) => prev.filter((p) => p.id !== id));
     message.success('Xóa quyền thành công');
@@ -78,10 +101,18 @@ const ManagerRoleUser: React.FC = () => {
     };
 
     if (editingPermission) {
+      if (!canUpdate) {
+        message.error('Bạn không có quyền cập nhật quyền');
+        return;
+      }
       // TODO: gọi API update
       setData((prev) => prev.map((p) => (p.id === editingPermission.id ? newPermission : p)));
       message.success('Cập nhật quyền thành công');
     } else {
+      if (!canCreate) {
+        message.error('Bạn không có quyền thêm quyền');
+        return;
+      }
       // TODO: gọi API create
       setData((prev) => [...prev, newPermission]);
       message.success('Thêm quyền thành công');
@@ -89,6 +120,7 @@ const ManagerRoleUser: React.FC = () => {
 
     setOpenModal(false);
     setEditingPermission(null);
+    setIsAddNewPermission(false);
   };
 
   const columns: ProColumns<Permission>[] = [
@@ -150,32 +182,45 @@ const ManagerRoleUser: React.FC = () => {
       width: 150,
       render: (_, record) => (
         <Space>
-          <EyeOutlined
-            style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
-            onClick={() => {
-              setViewingPermission(record);
-              setOpenView(true);
-            }}
-          />
-          <EditOutlined
-            style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
-            onClick={() => {
-              setEditingPermission(record);
-              setOpenModal(true);
-            }}
-          />
-          <Popconfirm
-            title="Bạn có chắc muốn xóa quyền này?"
-            okText="Xóa"
-            cancelText="Hủy"
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <DeleteOutlined style={{ color: '#ff4d4f', fontSize: 18, cursor: 'pointer' }} />
-          </Popconfirm>
+          {canView && (
+            <EyeOutlined
+              style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
+              onClick={() => {
+                setViewingPermission(record);
+                setOpenView(true);
+              }}
+            />
+          )}
+
+          {canUpdate && (
+            <EditOutlined
+              style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
+              onClick={() => {
+                setEditingPermission(record);
+                setOpenModal(true);
+              }}
+            />
+          )}
+
+          {canDelete && (
+            <Popconfirm
+              title="Bạn có chắc muốn xóa quyền này?"
+              okText="Xóa"
+              cancelText="Hủy"
+              onConfirm={() => handleDelete(record.id)}
+            >
+              <DeleteOutlined style={{ color: '#ff4d4f', fontSize: 18, cursor: 'pointer' }} />
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
   ];
+
+  // Không có quyền xem danh sách thì chặn luôn màn này
+  if (!canList) {
+    return <div>Bạn không có quyền quản lý quyền (permissions).</div>;
+  }
 
   return (
     <PageContainer>
@@ -202,28 +247,32 @@ const ManagerRoleUser: React.FC = () => {
           };
         }}
         toolBarRender={() => [
-          <Button
-            type="primary"
-            key="add"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setIsAddNewPermission(true);
-            }}
-          >
-            Thêm quyền
-          </Button>,
+          canCreate && (
+            <Button
+              type="primary"
+              key="add"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setEditingPermission(null);
+                setIsAddNewPermission(true);
+              }}
+            >
+              Thêm quyền
+            </Button>
+          ),
         ]}
       />
 
       <AddNewPermission
         open={isAddNewPermission}
         onClose={() => {
-          setOpenModal(false);
+          setIsAddNewPermission(false);
         }}
         onSubmit={handleSubmit}
         allRoles={allRoles}
         setIsAddNewPermission={setIsAddNewPermission}
       />
+
       <EditPermission
         open={openModal}
         onClose={() => {
@@ -232,8 +281,9 @@ const ManagerRoleUser: React.FC = () => {
         }}
         editingPermission={editingPermission}
         allRoles={allRoles}
-        onSubmit={(values) => {}}
+        onSubmit={handleSubmit}
       />
+
       <ModelViewPermission
         open={openView}
         onClose={() => {

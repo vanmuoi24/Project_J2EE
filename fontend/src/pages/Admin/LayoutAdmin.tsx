@@ -13,6 +13,8 @@ import {
   UsergroupAddOutlined,
   SafetyOutlined,
   GiftOutlined,
+  FieldTimeOutlined,
+  MoneyCollectOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Space, Avatar, Button, message } from 'antd';
 import type { MenuProps } from 'antd';
@@ -72,6 +74,7 @@ const AdminSidebar: React.FC = () => {
   };
 
   // Xây menu theo quyền
+  // Xây menu theo quyền
   const menuItems: MenuProps['items'] = [];
 
   // Quản lý người dùng (module USERS)
@@ -83,25 +86,44 @@ const AdminSidebar: React.FC = () => {
     });
   }
 
-  // Quản lý tour du lịch: gộp nhiều module liên quan
+  // ================== QUẢN LÝ TOUR DU LỊCH ==================
   const tourChildren: MenuProps['items'] = [];
 
+  // Danh sách tour
   if (hasPermissionForModules('TOURS')) {
     tourChildren.push({
       key: '/admin/managerTour/list',
       icon: <UnorderedListOutlined />,
       label: <Link to="/admin/managerTour/list">Danh sách tour</Link>,
     });
+
+    // Nếu bạn muốn mục "Giá" cũng thuộc module TOURS:
+    tourChildren.push({
+      key: '/admin/managerTour/price',
+      icon: <MoneyCollectOutlined />,
+      label: <Link to="/admin/managerTour/price">Giá</Link>,
+    });
   }
 
+  // Ngày khởi hành
+  if (hasPermissionForModules('TOUR_DEPARTURES')) {
+    tourChildren.push({
+      key: '/admin/managerTour/tourDeparture',
+      icon: <CalendarOutlined />,
+      label: <Link to="/admin/managerTour/tourDeparture">Ngày khởi hành</Link>,
+    });
+  }
+
+  // Lịch trình
   if (hasPermissionForModules('ITINERARIES')) {
     tourChildren.push({
       key: '/admin/managerTour/itinerary',
-      icon: <CalendarOutlined />,
+      icon: <FieldTimeOutlined />,
       label: <Link to="/admin/managerTour/itinerary">Lịch trình</Link>,
     });
   }
 
+  // Địa điểm
   if (hasPermissionForModules('LOCATIONS')) {
     tourChildren.push({
       key: '/admin/managerTour/destination',
@@ -110,6 +132,7 @@ const AdminSidebar: React.FC = () => {
     });
   }
 
+  // Đánh giá tour
   if (hasPermissionForModules('REVIEWS')) {
     tourChildren.push({
       key: '/admin/managerTour/reviews',
@@ -118,6 +141,7 @@ const AdminSidebar: React.FC = () => {
     });
   }
 
+  // Chỉ push group "Quản lý tour du lịch" nếu có ít nhất 1 mục con
   if (tourChildren.length > 0) {
     menuItems.push({
       key: '/admin/managerTour',
@@ -127,12 +151,18 @@ const AdminSidebar: React.FC = () => {
     });
   }
 
-  // Quản lý đặt chỗ (BOOKINGS, CUSTOMERS)
-  if (hasPermissionForModules(['BOOKINGS', 'CUSTOMERS'])) {
+  // ================== BOOKING / HÓA ĐƠN ==================
+  if (hasPermissionForModules('BOOKINGS')) {
     menuItems.push({
       key: '/admin/managerBooking',
       icon: <ScheduleOutlined />,
       label: <Link to="/admin/managerBooking">Quản lý đặt chỗ</Link>,
+    });
+
+    menuItems.push({
+      key: '/admin/managerInvoice',
+      icon: <GiftOutlined />,
+      label: <Link to="/admin/managerInvoice">Quản lý hóa đơn</Link>,
     });
   }
 
@@ -151,14 +181,6 @@ const AdminSidebar: React.FC = () => {
       key: '/admin/role',
       icon: <SafetyOutlined />,
       label: <Link to="/admin/role">Quản lý vai trò</Link>,
-    });
-  }
-
-  if (hasPermissionForModules('ROLES')) {
-    menuItems.push({
-      key: '/admin/managerInvoice',
-      icon: <GiftOutlined />,
-      label: <Link to="/admin/managerInvoice">Quản lý hóa đơn</Link>,
     });
   }
 

@@ -1,6 +1,7 @@
 package com.example.pricing_service.controller;
 
 import com.example.pricing_service.dto.request.ApiResponse;
+import com.example.pricing_service.dto.request.TourPriceBatchRequest;
 import com.example.pricing_service.dto.request.TourPriceRequest;
 import com.example.pricing_service.dto.response.TourPriceResponse;
 import com.example.pricing_service.service.TourPriceService;
@@ -32,13 +33,13 @@ public class TourPriceController {
                 .build();
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
-        service.deletePrice(id);
-        return ApiResponse.<Void>builder()
-                .message("Deleted successfully")
-                .build();
-    }
+//    @DeleteMapping("/{id}")
+//    public ApiResponse<Void> delete(@PathVariable Long id) {
+//        service.deletePrice(id);
+//        return ApiResponse.<Void>builder()
+//                .message("Deleted successfully")
+//                .build();
+//    }
 
     @GetMapping
     public ApiResponse<List<TourPriceResponse>> getAll() {
@@ -55,4 +56,14 @@ public class TourPriceController {
                 .message("Fetched successfully")
                 .build();
     }
+
+    @PostMapping("/batch")
+    public ApiResponse<List<TourPriceResponse>> getPricesBatch(@RequestBody TourPriceBatchRequest request) {
+        List<TourPriceResponse> prices = service.getPricesBatch(request.getIds());
+        return ApiResponse.<List<TourPriceResponse>>builder()
+                .result(prices)
+                .message("Fetched successfully")
+                .build();
+    }
+
 }

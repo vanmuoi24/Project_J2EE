@@ -3,6 +3,7 @@ package com.example.tour_service.controller;
 import com.example.tour_service.dto.request.ApiResponse;
 import com.example.tour_service.dto.request.TourRequest;
 import com.example.tour_service.dto.request.TourSearchRequest;
+import com.example.tour_service.dto.request.UpdateTourRequest;
 import com.example.tour_service.dto.response.TourResponse;
 import com.example.tour_service.service.TourService;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,17 @@ public class TourController {
                 .build();
     }
 
+    @GetMapping("/random-3")
+    public ApiResponse<List<TourResponse>> getRandom3Tours() {
+        return ApiResponse.<List<TourResponse>>builder()
+                .result(tourService.getRandom3Tours())
+                .message("Fetched 3 random tours successfully")
+                .build();
+    }
+
+
     @PostMapping()
-    public ApiResponse<TourResponse> createTour(@ModelAttribute TourRequest request) {
+        public ApiResponse<TourResponse> createTour(@ModelAttribute TourRequest request) {
         return ApiResponse.<TourResponse>builder()
                 .result(tourService.createTour(request))
                 .message("Created successfully")
@@ -45,7 +55,7 @@ public class TourController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<TourResponse> updateTour(@PathVariable int id,  @RequestBody TourRequest request) {
+    public ApiResponse<TourResponse> updateTourALl(@PathVariable int id,  @ModelAttribute TourRequest request) {
         return ApiResponse.<TourResponse>builder()
                 .result(tourService.updateTour(id, request))
                 .message("Updated successfully")
@@ -77,5 +87,12 @@ public class TourController {
                 .message("Search completed successfully")
                 .build();
     }
+//    @DeleteMapping("/{id}")
+//    public ApiResponse<Void> deleteTour(@PathVariable int id) {
+//        tourService.deleteTour(id);
+//        return ApiResponse.<Void>builder()
+//                .message("Deleted successfully")
+//                .build();
+//    }
 
 }

@@ -2,79 +2,66 @@ import AdditionalInfo from '@/components/TourDetail/AdditionalInfo';
 import ImportantInfo from '@/components/TourDetail/ImportantInfo';
 import Itinerary from '@/components/TourDetail/Itinerary';
 import Schedule from '@/components/TourDetail/Schedule';
-import TourCard from '@/components/TourDetail/TourCardProps';
+import TourCard from '@/components/TourDetail/TourCard';
 import TourDetailCard from '@/components/TourDetail/TourDetailCard';
 import TourImages from '@/components/TourDetail/TourImage';
 import { Row, Col, Typography } from 'antd';
-
-import img from '../assets/slide_cb_0_tuiblue-3.webp';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getTourById } from '@/services/tourServices';
-import type { ITour, TourResponse } from '@/types/Tour';
+import { getRandom3Tour, getTourById } from '@/services/tourServices';
+import type { ITour } from '@/types/Tour';
 import Comment from '@/components/Comment/Comment';
-
 
 const { Title } = Typography;
 
-const tours = [
-  {
-    id: 1,
-    imageUrl: img,
-    name: 'Từ Cố Đô Hoa Lư về đất Thăng Long | Hà Nội - Ninh Bình - Hạ Long',
-    departureLocation: 'TP. Hồ Chí Minh',
-    code: 'XV2SGN',
-    price: 11590000,
-    attractions: [
-      'Núi Yên Tử',
-      'Chùa Bái Đính',
-      'Tràng An',
-      'Yên Tử',
-      'Ninh Bình',
-      'Vịnh Hạ Long',
-      'Hà Nội',
-    ],
-    duration: '4N3Đ',
-    transport: 'Máy bay',
-  },
-  {
-    id: 2,
-    imageUrl: img,
-    name: 'Hà Nội - Yên Tử - Vịnh Hạ Long - Ninh Bình - Chùa Bái Đính - KDL Tràng An',
-    departureLocation: 'TP. Hồ Chí Minh',
-    code: 'NDSGN1064',
-    price: 7790000,
-    attractions: ['Hồ Gươm', 'Lăng Bác', 'Chùa Một Cột', 'Yên Tử', 'Vịnh Hạ Long', 'Tràng An'],
-    duration: '4N3Đ',
-    transport: 'Máy bay',
-  },
-  {
-    id: 3,
-    imageUrl: img,
-    name: 'Hà Nội - Sapa - Bản Cát Cát - Fansipan - Lào Cai - Tặng vé xe lửa Mường Hoa',
-    departureLocation: 'TP. Hồ Chí Minh',
-    code: 'NDSGN1965',
-    price: 7290000,
-    attractions: ['Fansipan', 'Bản Cát Cát', 'Thác Bạc', 'Cổng Trời', 'Nhà thờ Đá'],
-    duration: '4N3Đ',
-    transport: 'Máy bay',
-  },
-];
-
 export default function TourDetail() {
   const [dataDetailtour, setDataDetailTour] = useState<ITour | null>(null);
+  const [dataRandomTour, setDataRandomTour] = useState<ITour[]>([]);
   const [selectedDepartureId, setSelectedDepartureId] = useState<number | null>(null);
   const { id } = useParams<{ id: string }>();
+  const scheduleRef = useRef<HTMLDivElement>(null);
 
-  const fechDataTourById = async () => {
-    const res = await getTourById(Number(id));
-    const data: TourResponse = res;
-    setDataDetailTour(data.result);
+  const fetchDataTourById = async () => {
+    if (!id) return;
+    try {
+      const res = await getTourById(Number(id));
+      if (res.code==1000){
+        setDataDetailTour(res.result);
+      }
+      
+    } catch (error) {
+      console.error("Failed to fetch tour:", error);
+    }
   };
 
+  const fetchRandomTourData = async () => {
+    try {
+      const res = await getRandom3Tour();
+      if (res.code==1000){
+        setDataRandomTour(res.result);
+      }
+      
+    } catch (error) {
+      console.error("Failed to fetch tour:", error);
+    }
+  };
+
+  const scrollToSchedule = () => {
+    if (scheduleRef.current) {
+      scheduleRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+  
   useEffect(() => {
-    fechDataTourById();
+    fetchDataTourById();
   }, [id]);
+
+  useEffect(() => {
+      fetchRandomTourData();
+  }, []);
 
   const handleSelectDeparture = (departureId: number | null) => {
     setSelectedDepartureId(departureId);
@@ -90,8 +77,15 @@ export default function TourDetail() {
 
           <Row gutter={24}>
             <Col span={17}>
-              <TourImages />
-              {dataDetailtour && <Schedule tourData={dataDetailtour} onSelectDepartureId={handleSelectDeparture}/>}
+              {dataDetailtour && <TourImages imageIds={dataDetailtour.imageIds} />}
+              <div ref={scheduleRef}>
+                {dataDetailtour && (
+                  <Schedule 
+                    tourData={dataDetailtour} 
+                    onSelectDepartureId={handleSelectDeparture}
+                  />
+                )}
+              </div>
               <AdditionalInfo />
               <Itinerary tourId={dataDetailtour?.id}/>
               <ImportantInfo />
@@ -105,7 +99,11 @@ export default function TourDetail() {
                   alignSelf: 'flex-start', // đảm bảo sticky tính từ đầu Col
                 }}
               >
-                <TourDetailCard tourData={dataDetailtour} selectedDepartureId={selectedDepartureId}/>
+                <TourDetailCard 
+                  tourData={dataDetailtour} 
+                  selectedDepartureId={selectedDepartureId}
+                  onSelectDeparture={scrollToSchedule} // Truyền hàm xuống
+                />
               </div>
             </Col>
           </Row>
@@ -124,7 +122,7 @@ export default function TourDetail() {
           </Title>
 
           <Row gutter={24} justify="space-between">
-            {tours.map((tour) => (
+            {dataRandomTour.map((tour) => (
               <Col key={tour.id} span={8}>
                 <TourCard tour={tour} />
               </Col>

@@ -20,10 +20,11 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_URLS = {
             "/users/login",
+            "/users/logout",
             "/users/google",
-            "users/register",
-            "users/introspect",
-            "users/refresh"
+            "/users/register",
+            "/users/introspect",
+            "/users/refresh"
     };
 
     private final String[] PUBLIC_GET_URLS = {
