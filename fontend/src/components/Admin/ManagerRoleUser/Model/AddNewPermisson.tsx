@@ -21,7 +21,7 @@ const AddNewPermission: React.FC<AddNewPermissionProps> = ({
   open,
   onClose,
   onSubmit,
-  allRoles,
+  // allRoles,
   setIsAddNewPermission,
 }) => {
   const [form] = Form.useForm();

@@ -1,5 +1,5 @@
 import { sessionService } from '@/services/sessionServices';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 let persistorRef: any = null;
 export const injectPersistor = (persistor: any) => {

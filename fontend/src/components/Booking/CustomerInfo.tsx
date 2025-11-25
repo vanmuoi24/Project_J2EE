@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Form, Input, Select, Row, Col, Button, Divider, Typography } from 'antd';
 import type { FormInstance } from 'antd';
-import type { Customer as CustomerProp } from '@/types/Booking';
+import type { CustomerResponse as CustomerProp } from '@/types/Booking';
 
 const { Title } = Typography;
 const { Option } = Select;

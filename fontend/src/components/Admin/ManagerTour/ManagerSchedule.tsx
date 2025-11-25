@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 
-import { Button, Input, Modal, Space, message, Tooltip } from 'antd';
+import { Button, Modal, Space, message, Tooltip, Input } from 'antd';
 
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
@@ -172,6 +172,23 @@ const ManagerItinerary: React.FC = () => {
 
   return (
     <div>
+      {/* --------------- Chỗ sửa: Thêm để build không bị lỗi never read --------------- */}
+      <Space style={{ marginBottom: 16 }}>
+        <Input
+          placeholder="Search title"
+          value={searchTitle}
+          onChange={(e) => setSearchTitle(e.target.value)}
+          style={{ width: 200 }}
+        />
+        <Input
+          placeholder="Search tour"
+          value={searchTour}
+          onChange={(e) => setSearchTour(e.target.value)}
+          style={{ width: 200 }}
+        />
+      </Space>
+      {/* --------------- Chỗ sửa: Thêm để build không bị lỗi never read --------------- */}
+
       <ProTable<IItinerary>
         columns={columns}
         rowKey="id"

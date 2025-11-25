@@ -171,6 +171,7 @@ export interface ITourDepartureResponse {
 export interface IDestination {
   city: string;
   type: number;
+  img: string;
 }
 
 export interface ITourDeparture {

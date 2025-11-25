@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Form, Input, DatePicker, Select, Row, Col, Button, Divider, Typography } from 'antd';
 import dayjs from 'dayjs';
 
@@ -7,7 +7,7 @@ const { Option } = Select;
 
 export default function ListOfCustomerInfo({
   onFormReady,
-  personalFormGetter,
+  // personalFormGetter,
   onCustomersChange,
 }: {
   onFormReady?: (form: any) => void;

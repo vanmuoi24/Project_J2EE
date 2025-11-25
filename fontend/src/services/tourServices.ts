@@ -4,13 +4,11 @@ import type { IPaginationResponse } from '@/types/Pagination';
 import type {
   AddTourPriceRequest,
   ICity,
-  IDestination,
   IItinerary,
   ILocation,
   AddItineraryRequest,
   ITour,
   ITourDeparture,
-  ITourDepartureResponse,
   ITourPrice,
   IVehicle,
   AddLocationRequest,

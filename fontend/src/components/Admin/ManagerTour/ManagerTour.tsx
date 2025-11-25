@@ -21,7 +21,7 @@ const ManagerTourList: React.FC = () => {
   const canView = useHasPermission(ALL_PERMISSIONS.TOURS.GET_DETAIL);
   const canCreate = useHasPermission(ALL_PERMISSIONS.TOURS.CREATE);
   const canUpdate = useHasPermission(ALL_PERMISSIONS.TOURS.UPDATE);
-  const canDelete = useHasPermission(ALL_PERMISSIONS.TOURS.DELETE);
+  // const canDelete = useHasPermission(ALL_PERMISSIONS.TOURS.DELETE);
   const fetchDataTour = useCallback(async () => {
     try {
       const res = await getAllTours();

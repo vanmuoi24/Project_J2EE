@@ -7,12 +7,10 @@ import {
   TagOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { Card, Typography, Button, List, message } from 'antd';
+import { Card, Typography, Button, List } from 'antd';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '@/store/hooks';
-import type { RootState } from '@/store';
 const { Text, Title } = Typography;
 
 interface TourDetailCardProps {
@@ -39,15 +37,15 @@ export default function TourDetailCard({
     setDataDetailTourDeparture(data.result);
   };
 
-  const { user } = useAppSelector((state: RootState) => state.auth);
+  // const { user } = useAppSelector((state: RootState) => state.auth);
 
-  const handleBookTour = async () => {
-    if (!user) {
-      message.info('Bạn cần phải đăng nhập trước khi đặt tour');
-      return;
-    }
-    message.success('Bạn đã đặt tour ' + tourData?.id);
-  };
+  // const handleBookTour = async () => {
+  //   if (!user) {
+  //     message.info('Bạn cần phải đăng nhập trước khi đặt tour');
+  //     return;
+  //   }
+  //   message.success('Bạn đã đặt tour ' + tourData?.id);
+  // };
 
   useEffect(() => {
     fetchDataTourDepartureById();
