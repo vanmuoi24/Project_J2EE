@@ -32,13 +32,13 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 public class AuthenticationFilter implements GlobalFilter, Ordered {
      IdentityService identityService;
-    ObjectMapper objectMapper;
+     ObjectMapper objectMapper;
 
-    @NonFinal
-    private String[] publicEndpoints = {
+     @NonFinal
+     private String[] publicEndpoints = {
             "/auth/users/login",
             "/auth/users/logout",
-            "/auth/users/googleDockerfile",
+            "/auth/users/google",
             "/auth/users/register",
             "/auth/users/refresh",
             "/auth/users/introspect",
@@ -55,7 +55,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/search/tours/search",
             "/search/tours",
             "/file/media/tours"
-    };
+     };
 
     @Value("${app.api-prefix}")
     @NonFinal
@@ -63,31 +63,52 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("Enter authentication filter...");
-
+        // 1. Logic check Public Endpoint (Giữ nguyên)
         if (isPublicEndpoint(exchange.getRequest())) {
             return chain.filter(exchange);
         }
 
-        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        // 2. Logic lấy Token (Giữ nguyên)
+        List<String> authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION);
+        if (CollectionUtils.isEmpty(authHeader))
             return unauthenticated(exchange.getResponse());
-        }
 
-        String token = authHeader.substring(7); // bỏ "Bearer "
-        log.info("Token: {}", token);
+        String token = authHeader.get(0).substring(7);
 
+        // 3. LOGIC GỌI INTROSPECT VÀ XỬ LÝ LỖI PHÂN TÁCH
         return identityService.introspect(token)
+                // --- BƯỚC QUAN TRỌNG NHẤT: BẮT LỖI RIÊNG CHO AUTH SERVICE ---
+                .onErrorResume(throwable -> {
+                    // Đây là nơi bắt lỗi nếu Identity Service (Port 8080) bị chết hoặc lỗi mạng
+                    log.error("Lỗi khi gọi Identity Service: {}", throwable.getMessage());
+
+                    // Chúng ta đánh dấu đây là lỗi Auth bằng cách ném ra 1 Exception riêng
+                    // Hoặc trả về 401 ngay tại đây
+                    return Mono.error(new RuntimeException("AUTH_FAILED"));
+                })
                 .flatMap(introspectResponse -> {
+                    // Nếu Introspect thành công, check valid
                     if (introspectResponse.getResult().isValid()) {
+                        // --- GỌI SERVICE ĐÍCH (Tour, Booking...) ---
+                        // Nếu Tour Service chết, lỗi sẽ bắn ra từ dòng này
                         return chain.filter(exchange);
                     } else {
+                        // Token hết hạn hoặc fake
                         return unauthenticated(exchange.getResponse());
                     }
                 })
-                .onErrorResume(e -> {
-                    log.error("Error while introspecting token", e);
-                    return unauthenticated(exchange.getResponse());
+                // --- XỬ LÝ LỖI CUỐI CÙNG ---
+                .onErrorResume(throwable -> {
+                    // Nếu lỗi do Identity Service chết (đã đánh dấu ở trên) -> Trả 401
+                    if ("AUTH_FAILED".equals(throwable.getMessage())) {
+                        return unauthenticated(exchange.getResponse());
+                    }
+
+                    // QUAN TRỌNG: Nếu lỗi do Tour/Booking Service chết (ConnectException, 503...)
+                    // Chúng ta KHÔNG được return unauthenticated().
+                    // Hãy return Mono.error(throwable) để Gateway tự xử lý (sẽ ra 500 hoặc 503)
+                    log.error("Lỗi Gateway/Service con: {}", throwable.getMessage());
+                    return Mono.error(throwable);
                 });
     }
 

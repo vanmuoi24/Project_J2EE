@@ -1,5 +1,6 @@
 import React from 'react';
-import { Form, Input, Button, Select } from 'antd';
+import { Form, Input, Button, Select, Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 const { Option } = Select;
 
 interface AddLocationProps {
@@ -12,6 +13,14 @@ const AddLocation: React.FC<AddLocationProps> = ({ onSubmit }) => {
   const handleFinish = (values: any) => {
     if (onSubmit) onSubmit(values);
     form.resetFields();
+  };
+
+  // Hàm chuẩn hóa value cho Upload component trong Form
+  const normFile = (e: any) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
   };
 
   return (
@@ -43,6 +52,26 @@ const AddLocation: React.FC<AddLocationProps> = ({ onSubmit }) => {
             <Option value="DESTINATION">DESTINATION</Option>
           </Select>
         </Form.Item>
+
+        {/* --- PHẦN BỔ SUNG: UPLOAD ẢNH --- */}
+        <Form.Item
+          label="Hình ảnh minh họa"
+          name="img"
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
+          extra="Chấp nhận file ảnh (jpg, png). Tối đa 1 file."
+        >
+          <Upload
+            name="img"
+            listType="picture"
+            maxCount={1}
+            beforeUpload={() => false} // Quan trọng: Chặn auto upload để gửi cùng form submit
+            accept="image/*"
+          >
+            <Button icon={<UploadOutlined />}>Chọn ảnh từ máy tính</Button>
+          </Upload>
+        </Form.Item>
+        {/* -------------------------------- */}
 
         <Form.Item style={{ textAlign: 'right', marginTop: 16 }}>
           <Button type="primary" htmlType="submit" size="large" style={{ minWidth: 140 }}>

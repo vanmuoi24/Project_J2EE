@@ -5,6 +5,7 @@ import Container from '@/components/Share/Container';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store';
 import { logoutUser } from '@/store/slices/authSlice';
+import fallback from '@/assets/images/fallback.png';
 
 const Navbar: React.FC = () => {
   const { user } = useAppSelector((state: RootState) => state.auth);
@@ -118,7 +119,7 @@ const Navbar: React.FC = () => {
               {user != null && user.username ? (
                 <Avatar
                   size={40}
-                  src={user?.avatar}
+                  src={user?.avatar || fallback}
                   className="border-2 border-gray-200 cursor-pointer"
                 />
               ) : (

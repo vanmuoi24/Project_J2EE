@@ -68,6 +68,9 @@ export const getAllDepartures = (): Promise<AxiosResponse<ILocation[]>> => {
 export const getAllDestinations = (): Promise<AxiosResponse<ILocation[]>> => {
   return axiosClient.get(`/tour/locations/destinations`);
 };
+export const getRandom7Destinations = (): Promise<AxiosResponse<ILocation[]>> => {
+  return axiosClient.get(`/tour/locations/destinations/attractive`);
+};
 
 export const getAllVehicles = (): Promise<AxiosResponse<IVehicle[]>> => {
   return axiosClient.get(`/tour/vehicles/list`);
@@ -91,7 +94,19 @@ export const searchLocation = (
 };
 
 export const addLocation = (data: AddLocationRequest): Promise<AxiosResponse<ILocation>> => {
-  return axiosClient.post(`/tour/locations`, data);
+  const formData = new FormData();
+
+  formData.append('city', data.city);
+  formData.append('type', data.type);
+  if (data.img) {
+    formData.append('img', data.img);
+  }
+
+  return axiosClient.post(`/tour/locations`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 };
 
 export const addItinerary = (data: AddItineraryRequest): Promise<AxiosResponse<IItinerary>> => {
@@ -157,7 +172,19 @@ export const updateTourPrice = (
 };
 
 export const updateLocation = (data: UpdateLocationRequest): Promise<AxiosResponse<ILocation>> => {
-  return axiosClient.put(`tour/locations/${data.id}`, data);
+  const formData = new FormData();
+
+  formData.append('city', data.city ?? '');
+  formData.append('type', data.type ?? '');
+  if (data.img) {
+    formData.append('img', data.img);
+  }
+
+  return axiosClient.put(`/tour/locations/${data.id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 };
 
 export const updateItinerary = (

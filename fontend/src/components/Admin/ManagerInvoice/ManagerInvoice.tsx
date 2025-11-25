@@ -140,7 +140,7 @@ const ManagerInvoice: React.FC = () => {
       render: (val) =>
         val === 'PAID' ? (
           <Tag color="green">Đã thanh toán</Tag>
-        ) : val === 'WAITING' ? (
+        ) : val === 'UNPAID' ? (
           <Tag color="orange">Chưa thanh toán</Tag>
         ) : (
           '-'

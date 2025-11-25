@@ -7,7 +7,7 @@ import { Bounce, ToastContainer } from 'react-toastify';
 export default function App() {
   return (
     <ConfigProvider locale={viVN}>
-      <AppRoutes />;
+      <AppRoutes />
       <ToastContainer
         position="top-right"
         autoClose={2000}

@@ -111,6 +111,6 @@ export const createComent = (data: CreateCommentRequest): Promise<AxiosResponse>
   return axiosClient.post('/auth/reviews', data);
 };
 
-export const getHighReviews = (size: number = 4): Promise<AxiosResponse<ReviewResponse[]>> => {
+export const getHighReviews = (size: number = 3): Promise<AxiosResponse<ReviewResponse[]>> => {
   return axiosClient.get(`/auth/reviews/high-rating?size=${size}`);
 };

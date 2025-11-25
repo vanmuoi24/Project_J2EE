@@ -4,6 +4,7 @@ import com.example.tour_service.enums.LocationType;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -13,4 +14,6 @@ import lombok.experimental.FieldDefaults;
 public class LocationRequest {
     String city;
     LocationType type;
+    MultipartFile img;
+
 }

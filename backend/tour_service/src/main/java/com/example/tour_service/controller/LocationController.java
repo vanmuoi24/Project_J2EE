@@ -6,6 +6,7 @@ import com.example.tour_service.dto.response.LocationResponse;
 import com.example.tour_service.repository.LocationRepository;
 import com.example.tour_service.service.LocationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import javax.xml.stream.Location;
@@ -16,8 +17,8 @@ import javax.xml.stream.Location;
 public class LocationController {
     private final LocationService locationService;
 
-    @PostMapping
-    public ApiResponse<LocationResponse> createLocation(@RequestBody LocationRequest request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // Chỉ định rõ nhận Multipart
+    public ApiResponse<LocationResponse> createLocation(@ModelAttribute LocationRequest request) { // Đổi thành @ModelAttribute
         return ApiResponse.<LocationResponse>builder()
                 .result(locationService.createLocation(request))
                 .message("Created Successfully")
@@ -25,7 +26,7 @@ public class LocationController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<LocationResponse> updateLocation(@PathVariable int id, @RequestBody LocationRequest request) {
+    public ApiResponse<LocationResponse> updateLocation(@PathVariable int id, @ModelAttribute LocationRequest request) {
         return ApiResponse.<LocationResponse>builder()
                 .result(locationService.updateLocation(id, request))
                 .message("Updated Successfully")
@@ -84,9 +85,16 @@ public class LocationController {
     @GetMapping("/destinations/search")
     public ApiResponse<List<LocationResponse>> searchDestinationLocations(@RequestParam(name = "keyword") String keyword) {
         return ApiResponse.<List<LocationResponse>>builder()
-                // 2. Bạn cần tạo phương thức này trong LocationService
                 .result(locationService.searchDestinationLocations(keyword))
                 .message("Searched destination locations successfully")
+                .build();
+    }
+
+    @GetMapping("/destinations/attractive")
+    public ApiResponse<List<LocationResponse>> attractiveDestinationLocations() {
+        return ApiResponse.<List<LocationResponse>>builder()
+                .result(locationService.attractiveDestinationLocations())
+                .message("List attractive destination locations successfully")
                 .build();
     }
 }

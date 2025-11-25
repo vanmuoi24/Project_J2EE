@@ -71,3 +71,6 @@ spring:
           filters:
             - StripPrefix=2
 
+identity-service:
+#  base-url: http://auth_service:8080   # nếu chạy Docker
+   base-url: http://localhost:8080     # nếu chạy local

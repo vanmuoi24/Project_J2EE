@@ -315,6 +315,7 @@ public class AuthService {
         User user = userRepository.findByGoogleId(googleId).orElse(null);
 
         if (user != null) {
+            System.out.println(">>>> User auth by GG: " + user.getId());
             return user;
         }
 
@@ -322,11 +323,13 @@ public class AuthService {
         user = userRepository.findByEmail(email).orElse(null);
 
         if (user != null) {
+            System.out.println(">>>>>>>User auth by GM(Duplicate): " + user.getId());
             // user cũ đăng ký bằng LOCAL → gán thêm googleId
             user.setGoogleId(googleId);
             user.setProvider("GOOGLE");
             // Upload avatar Google lên Cloudinary
             if (avatarUrl != null && !avatarUrl.isBlank()) {
+                System.out.println(">>>> Uploading avatar: " + avatarUrl);
                 try {
                     MultipartFile file = downloadUrlAsMultipartFile(avatarUrl, "avatar_" + user.getId());
                     FileResponse fileResponse = fileServiceClient.uploadAvt(user.getId().toString(), file);
@@ -340,6 +343,7 @@ public class AuthService {
             userRepository.save(user);
             return user;
         }
+        System.out.println(">>>>>>>>>> User doesn't exists" );
         User newUser = new User();
         newUser.setGoogleId(googleId);
         newUser.setProvider("GOOGLE");
