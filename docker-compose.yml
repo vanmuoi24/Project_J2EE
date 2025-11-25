@@ -195,7 +195,7 @@ services:
   # 11. NOTIFICATION SERVICE
   # ====================================================
   notification-service:
-    build: ./backend/notification_service
+    build: ./backend/notification_sevice
     container_name: notification_service
     restart: unless-stopped
     environment:
