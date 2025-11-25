@@ -55,6 +55,7 @@ export default function CustomerInfo({
                 {({ getFieldValue, setFieldsValue }) => (
                   <Button
                     type="primary"
+                    className="bg-[#7BBCB0]!"
                     block
                     onClick={() => {
                       const customers = getFieldValue('customers') || [];
@@ -78,6 +79,7 @@ export default function CustomerInfo({
                 {({ getFieldValue, setFieldsValue }) => (
                   <Button
                     type="primary"
+                    className="bg-[#7BBCB0]!"
                     block
                     onClick={() => {
                       const customers = getFieldValue('customers') || [];
@@ -101,6 +103,7 @@ export default function CustomerInfo({
                 {({ getFieldValue, setFieldsValue }) => (
                   <Button
                     type="primary"
+                    className="bg-[#7BBCB0]!"
                     block
                     onClick={() => {
                       const customers = getFieldValue('customers') || [];
@@ -124,6 +127,7 @@ export default function CustomerInfo({
                 {({ getFieldValue, setFieldsValue }) => (
                   <Button
                     type="primary"
+                    className="bg-[#7BBCB0]!"
                     block
                     onClick={() => {
                       const customers = getFieldValue('customers') || [];

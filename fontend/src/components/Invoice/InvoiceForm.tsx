@@ -184,7 +184,7 @@ export default function InvoiceForm({
           </Select>
         </Form.Item>
 
-        <Button type="primary" htmlType="submit" block size="large">
+        <Button type="primary" className="bg-[#7BBCB0]!" htmlType="submit" block size="large">
           Thanh toán
         </Button>
 
