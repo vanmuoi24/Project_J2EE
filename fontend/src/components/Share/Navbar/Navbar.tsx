@@ -12,7 +12,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userMenu = (user &&
-    user !== null && [
+    [
       {
         key: 'profile',
         label: (
@@ -21,14 +21,17 @@ const Navbar: React.FC = () => {
           </Button>
         ),
       },
-      {
-        key: 'quản trị',
+
+      // Chỉ hiển thị nếu KHÔNG phải khách hàng
+      user.role?.name !== 'Khách Hàng' && {
+        key: 'admin',
         label: (
           <Button type="link" onClick={() => navigate('/admin')}>
             Trang quản trị
           </Button>
         ),
       },
+
       {
         key: 'logout',
         label: (
@@ -43,7 +46,7 @@ const Navbar: React.FC = () => {
           </Button>
         ),
       },
-    ]) || [
+    ].filter(Boolean)) || [
     {
       key: 'login',
       label: (
@@ -61,6 +64,7 @@ const Navbar: React.FC = () => {
       ),
     },
   ];
+
   return (
     <div className="bg-white shadow-sm">
       <Container className="flex items-center justify-between relative py-[10px]">

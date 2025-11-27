@@ -46,14 +46,13 @@ export const loginWithGGService = async (googleToken: string) => {
   }
 };
 
-export const registerService = async (data: RegisterRequest): Promise<RegisterResponse> => {
+export const registerService = async (data: RegisterRequest) => {
   try {
     const res: RegisterResponse = await axiosClient.post('/auth/users/register', data);
     console.log('>>>', res);
     if (res.code !== 1000) {
       throw new Error(res?.message || 'Register failed');
     }
-
     return res;
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {

@@ -53,7 +53,11 @@ export default function AppRoutes() {
         </Route>
 
         <Route path="*" element={<NotFound />} />
-        <Route element={<RouteGuard isPrivate />}>
+        <Route
+          element={
+            <RouteGuard isPrivate roles={['Quản trị viên Tour', 'Nhân Viên']} redirectPath="/" />
+          }
+        >
           <Route path="/admin" element={<LayoutAdmin />}>
             <Route path="/admin/managerUser" element={<ManagerUser />} />
             <Route path="/admin/managerTour/list" element={<ManagerTour />} />
