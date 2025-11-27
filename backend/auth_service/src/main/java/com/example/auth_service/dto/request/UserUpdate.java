@@ -16,7 +16,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdate {
     String username;
-    MultipartFile file;
     String phone;
     String address;
+    Long roleId;
 }

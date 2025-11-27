@@ -1,9 +1,12 @@
 package com.example.invoice_service.exception;
 
+
+
 public class AppException extends RuntimeException {
  public AppException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+
+     super(errorCode.getMessage());
+     this.errorCode = errorCode;
     }
 
     private ErrorCode errorCode;

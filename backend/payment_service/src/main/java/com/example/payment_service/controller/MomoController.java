@@ -1,8 +1,6 @@
 package com.example.payment_service.controller;
 
-import com.example.invoice_service.dto.request.MoMoRequest;
-import com.example.invoice_service.dto.response.ApiResponse;
-import com.example.invoice_service.dto.response.InvoiceResponse;
+import com.example.payment_service.dto.request.ApiResponse;
 import com.example.payment_service.dto.request.CreateMomoRequest;
 import com.example.payment_service.service.MomoService;
 import com.example.payment_service.dto.response.CreateMomoResponse;
@@ -19,7 +17,7 @@ public class MomoController {
     private final MomoService momoService;
 
     @PostMapping("/create")
-    public ApiResponse<CreateMomoResponse> createQR(@RequestBody MoMoRequest request){
+    public ApiResponse<CreateMomoResponse> createQR(@RequestBody CreateMomoRequest request){
         try {
             // Gọi service để tạo QR
 //            CreateMomoResponse response = momoService.createMomoQR(

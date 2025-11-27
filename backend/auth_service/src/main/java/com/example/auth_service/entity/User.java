@@ -33,7 +33,16 @@ public class User {
 
     @Column
     private String address;
-    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
+
+    @Column
+    private String googleId;   // id duy nhất từ Google
+
+    @Builder.Default
+    private String provider = "LOCAL";
 
 }
+    

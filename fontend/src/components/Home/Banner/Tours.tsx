@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import debounce from 'lodash.debounce';
 import { searchLocation } from '@/services/tourServices';
-import { Calendar, Car, LocationEdit, Ticket } from 'lucide-react';
+import { Calendar, LocationEdit, Ticket } from 'lucide-react';
 
 interface DestinationOption {
   value: string | number;

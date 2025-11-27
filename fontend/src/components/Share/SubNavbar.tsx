@@ -1,16 +1,12 @@
 import { Dropdown, Button, Typography, message } from 'antd';
-import { PhoneOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import flag from '@/assets/images/en.png';
+import { PhoneOutlined, SettingOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import ModalChangeLC from '@/components/Home/Modal/ModalChangeLC';
-import { useState } from 'react';
 import Container from './Container';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store';
 import { logoutUser } from '@/store/slices/authSlice';
 
 export default function TopNavbar() {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const { user } = useAppSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();

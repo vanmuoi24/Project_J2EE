@@ -142,7 +142,7 @@ const PopularTours = () => {
             className="!bg-[#7BBCB0] rounded-[8px] !py-0 !px-[32px] h-[48px] text-[16px] !font-bold"
             onClick={handleViewMore}
           >
-            View more
+            Xem thêm
           </Button>
         </div>
       </Container>

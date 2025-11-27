@@ -49,6 +49,7 @@ public class UserControllerTest {
                 .email("muoi@gmail.com")
                 .password("123456")
                 .phone("0868166353")
+                
                 .build();
 
         // ❌ Request không hợp lệ (username rỗng)

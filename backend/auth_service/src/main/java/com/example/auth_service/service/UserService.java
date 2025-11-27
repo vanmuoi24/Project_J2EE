@@ -3,6 +3,7 @@ package com.example.auth_service.service;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.mapstruct.control.MappingControl;
@@ -21,13 +22,16 @@ import com.example.auth_service.dto.request.UserUpdate;
 import com.example.auth_service.dto.response.FileResponse;
 import com.example.auth_service.dto.response.PageResponse;
 import com.example.auth_service.dto.response.UserResponse;
+import com.example.auth_service.entity.Role;
 import com.example.auth_service.entity.User;
 import com.example.auth_service.exception.AppException;
 import com.example.auth_service.exception.ErrorCode;
 import com.example.auth_service.mapper.UserMapper;
+import com.example.auth_service.repository.RoleRepository;
 import com.example.auth_service.repository.UserRepository;
 import com.example.auth_service.repository.httpclient.FileServiceClient;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -38,25 +42,42 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final FileServiceClient fileServiceClient;
-
+    private final RoleRepository roleRepository;
     public UserResponse createUser(UserCreationRequest request) {
 
-        System.out.println("uerservice check check");
+        // Validate các trường bắt buộc
         if (request.getUsername() == null || request.getUsername().isBlank()) {
-            throw new AppException(ErrorCode.User_name);
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
+      
 
+        // Check email tồn tại
+        userRepository.findByEmail(request.getEmail())
+                .ifPresent(u -> {
+                    throw new AppException(ErrorCode.USER_EXISTED);
+                });
+
+        // Map DTO -> Entity
         User user = userMapper.toUser(request);
-        user.setPassword(passwordEncoder.encode(request.getPassword())); 
+
+        // Encode password
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        // Map Role nếu có roleId
+        if (request.getRoleId() != null) {
+            Role role = roleRepository.findById(request.getRoleId())
+                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+            user.setRole(role);
+        }
 
         try {
             user = userRepository.save(user);
-        } catch (DataIntegrityViolationException exception) {
-            throw new AppException(ErrorCode.USER_EXISTED);
+        } catch (DataIntegrityViolationException ex) {
+            throw new AppException(ErrorCode.USER_EXISTED); // email/username trùng
         }
+
         return userMapper.toUserResponse(user);
     }
-
     public List<UserResponse> getAllUser() {
         List<User> users = userRepository.findAll();
         return users.stream()
@@ -71,19 +92,36 @@ public class UserService {
 
     }
 
+   
+    @Transactional
     public UserResponse updateUser(Long id, UserUpdate req) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        FileResponse fileResponse = fileServiceClient.uploadFile(req.getFile());
-        if (fileResponse != null && fileResponse.getUrl() != null) {
-            user.setAvatar(fileResponse.getUrl());
-        } else {
-            log.warn("Upload file thất bại hoặc trả về null!");
+        // Update username nếu khác null/blank
+        if (req.getUsername() != null && !req.getUsername().isBlank()) {
+            userRepository.findByUsername(req.getUsername())
+                    .filter(u -> !u.getId().equals(id))
+                    .ifPresent(u -> {
+                        throw new AppException(ErrorCode.USER_EXISTED);
+                    });
+
+            user.setUsername(req.getUsername());
         }
 
-        userMapper.updateUserFromRequest(req, user);
+        // Update phone và address nếu khác null
+        Optional.ofNullable(req.getPhone()).ifPresent(user::setPhone); 
+        Optional.ofNullable(req.getAddress()).ifPresent(user::setAddress);
+
+        // Update role nếu roleId khác null
+        if (req.getRoleId() != null) {
+            Role role = roleRepository.findById(req.getRoleId())
+                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+            user.setRole(role);
+        }
+
         userRepository.save(user);
+
         return userMapper.toUserResponse(user);
     }
 
@@ -98,6 +136,12 @@ public class UserService {
         userRepository.save(user);
 
         return fileResponse;
+    }
+
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        userRepository.delete(user);
     }
 
 }

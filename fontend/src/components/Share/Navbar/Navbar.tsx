@@ -1,27 +1,37 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Dropdown, Menu, message } from 'antd';
+import { Avatar, Button, Dropdown, message } from 'antd';
 import brand from '@/assets/images/logo.png';
 import Container from '@/components/Share/Container';
-import { SettingOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store';
 import { logoutUser } from '@/store/slices/authSlice';
+import fallback from '@/assets/images/fallback.png';
 
 const Navbar: React.FC = () => {
   const { user } = useAppSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
   const userMenu = (user &&
-    user !== null && [
+    [
       {
         key: 'profile',
         label: (
           <Button type="link" onClick={() => navigate('/profile')}>
-            {user.username}
+            Trang cá nhân
           </Button>
         ),
       },
+
+      // Chỉ hiển thị nếu KHÔNG phải khách hàng
+      user.role?.name !== 'Khách Hàng' && {
+        key: 'admin',
+        label: (
+          <Button type="link" onClick={() => navigate('/admin')}>
+            Trang quản trị
+          </Button>
+        ),
+      },
+
       {
         key: 'logout',
         label: (
@@ -36,7 +46,7 @@ const Navbar: React.FC = () => {
           </Button>
         ),
       },
-    ]) || [
+    ].filter(Boolean)) || [
     {
       key: 'login',
       label: (
@@ -54,6 +64,7 @@ const Navbar: React.FC = () => {
       ),
     },
   ];
+
   return (
     <div className="bg-white shadow-sm">
       <Container className="flex items-center justify-between relative py-[10px]">
@@ -110,7 +121,11 @@ const Navbar: React.FC = () => {
           <div className="flex items-center justify-center gap-[12px]">
             <Dropdown menu={{ items: userMenu }} placement="bottomRight" arrow>
               {user != null && user.username ? (
-                <SettingOutlined className="text-[20px] text-black cursor-pointer" />
+                <Avatar
+                  size={40}
+                  src={user?.avatar || fallback}
+                  className="border-2 border-gray-200 cursor-pointer"
+                />
               ) : (
                 // <UserOutlined className="text-[20px] text-black cursor-pointer" />
                 <button className=" bg-[#7BBCB0] rounded-[6px] !px-2 !py-2 transition hover:bg-[#87b0eb]">

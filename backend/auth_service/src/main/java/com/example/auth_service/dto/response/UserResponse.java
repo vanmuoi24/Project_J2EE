@@ -1,5 +1,6 @@
 package com.example.auth_service.dto.response;
 
+import java.util.List;
 import java.util.Set;
 
 import lombok.*;
@@ -17,5 +18,8 @@ public class UserResponse {
     String avatar;
     String phone;
     String address;
+    RoleResponse role;
+   
+
 
 }

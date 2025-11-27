@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Spin, Card, Result, Button, Descriptions, message } from 'antd';
+import { Spin, Card, Result, Button, Descriptions } from 'antd';
 import paymentServices from '@/services/paymentServices';
 import invoiceServices from '@/services/invoiceServices';
 import { formatCurrencyVND, formatDatetime } from "@/utils/index"
@@ -9,9 +8,9 @@ import type { RootState } from '@/store';
 
 export default function VnPayCallback() {
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState('');
   const [invoice, setInvoice] = useState<Record<string, any> | null>(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const calledRef = useRef(false);
 
    const { user } = useAppSelector((state: RootState) => state.auth);
@@ -22,17 +21,17 @@ export default function VnPayCallback() {
    * Xử lý tạo invoice sau khi thanh toán thành công
    */
   const createInvoiceAfterPayment = async () => {
-    const temp = sessionStorage.getItem("invoice_temp");
+    const temp = sessionStorage.getItem('invoice_temp');
     const data = temp ? JSON.parse(temp) : null;
 
     if (!data?.invoiceRequest) {
-      throw new Error("Không tìm thấy dữ liệu invoice để lưu.");
+      throw new Error('Không tìm thấy dữ liệu invoice để lưu.');
     }
 
     const res = await invoiceServices.create(data.invoiceRequest);
 
     if (res.code === 1000) {
-      sessionStorage.removeItem("invoice_temp");
+      sessionStorage.removeItem('invoice_temp');
       return true;
     }
 
@@ -143,7 +142,7 @@ const sendEmail = async (invoice: any) => {
 
     fetchPaymentStatus();
   }, []);
-  
+
   if (loading) {
     return (
       <div style={{ padding: '5rem', textAlign: 'center' }}>
@@ -155,7 +154,7 @@ const sendEmail = async (invoice: any) => {
 
   return (
     <div style={{ padding: '24px 10rem' }}>
-      {status === "success" ? (
+      {status === 'success' ? (
         <>
           <Result
             status="success"
@@ -173,7 +172,7 @@ const sendEmail = async (invoice: any) => {
               ))}
             </Descriptions>
           </Card>
-          <div style={{ marginTop: 24, textAlign: "center" }}>
+          <div style={{ marginTop: 24, textAlign: 'center' }}>
             <Button className="home-btn" href="/" key="home">
               Về trang chủ
             </Button>
@@ -183,11 +182,11 @@ const sendEmail = async (invoice: any) => {
         <Result
           status="error"
           title="Thanh toán thất bại"
-          subTitle={error || "Giao dịch không hợp lệ"}
+          subTitle={error || 'Giao dịch không hợp lệ'}
           extra={[
             <Button href="/" key="home">
               Về trang chủ
-            </Button>
+            </Button>,
           ]}
         />
       )}

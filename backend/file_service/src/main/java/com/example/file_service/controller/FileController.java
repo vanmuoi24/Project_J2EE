@@ -7,13 +7,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.file_service.dto.reponse.FileResponse;
@@ -36,6 +30,16 @@ public class FileController {
     public ResponseEntity<FileResponse> uploadMedia(@RequestPart("file") MultipartFile file) throws IOException {
         System.out.println("📂 Nhận file: " + file.getOriginalFilename());
         return ResponseEntity.ok(fileService.uploadFile(file));
+    }
+
+
+    @PostMapping(value = "/media/upload/location", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<FileResponse> uploadLocationImg(
+            @RequestParam(value = "locationId", required = false) Integer locationId,
+            @RequestPart("file") MultipartFile file
+    ) throws IOException {
+        System.out.println("📂 Upload Location Img - File: " + file.getOriginalFilename() + ", LocID: " + locationId);
+        return ResponseEntity.ok(fileService.uploadFile(file, locationId));
     }
 
     @GetMapping("/media/download/{fileName}")
@@ -74,6 +78,19 @@ public ResponseEntity<FileResponse> uploadAvt(
     return ResponseEntity.ok(response);
 }
 
+    @PostMapping("/media/tour")
+    public ResponseEntity<ApiResponse<List<String>>> deleteMultipleTourImagesByUrl(
+            @RequestBody List<String> urls) {
 
-        
+        fileService.deleteMultipleTourImagesByUrl(urls);
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<String>>builder()
+                        .message("Đã xóa " + urls.size() + " ảnh")
+                        .result(urls)
+                        .build()
+        );
+    }
+
+
 }

@@ -5,6 +5,7 @@ import type {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  ReviewResponse,
 } from '@/types/Auth';
 import { sessionService } from './sessionServices';
 import axios from 'axios';
@@ -17,7 +18,7 @@ export const loginService = async (data: LoginRequest): Promise<LoginResponse> =
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
       const serverError = err.response?.data as { message?: string };
-      throw new Error(serverError?.message || 'Login failed');
+      throw new Error(serverError?.message || 'Đăng nhập thất bại');
     }
     if (err instanceof Error) {
       throw err;
@@ -25,15 +26,33 @@ export const loginService = async (data: LoginRequest): Promise<LoginResponse> =
     throw new Error('Unexpected error');
   }
 };
+export const loginWithGGService = async (googleToken: string) => {
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/auth/users/google`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${googleToken}`,
+        },
+      }
+    );
+    if (res.data.code === 1000) {
+      return res.data;
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Đăng nhập thất bại');
+  }
+};
 
-export const registerService = async (data: RegisterRequest): Promise<RegisterResponse> => {
+export const registerService = async (data: RegisterRequest) => {
   try {
     const res: RegisterResponse = await axiosClient.post('/auth/users/register', data);
     console.log('>>>', res);
     if (res.code !== 1000) {
       throw new Error(res?.message || 'Register failed');
     }
-
     return res;
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
@@ -76,7 +95,7 @@ export const refreshTokenService = async (token: string): Promise<LoginResponse>
 };
 
 export const changePW = async (data: ChangePWReq): Promise<AxiosResponse> => {
-  return axios.post('/auth/users/Change-password', data);
+  return axiosClient.post('/auth/users/Change-password', data);
 };
 
 export const getListComentByTour = (id: number): Promise<AxiosResponse> => {
@@ -89,4 +108,8 @@ export const getListComentByTourALll = (): Promise<AxiosResponse> => {
 
 export const createComent = (data: CreateCommentRequest): Promise<AxiosResponse> => {
   return axiosClient.post('/auth/reviews', data);
+};
+
+export const getHighReviews = (size: number = 3): Promise<AxiosResponse<ReviewResponse[]>> => {
+  return axiosClient.get(`/auth/reviews/high-rating?size=${size}`);
 };

@@ -20,4 +20,6 @@ public class Location {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LocationType type;
+    @Column(nullable = false)
+    private String img;
 }

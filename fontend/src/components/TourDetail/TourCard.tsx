@@ -5,22 +5,13 @@ import {
     CalendarOutlined,
     GlobalOutlined,
 } from "@ant-design/icons";
+import type { ITour } from "@/types/Tour";
 
 const { Text, Title } = Typography;
 
-interface Tour {
-    imageUrl: string;
-    name: string;
-    departureLocation: string;
-    code: string;
-    attractions: string[];
-    duration: string;
-    transport: string;
-    price: number;
-}
 
 interface TourCardProps {
-    tour: Tour;
+    tour: ITour;
 }
 
 export default function TourCard({ tour }: TourCardProps) {
@@ -42,8 +33,8 @@ export default function TourCard({ tour }: TourCardProps) {
             {/* Ảnh */}
             <div style={{ position: "relative", height: 290, overflow: "hidden" }}>
                 <img
-                    src={tour.imageUrl}
-                    alt={tour.name}
+                    src={tour.imageIds[0]}
+                    alt={tour.tourTitle}
                     style={{
                         width: "100%",
                         height: "100%",
@@ -81,13 +72,13 @@ export default function TourCard({ tour }: TourCardProps) {
                 <div style={{ height: 28 }}> {/* chiều cao cứng đủ cho cả 2 text */}
                     {isHovered ? (
                        <Text style={{ fontSize: 10, display: "block", fontWeight: "600" }}>
-                        <Text style={{ fontSize: 10, fontWeight: "700" }}>Chương trình {tour.code}</Text> : {tour.name}
+                        <Text style={{ fontSize: 10, fontWeight: "700" }}>Chương trình {tour.tourProgram}</Text> : {tour.tourTitle}
                         </Text>
 
 
                     ) : (
                         <Text style={{ fontSize: 12, fontWeight: 700, display: "block" }}>
-                            {tour.name}
+                            {tour.tourTitle}
                         </Text>
                     )}
                 </div>
@@ -106,7 +97,7 @@ export default function TourCard({ tour }: TourCardProps) {
                         Khởi hành:
                     </Text>
                     <Text style={{ fontSize: 10, fontWeight: "bold", color: "#0F5BA0" }}>
-                        {tour.departureLocation}
+                        {tour.departureCity.city}
                     </Text>
                 </div>
 
@@ -122,18 +113,18 @@ export default function TourCard({ tour }: TourCardProps) {
                         Mã chương trình:
                     </Text>
                     <Text style={{ fontSize: 10, fontWeight: "bold" }}>
-                        {tour.code} ({tour.duration})
+                        {tour.tourProgram} ({tour.duration})
                     </Text>
                 </div>
 
                 {isHovered && (
                     <div style={{ marginTop: 8 }}>
-                        <div>
+                        {/* <div>
                             <Text style={{ fontSize: 10, display: "block", fontWeight: "600" }}>
                             <Text style={{ fontSize: 10, fontWeight: "700" }}>Điểm tham quan: </Text> : {tour.attractions.join(", ")}
                             </Text>
                            
-                        </div>
+                        </div> */}
 
 
                         <div
@@ -143,10 +134,10 @@ export default function TourCard({ tour }: TourCardProps) {
                             }}
                         >
                             <div>
-                                <Text style={{ fontSize: 11, fontWeight: "bold" }}>Thời gian:</Text> <Text style={{ fontSize: 11, fontWeight: 500 }}>{tour.duration}</Text>
+                                <Text style={{ fontSize: 11, fontWeight: "bold" }}>Thời gian:</Text> <Text style={{ fontSize: 11, fontWeight: 500 }}>{tour.duration}N{tour.duration-1}Đ</Text>
                             </div>
                             <div>
-                                <Text style={{ fontSize: 11, fontWeight: "bold" }}>Phương tiện:</Text> <Text style={{ fontSize: 11, fontWeight: 500 }}>{tour.transport}</Text>
+                                <Text style={{ fontSize: 11, fontWeight: "bold" }}>Phương tiện:</Text> <Text style={{ fontSize: 11, fontWeight: 500 }}>{tour.vehicle.name}</Text>
                             </div>
                         </div>
                     </div>
@@ -187,7 +178,7 @@ export default function TourCard({ tour }: TourCardProps) {
                 <div>
                     <Text style={{ fontSize: 12, fontWeight: 600 }}>Giá từ</Text>
                     <Title level={4} style={{ color: "#D5382C", margin: 0 }}>
-                        {tour.price.toLocaleString("vi-VN")} đ
+                        {tour.basePrice.toLocaleString("vi-VN")} đ
                     </Title>
                 </div>
 

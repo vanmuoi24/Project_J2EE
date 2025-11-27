@@ -1,13 +1,12 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="tour_sale_gateway" type="CompoundRunConfigurationType">
-    <toRun name="api_gateway" type="Application" />
-    <toRun name="auth_gateway" type="Application" />
-    <toRun name="booking_gateway" type="Application" />
-    <toRun name="file_gateway" type="Application" />
-    <toRun name="invoice_gateway" type="Application" />
-    <toRun name="payment_gateway" type="Application" />
-    <toRun name="price_gateway" type="Application" />
-    <toRun name="tour_gateway" type="Application" />
+    <toRun name="ApiGatewayApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="Booking" type="SpringBootApplicationConfigurationType" />
+    <toRun name="FileServiceApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="InvoiceServiceApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="PaymentServiceApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="PricingServiceApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="Tour" type="SpringBootApplicationConfigurationType" />
     <method v="2" />
   </configuration>
 </component>

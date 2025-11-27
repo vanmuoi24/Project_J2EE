@@ -2,200 +2,259 @@
 import React, { useRef, useState } from 'react';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns, ActionType } from '@ant-design/pro-components';
-import { Button, Space, Tag, Popconfirm, Modal, Form, Input, Select, message } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Space, Tag, Popconfirm, message } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
+import ModalAddNewRole from './ModelRole/ModalAddNewRole';
+import ModelEditRole from './ModelRole/ModelEditRole';
+import ModelViewRole from './ModelRole/ModelViewRole';
+import { getRoles, deleteRole } from '@/services/rolesServices';
+import { toast } from 'react-toastify';
+
+import { ALL_PERMISSIONS } from '@/config/permissions';
+import { useHasPermission } from '@/config/useHasPermission';
+
+interface Permission {
+  id: number;
+  name: string;
+  apiPath: string;
+  method: string;
+  module: string;
+}
 
 interface Role {
   role_id: number;
   name: string;
   description?: string;
-  permissions: string[];
-  status: 'active' | 'inactive';
+  permissions: Permission[];
+  active: boolean;
 }
-
-const tourPermissions = [
-  'Thêm Tour',
-  'Sửa Tour',
-  'Xóa Tour',
-  'Xem Tour',
-  'Quản lý Lịch trình',
-  'Quản lý Địa điểm',
-];
 
 const ManagerRoleTour: React.FC = () => {
   const actionRef = useRef<ActionType>(null);
-
-  const [data, setData] = useState<Role[]>([
-    {
-      role_id: 1,
-      name: 'Quản trị viên Tour',
-      description: 'Toàn quyền quản lý Tour và các tính năng liên quan',
-      permissions: tourPermissions,
-      status: 'active',
-    },
-    {
-      role_id: 2,
-      name: 'Nhân viên Tour',
-      description: 'Chỉ quản lý Tour và lịch trình',
-      permissions: ['Thêm Tour', 'Sửa Tour', 'Xem Tour', 'Quản lý Lịch trình'],
-      status: 'active',
-    },
-  ]);
-
+  const [loading, setLoading] = useState(false);
   const [openAddEdit, setOpenAddEdit] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
+  const [openView, setOpenView] = useState(false);
+  const [viewingRole, setViewingRole] = useState<Role | null>(null);
 
-  const handleDelete = (id: number) => {
-    setData((prev) => prev.filter((r) => r.role_id !== id));
-    message.success('Xóa vai trò thành công');
+  // ========= QUYỀN =========
+  const canList = useHasPermission(ALL_PERMISSIONS.ROLES.GET_LIST);
+  const canView = useHasPermission(ALL_PERMISSIONS.ROLES.GET_DETAIL);
+  const canCreate = useHasPermission(ALL_PERMISSIONS.ROLES.CREATE);
+  const canUpdate = useHasPermission(ALL_PERMISSIONS.ROLES.UPDATE);
+  const canDelete = useHasPermission(ALL_PERMISSIONS.ROLES.DELETE);
+
+  const reloadTable = () => {
+    actionRef.current?.reload();
   };
 
-  const handleSubmit = (values: any) => {
-    if (editingRole) {
-      setData((prev) =>
-        prev.map((r) => (r.role_id === editingRole.role_id ? { ...r, ...values } : r))
-      );
-      message.success('Cập nhật vai trò thành công');
-    } else {
-      const newRole: Role = {
-        role_id: Date.now(),
-        ...values,
-      };
-      setData((prev) => [...prev, newRole]);
-      message.success('Thêm vai trò thành công');
+  const handleDelete = async (id: number) => {
+    if (!canDelete) {
+      toast.error('Bạn không có quyền xóa vai trò');
+      return;
     }
-    setOpenAddEdit(false);
-    setEditingRole(null);
+
+    try {
+      const res = await deleteRole(id);
+      if (res.code === 200) {
+        toast.success('Xóa vai trò thành công');
+        reloadTable();
+      } else {
+        toast.error(res.message || 'Xóa vai trò thất bại');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Xóa vai trò thất bại');
+    }
   };
 
   const columns: ProColumns<Role>[] = [
-    { title: 'Tên vai trò', dataIndex: 'name', width: 180, render: (text) => <b>{text}</b> },
-    { title: 'Mô tả', dataIndex: 'description', ellipsis: true },
+    {
+      title: 'Tên vai trò',
+      dataIndex: 'name',
+      width: 200,
+      render: (text) => <b>{text}</b>,
+    },
+    {
+      title: 'Mô tả',
+      dataIndex: 'description',
+      ellipsis: true,
+    },
     {
       title: 'Quyền hạn',
       dataIndex: 'permissions',
-      render: (_, record) =>
-        record.permissions.map((p, i) => (
-          <Tag key={i} color="blue" style={{ marginBottom: 4 }}>
-            {p}
-          </Tag>
-        )),
+      hideInSearch: true,
+      render: (_, record) => {
+        const max = 3;
+        const list = record.permissions || [];
+        const visible = list.slice(0, max);
+        const hidden = list.length - max;
+        return (
+          <>
+            {visible.map((p) => (
+              <Tag key={p.id} color="blue" style={{ marginBottom: 4 }}>
+                {p.name}
+              </Tag>
+            ))}
+            {hidden > 0 && (
+              <Tag color="cyan" style={{ marginBottom: 4 }}>
+                +{hidden} quyền nữa
+              </Tag>
+            )}
+          </>
+        );
+      },
     },
     {
       title: 'Trạng thái',
-      dataIndex: 'status',
-      width: 120,
+      dataIndex: 'active',
+      width: 130,
+      valueType: 'select',
+      valueEnum: {
+        true: { text: 'Hoạt động', status: 'Success' },
+        false: { text: 'Ngừng hoạt động', status: 'Error' },
+      },
       render: (_, record) =>
-        record.status === 'active' ? (
-          <Tag color="green">Hoạt động</Tag>
-        ) : (
-          <Tag color="red">Ngưng</Tag>
-        ),
+        record.active ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng hoạt động</Tag>,
     },
     {
       title: 'Thao tác',
       key: 'actions',
       width: 150,
+      search: false,
       render: (_, record) => (
         <Space>
-          <EditOutlined
-            style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
-            onClick={() => {
-              setEditingRole(record);
-              setOpenAddEdit(true);
-            }}
-          />
-          <Popconfirm
-            title="Bạn có chắc muốn xóa vai trò này?"
-            okText="Xóa"
-            cancelText="Hủy"
-            onConfirm={() => handleDelete(record.role_id)}
-          >
-            <DeleteOutlined style={{ color: '#ff4d4f', fontSize: 18, cursor: 'pointer' }} />
-          </Popconfirm>
+          {canView && (
+            <EyeOutlined
+              style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
+              onClick={() => {
+                setViewingRole(record);
+                setOpenView(true);
+              }}
+            />
+          )}
+
+          {canUpdate && (
+            <EditOutlined
+              style={{ color: '#1677ff', fontSize: 18, cursor: 'pointer' }}
+              onClick={() => {
+                setEditingRole(record);
+                setOpenEdit(true);
+              }}
+            />
+          )}
+
+          {canDelete && (
+            <Popconfirm
+              title="Bạn có chắc muốn xóa vai trò này?"
+              okText="Xóa"
+              cancelText="Hủy"
+              onConfirm={() => handleDelete(record.role_id)}
+            >
+              <DeleteOutlined style={{ color: '#ff4d4f', fontSize: 18, cursor: 'pointer' }} />
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
   ];
 
+  // Không có quyền xem danh sách thì chặn luôn
+  if (!canList) {
+    return <div>Bạn không có quyền quản lý vai trò.</div>;
+  }
+
   return (
     <div style={{ padding: 24 }}>
       <ProTable<Role>
-        headerTitle="Quản lý vai trò Tour"
+        headerTitle="Quản Lý Vai Trò"
         columns={columns}
-        dataSource={data}
         rowKey="role_id"
-        search={false}
-        pagination={{ pageSize: 5 }}
         actionRef={actionRef}
+        search={{ labelWidth: 'auto' }}
+        pagination={{ pageSize: 5 }}
+        loading={loading}
+        request={async (params) => {
+          try {
+            if (!canList) {
+              return { data: [], success: true, total: 0 };
+            }
+
+            setLoading(true);
+            const res = await getRoles();
+            if (res.code !== 200) {
+              return { data: [], success: false, total: 0 };
+            }
+
+            const all: Role[] = res.result || [];
+
+            const nameKeyword = (params.name || '').toLowerCase().trim();
+            const descKeyword = (params.description || '').toLowerCase().trim();
+            const statusFilter = params.active as boolean | undefined;
+
+            let filtered = all;
+
+            if (nameKeyword) {
+              filtered = filtered.filter((role) => {
+                const nameMatch = role.name.toLowerCase().includes(nameKeyword);
+                const permMatch = role.permissions?.some((p) =>
+                  p.name.toLowerCase().includes(nameKeyword)
+                );
+                return nameMatch || permMatch;
+              });
+            }
+
+            if (descKeyword) {
+              filtered = filtered.filter((role) =>
+                (role.description || '').toLowerCase().includes(descKeyword)
+              );
+            }
+
+            if (typeof statusFilter !== 'undefined') {
+              filtered = filtered.filter((role) => role.active === statusFilter);
+            }
+
+            return {
+              data: filtered,
+              success: true,
+              total: filtered.length,
+            };
+          } catch (error) {
+            console.error(error);
+            message.error('Lấy danh sách vai trò thất bại');
+            return { data: [], success: false, total: 0 };
+          } finally {
+            setLoading(false);
+          }
+        }}
         toolBarRender={() => [
-          <Button
-            type="primary"
-            key="add"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setEditingRole(null);
-              setOpenAddEdit(true);
-            }}
-          >
-            Thêm vai trò
-          </Button>,
+          canCreate && (
+            <Button
+              type="primary"
+              key="add"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setEditingRole(null);
+                setOpenAddEdit(true);
+              }}
+            >
+              Thêm vai trò
+            </Button>
+          ),
         ]}
       />
 
-      <Modal
-        title={editingRole ? 'Chỉnh sửa vai trò' : 'Thêm vai trò mới'}
-        open={openAddEdit}
-        onCancel={() => setOpenAddEdit(false)}
-        footer={null}
-        destroyOnClose
-        centered
-        width={600}
-      >
-        <Form
-          layout="vertical"
-          initialValues={editingRole || { status: 'active', permissions: [] }}
-          onFinish={handleSubmit}
-        >
-          <Form.Item
-            label="Tên vai trò"
-            name="name"
-            rules={[{ required: true, message: 'Vui lòng nhập tên vai trò' }]}
-          >
-            <Input />
-          </Form.Item>
+      <ModalAddNewRole open={openAddEdit} setOpen={setOpenAddEdit} fetchRoles={reloadTable} />
 
-          <Form.Item label="Mô tả" name="description">
-            <Input.TextArea rows={3} />
-          </Form.Item>
+      <ModelEditRole
+        open={openEdit}
+        setOpen={setOpenEdit}
+        role={editingRole}
+        fetchRoles={reloadTable}
+      />
 
-          <Form.Item
-            label="Quyền hạn"
-            name="permissions"
-            rules={[{ required: true, message: 'Vui lòng chọn ít nhất 1 quyền' }]}
-          >
-            <Select
-              mode="multiple"
-              options={tourPermissions.map((p) => ({ value: p, label: p }))}
-            />
-          </Form.Item>
-
-          <Form.Item label="Trạng thái" name="status">
-            <Select
-              options={[
-                { value: 'active', label: 'Hoạt động' },
-                { value: 'inactive', label: 'Ngưng' },
-              ]}
-            />
-          </Form.Item>
-
-          <Form.Item style={{ textAlign: 'right' }}>
-            <Button type="primary" htmlType="submit">
-              {editingRole ? 'Lưu thay đổi' : 'Thêm vai trò'}
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+      <ModelViewRole open={openView} setOpen={setOpenView} role={viewingRole} />
     </div>
   );
 };

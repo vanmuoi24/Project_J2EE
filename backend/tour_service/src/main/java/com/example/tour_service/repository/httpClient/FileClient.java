@@ -2,13 +2,11 @@ package com.example.tour_service.repository.httpClient;
 
 import java.util.List;
 
+import com.example.tour_service.dto.response.ApiResponse;
+import com.example.tour_service.dto.response.LocationFileResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.tour_service.config.AuthenticationRequestInterceptor;
@@ -27,5 +25,16 @@ public interface FileClient {
          @PathVariable("tourId") String tourId,
         @RequestPart("files") List<MultipartFile> files
     );
+
+    @PostMapping(value = "file/media/upload/location", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    LocationFileResponse uploadLocationImg(
+            @RequestParam(value = "locationId", required = false) Integer locationId,
+            @RequestPart("file") MultipartFile file
+    );
+
+
+
+    @PostMapping(value = "file/media/tour", consumes = MediaType.APPLICATION_JSON_VALUE)
+    ApiResponse<List<String>> deleteMultipleTourImagesByUrl(@RequestBody List<String> urls);
 
 }

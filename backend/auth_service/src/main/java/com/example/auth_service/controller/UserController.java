@@ -29,14 +29,12 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @Validated
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class UserController {
 
     UserService userService;
 
     @PostMapping("/register")
         ApiResponse<UserResponse> createUser(@RequestBody UserCreationRequest request) {
-            System.err.println(request);
         return ApiResponse.<UserResponse>builder()
                 .result(userService.createUser(request))
                 .build();
@@ -68,17 +66,23 @@ public class UserController {
     public ApiResponse<UserResponse> updateUser(
             @PathVariable Long id,
             @ModelAttribute UserUpdate request) {
-                System.out.println(request);
+
         return ApiResponse.<UserResponse>builder().result(userService.updateUser(id, request))
                 .build();
     }
 
 
     @PostMapping ("/updateAvtUser/{id}")
-    public ResponseEntity<FileResponse>  updateAvtUser( @PathVariable("id") String id,
+    public ApiResponse<FileResponse>  updateAvtUser( @PathVariable("id") String id,
             @RequestPart("file") MultipartFile file) throws IOException{
                  FileResponse response = userService.uploadAvatar(id, file);
-        return ResponseEntity.ok(response);
+        return ApiResponse.<FileResponse>builder().result(response).build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ApiResponse.<Void>builder().build();
     }
  
 }

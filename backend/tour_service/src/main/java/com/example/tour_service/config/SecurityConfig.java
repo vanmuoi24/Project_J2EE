@@ -19,8 +19,12 @@
     public class SecurityConfig {
 
         private final String[] PUBLIC_URLS = {
+//            "/tours/list",
             "/tours/list",
+            "/tours/random-3",
             "/tours/**",
+            "/vehicles/**",
+            "/locations/**",
             "/tour-departures/tour/**",
             "/tour-departures/**",
             "/itineraries/tour/**"

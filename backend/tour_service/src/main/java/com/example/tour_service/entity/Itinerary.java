@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class Itinerary {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -20,7 +21,7 @@ public class Itinerary {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
     private String description;
 
     @Column(nullable = false)

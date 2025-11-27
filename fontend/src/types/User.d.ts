@@ -5,6 +5,8 @@ export type User = {
   address: string;
   email: string;
   phone: string;
+  role: Role;
+  permissions: Permission[];
 };
 
 export interface IUserUpdate {
@@ -12,4 +14,13 @@ export interface IUserUpdate {
   file?: File;
   phone?: string;
   address?: string;
+}
+
+export interface IUserCreate {
+  username: string;
+  email: string;
+  phone: string;
+  address: string;
+  roleId: number;
+  password: string;
 }

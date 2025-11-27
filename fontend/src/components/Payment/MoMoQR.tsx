@@ -1,5 +1,4 @@
 import { Button, Card, Space, Typography } from 'antd';
-import { useNavigate } from 'react-router-dom';
 
 const { Text, Title } = Typography;
 
@@ -25,7 +24,11 @@ export default function MoMoQR({ paymentQrBase64, paymentUrl, onClose }: Props) 
       <Title level={4}>Thanh toán bằng MoMo</Title>
       <Space direction="vertical" size={16} style={{ width: '100%', alignItems: 'center' }}>
         {paymentQrBase64 ? (
-          <img src={paymentQrBase64} alt="MoMo QR" style={{ width: 260, height: 260, objectFit: 'contain', borderRadius: 8 }} />
+          <img
+            src={paymentQrBase64}
+            alt="MoMo QR"
+            style={{ width: 260, height: 260, objectFit: 'contain', borderRadius: 8 }}
+          />
         ) : (
           <Text type="secondary">QR không có sẵn. Vui lòng dùng đường dẫn thanh toán.</Text>
         )}

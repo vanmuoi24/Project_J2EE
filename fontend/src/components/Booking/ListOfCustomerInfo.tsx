@@ -1,24 +1,13 @@
-import { useEffect, useRef } from "react";
-import {
-  Form,
-  Input,
-  DatePicker,
-  Select,
-  Row,
-  Col,
-  Button,
-  Divider,
-  Typography,
-} from "antd";
-import dayjs from "dayjs";
-
+import { useRef } from 'react';
+import { Form, Input, DatePicker, Select, Row, Col, Button, Divider, Typography } from 'antd';
+import dayjs from 'dayjs';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 export default function ListOfCustomerInfo({
   onFormReady,
-  personalFormGetter,
+  // personalFormGetter,
   onCustomersChange,
 }: {
   onFormReady?: (form: any) => void;
@@ -27,23 +16,22 @@ export default function ListOfCustomerInfo({
   /** notify parent when customers change */
   onCustomersChange?: (customers: any[]) => void;
 }) {
-
   const [form] = Form.useForm();
 
   if (onFormReady) onFormReady(form);
   const idCounter = useRef(1);
 
-  const addCustomer = (type: "ADULT" | "CHILD" | "TODDLER" | "INFANT") => {
-    const customers = form.getFieldValue("customers") || [];
+  const addCustomer = (type: 'ADULT' | 'CHILD' | 'TODDLER' | 'INFANT') => {
+    const customers = form.getFieldValue('customers') || [];
 
     idCounter.current += 1;
     const newItem = {
       id: idCounter.current,
       type,
-      fullName: "",
+      fullName: '',
       gender: undefined,
       birthDate: null,
-      address: "",
+      address: '',
     };
     form.setFieldsValue({ customers: [...customers, newItem] });
   };
@@ -68,7 +56,9 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Người lớn</p>
                 <p className="text-xs text-gray-500">Từ 12 tuổi trở lên</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer("ADULT")}>+ Thêm</Button>
+              <Button type="primary" className="bg-[#7BBCB0]!" onClick={() => addCustomer('ADULT')}>
+                + Thêm
+              </Button>
             </div>
           </Col>
           <Col span={8}>
@@ -77,7 +67,9 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Trẻ em</p>
                 <p className="text-xs text-gray-500">Từ 5 - 11 tuổi</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer("CHILD")}>+ Thêm</Button>
+              <Button type="primary" className="bg-[#7BBCB0]!" onClick={() => addCustomer('CHILD')}>
+                + Thêm
+              </Button>
             </div>
           </Col>
           <Col span={8}>
@@ -86,7 +78,13 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Trẻ nhỏ</p>
                 <p className="text-xs text-gray-500">Từ 2 - 4 tuổi</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer("TODDLER")}>+ Thêm</Button>
+              <Button
+                type="primary"
+                className="bg-[#7BBCB0]!"
+                onClick={() => addCustomer('TODDLER')}
+              >
+                + Thêm
+              </Button>
             </div>
           </Col>
           <Col span={8}>
@@ -95,7 +93,13 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Em bé</p>
                 <p className="text-xs text-gray-500">Dưới 2 tuổi</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer("INFANT")}>+ Thêm</Button>
+              <Button
+                type="primary"
+                className="bg-[#7BBCB0]!"
+                onClick={() => addCustomer('INFANT')}
+              >
+                + Thêm
+              </Button>
             </div>
           </Col>
         </Row>
@@ -108,28 +112,29 @@ export default function ListOfCustomerInfo({
           {(fields, { remove }) => (
             <>
               {fields.length === 0 && (
-                <p style={{ color: "#888" }}>Chưa có hành khách nào được thêm.</p>
+                <p style={{ color: '#888' }}>Chưa có hành khách nào được thêm.</p>
               )}
 
               {fields.map(({ key, name, ...restField }, index) => (
                 <div
                   key={key}
-                  style={{ marginBottom: 24, borderBottom: "1px solid #eee", paddingBottom: 16 }}
+                  style={{ marginBottom: 24, borderBottom: '1px solid #eee', paddingBottom: 16 }}
                 >
                   <Row gutter={16} align="middle">
                     <Col span={20}>
                       <p className="font-bold mb-2">
-                        {index + 1}. <Form.Item {...restField} name={[name, "type"]} noStyle>
+                        {index + 1}.{' '}
+                        <Form.Item {...restField} name={[name, 'type']} noStyle>
                           <>{/* will render type label via value */}</>
                         </Form.Item>
                         <span>
-                          {form.getFieldValue(["customers", name, "type"]) === "ADULT"
-                            ? "Người lớn"
-                            : form.getFieldValue(["customers", name, "type"]) === "CHILD"
-                              ? "Trẻ em"
-                              : form.getFieldValue(["customers", name, "type"]) === "TODDLER"
-                                ? "Trẻ nhỏ"
-                                : "Em bé"}
+                          {form.getFieldValue(['customers', name, 'type']) === 'ADULT'
+                            ? 'Người lớn'
+                            : form.getFieldValue(['customers', name, 'type']) === 'CHILD'
+                              ? 'Trẻ em'
+                              : form.getFieldValue(['customers', name, 'type']) === 'TODDLER'
+                                ? 'Trẻ nhỏ'
+                                : 'Em bé'}
                         </span>
                       </p>
                     </Col>
@@ -142,9 +147,9 @@ export default function ListOfCustomerInfo({
                     <Col span={6}>
                       <Form.Item
                         {...restField}
-                        name={[name, "fullName"]}
+                        name={[name, 'fullName']}
                         label="Họ tên"
-                        rules={[{ required: true, message: "Vui lòng nhập họ tên" }]}
+                        rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
                       >
                         <Input placeholder="Nhập họ tên" />
                       </Form.Item>
@@ -153,9 +158,9 @@ export default function ListOfCustomerInfo({
                     <Col span={6}>
                       <Form.Item
                         {...restField}
-                        name={[name, "gender"]}
+                        name={[name, 'gender']}
                         label="Giới tính"
-                        rules={[{ required: true, message: "Chọn giới tính" }]}
+                        rules={[{ required: true, message: 'Chọn giới tính' }]}
                       >
                         <Select placeholder="Chọn giới tính">
                           <Option value="male">Nam</Option>
@@ -167,42 +172,42 @@ export default function ListOfCustomerInfo({
                     <Col span={6}>
                       <Form.Item
                         {...restField}
-                        name={[name, "birthDate"]}
+                        name={[name, 'birthDate']}
                         label="Ngày sinh"
                         rules={[
-                          { required: true, message: "Chọn ngày sinh" },
+                          { required: true, message: 'Chọn ngày sinh' },
                           {
                             validator: (_, value) => {
                               if (!value) return Promise.resolve();
 
-                              const type = form.getFieldValue(["customers", name, "type"]);
+                              const type = form.getFieldValue(['customers', name, 'type']);
                               const today = dayjs();
-                              const age = today.diff(value, "year");
+                              const age = today.diff(value, 'year');
 
                               // Không cho phép ngày sinh trong tương lai
                               if (value.isAfter(today)) {
-                                return Promise.reject("Ngày sinh không được lớn hơn ngày hiện tại");
+                                return Promise.reject('Ngày sinh không được lớn hơn ngày hiện tại');
                               }
 
                               // Validate theo từng loại
                               switch (type) {
-                                case "ADULT":
-                                  if (age < 12) return Promise.reject("Người lớn phải từ 12 tuổi trở lên");
+                                case 'ADULT':
+                                  if (age < 12)
+                                    return Promise.reject('Người lớn phải từ 12 tuổi trở lên');
                                   break;
 
-                                case "CHILD":
+                                case 'CHILD':
                                   if (age < 5 || age > 11)
-                                    return Promise.reject("Trẻ em phải từ 5 đến 11 tuổi");
+                                    return Promise.reject('Trẻ em phải từ 5 đến 11 tuổi');
                                   break;
 
-                                case "TODDLER":
+                                case 'TODDLER':
                                   if (age < 2 || age > 4)
-                                    return Promise.reject("Trẻ nhỏ phải từ 2 đến 4 tuổi");
+                                    return Promise.reject('Trẻ nhỏ phải từ 2 đến 4 tuổi');
                                   break;
 
-                                case "INFANT":
-                                  if (age >= 2)
-                                    return Promise.reject("Em bé phải dưới 2 tuổi");
+                                case 'INFANT':
+                                  if (age >= 2) return Promise.reject('Em bé phải dưới 2 tuổi');
                                   break;
 
                                 default:
@@ -214,23 +219,18 @@ export default function ListOfCustomerInfo({
                           },
                         ]}
                       >
-                        <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
+                        <DatePicker format="DD/MM/YYYY" style={{ width: '100%' }} />
                       </Form.Item>
                     </Col>
 
-
                     <Col span={6}>
-                      <Form.Item
-                        {...restField}
-                        name={[name, "address"]}
-                        label="Địa chỉ"
-                      >
+                      <Form.Item {...restField} name={[name, 'address']} label="Địa chỉ">
                         <Input placeholder="Nhập địa chỉ" />
                       </Form.Item>
                     </Col>
 
                     {/* Hidden type field so type persists */}
-                    <Form.Item {...restField} name={[name, "type"]} hidden initialValue="adult">
+                    <Form.Item {...restField} name={[name, 'type']} hidden initialValue="adult">
                       <Input />
                     </Form.Item>
                   </Row>
@@ -246,7 +246,10 @@ export default function ListOfCustomerInfo({
 
         <Title level={5}>Ghi chú</Title>
         <Form.Item name="note">
-          <Input.TextArea rows={3} placeholder="Vui lòng nhập nội dung lời nhắn bằng tiếng Việt hoặc tiếng Anh" />
+          <Input.TextArea
+            rows={3}
+            placeholder="Vui lòng nhập nội dung lời nhắn bằng tiếng Việt hoặc tiếng Anh"
+          />
         </Form.Item>
       </Form>
     </div>
