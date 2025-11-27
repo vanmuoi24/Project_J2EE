@@ -1,176 +1,176 @@
-# server:
-#  port: 8888
-# app:
-#  api-prefix: /api/v1
+server:
+ port: 8888
+app:
+ api-prefix: /api/v1
 
-# spring:
-#  application:
-#    name: api_gateway
-#  cloud:
-#    gateway:
-#      routes:
-#        - id: auth_service
-#          uri: http://localhost:8080
-#          predicates:
-#            - Path=${app.api-prefix}/auth/**
-#          filters:
-#            - StripPrefix=2
-#        - id: booking_service
-#          uri: http://localhost:8081
-#          predicates:
-#            - Path=${app.api-prefix}/booking/**
-#          filters:
-#            - StripPrefix=2
-#        - id: notification_service
-#          uri: http://localhost:8082
-#          predicates:
-#            - Path=${app.api-prefix}/notification/**
-#          filters:
-#            - StripPrefix=2
+spring:
+ application:
+   name: api_gateway
+ cloud:
+   gateway:
+     routes:
+       - id: auth_service
+         uri: http://localhost:8080
+         predicates:
+           - Path=${app.api-prefix}/auth/**
+         filters:
+           - StripPrefix=2
+       - id: booking_service
+         uri: http://localhost:8081
+         predicates:
+           - Path=${app.api-prefix}/booking/**
+         filters:
+           - StripPrefix=2
+       - id: notification_service
+         uri: http://localhost:8082
+         predicates:
+           - Path=${app.api-prefix}/notification/**
+         filters:
+           - StripPrefix=2
 
-#        - id: payment_service
-#          uri: http://localhost:8083
-#          predicates:
-#            - Path=${app.api-prefix}/payment/**
-#          filters:
-#            - StripPrefix=2
-#        - id: pricing_service
-#          uri: http://localhost:8084
-#          predicates:
-#            - Path=${app.api-prefix}/pricing/**
-#          filters:
-#            - StripPrefix=2
-#        - id: schedule_service
-#          uri: http://localhost:8085
-#          predicates:
-#            - Path=${app.api-prefix}/schedule/**
-#          filters:
-#            - StripPrefix=2
-#        - id: tour_service
-#          uri: http://localhost:8086
-#          predicates:
-#            - Path=${app.api-prefix}/tour/**
-#          filters:
-#            - StripPrefix=2
-#        - id: file-service
-#          uri: http://localhost:8087
-#          predicates:
-#            - Path=${app.api-prefix}/file/**
-#          filters:
-#            - StripPrefix=2
-#        - id: invoice_service
-#          uri: http://localhost:8090
-#          predicates:
-#            - Path=${app.api-prefix}/invoice/**
-#          filters:
-#            - StripPrefix=2
-#        - id: search-service
-#          uri: http://localhost:8089
-#          predicates:
-#            - Path=${app.api-prefix}/search/**
-#          filters:
-#            - StripPrefix=2
+       - id: payment_service
+         uri: http://localhost:8083
+         predicates:
+           - Path=${app.api-prefix}/payment/**
+         filters:
+           - StripPrefix=2
+       - id: pricing_service
+         uri: http://localhost:8084
+         predicates:
+           - Path=${app.api-prefix}/pricing/**
+         filters:
+           - StripPrefix=2
+       - id: schedule_service
+         uri: http://localhost:8085
+         predicates:
+           - Path=${app.api-prefix}/schedule/**
+         filters:
+           - StripPrefix=2
+       - id: tour_service
+         uri: http://localhost:8086
+         predicates:
+           - Path=${app.api-prefix}/tour/**
+         filters:
+           - StripPrefix=2
+       - id: file-service
+         uri: http://localhost:8087
+         predicates:
+           - Path=${app.api-prefix}/file/**
+         filters:
+           - StripPrefix=2
+       - id: invoice_service
+         uri: http://localhost:8090
+         predicates:
+           - Path=${app.api-prefix}/invoice/**
+         filters:
+           - StripPrefix=2
+       - id: search-service
+         uri: http://localhost:8089
+         predicates:
+           - Path=${app.api-prefix}/search/**
+         filters:
+           - StripPrefix=2
 
-# identity-service:
-# #  base-url: http://auth_service:8080   # nếu chạy Docker
-#   base-url: http://localhost:8080     # nếu chạy local
+identity-service:
+#  base-url: http://auth_service:8080   # nếu chạy Docker
+  base-url: http://localhost:8080     # nếu chạy local
 
 
 # DÙNG ĐỂ DEPLOY
 
-server:
-  port: 8888  # Cổng nội bộ Gateway (Docker đã map 8888:8888)
+# server:
+#   port: 8888  # Cổng nội bộ Gateway (Docker đã map 8888:8888)
 
-app:
-  api-prefix: /api/v1
+# app:
+#   api-prefix: /api/v1
 
-spring:
-  application:
-    name: api_gateway
-  cloud:
-    gateway:
-      routes:
-        # --- AUTH SERVICE ---
-        - id: auth_service
-          uri: http://auth_service:8080   # Sửa localhost -> tên container, port -> 8080
-          predicates:
-            - Path=${app.api-prefix}/auth/**
-          filters:
-            - StripPrefix=2
+# spring:
+#   application:
+#     name: api_gateway
+#   cloud:
+#     gateway:
+#       routes:
+#         # --- AUTH SERVICE ---
+#         - id: auth_service
+#           uri: http://auth_service:8080   # Sửa localhost -> tên container, port -> 8080
+#           predicates:
+#             - Path=${app.api-prefix}/auth/**
+#           filters:
+#             - StripPrefix=2
 
-        # --- BOOKING SERVICE ---
-        - id: booking_service
-          uri: http://booking_service:8080 # Sửa localhost -> tên container
-          predicates:
-            - Path=${app.api-prefix}/booking/**
-          filters:
-            - StripPrefix=2
+#         # --- BOOKING SERVICE ---
+#         - id: booking_service
+#           uri: http://booking_service:8080 # Sửa localhost -> tên container
+#           predicates:
+#             - Path=${app.api-prefix}/booking/**
+#           filters:
+#             - StripPrefix=2
 
-        # --- NOTIFICATION SERVICE ---
-        - id: notification_service
-          uri: http://notification_service:8080
-          predicates:
-            - Path=${app.api-prefix}/notification/**
-          filters:
-            - StripPrefix=2
+#         # --- NOTIFICATION SERVICE ---
+#         - id: notification_service
+#           uri: http://notification_service:8080
+#           predicates:
+#             - Path=${app.api-prefix}/notification/**
+#           filters:
+#             - StripPrefix=2
 
-        # --- PAYMENT SERVICE ---
-        - id: payment_service
-          uri: http://payment_service:8080
-          predicates:
-            - Path=${app.api-prefix}/payment/**
-          filters:
-            - StripPrefix=2
+#         # --- PAYMENT SERVICE ---
+#         - id: payment_service
+#           uri: http://payment_service:8080
+#           predicates:
+#             - Path=${app.api-prefix}/payment/**
+#           filters:
+#             - StripPrefix=2
 
-        # --- PRICING SERVICE ---
-        - id: pricing_service
-          uri: http://pricing_service:8080
-          predicates:
-            - Path=${app.api-prefix}/pricing/**
-          filters:
-            - StripPrefix=2
+#         # --- PRICING SERVICE ---
+#         - id: pricing_service
+#           uri: http://pricing_service:8080
+#           predicates:
+#             - Path=${app.api-prefix}/pricing/**
+#           filters:
+#             - StripPrefix=2
 
-        # --- SCHEDULE SERVICE ---
-        - id: schedule_service
-          uri: http://schedule_service:8080
-          predicates:
-            - Path=${app.api-prefix}/schedule/**
-          filters:
-            - StripPrefix=2
+#         # --- SCHEDULE SERVICE ---
+#         - id: schedule_service
+#           uri: http://schedule_service:8080
+#           predicates:
+#             - Path=${app.api-prefix}/schedule/**
+#           filters:
+#             - StripPrefix=2
 
-        # --- TOUR SERVICE ---
-        - id: tour_service
-          uri: http://tour_service:8080
-          predicates:
-            - Path=${app.api-prefix}/tour/**
-          filters:
-            - StripPrefix=2
+#         # --- TOUR SERVICE ---
+#         - id: tour_service
+#           uri: http://tour_service:8080
+#           predicates:
+#             - Path=${app.api-prefix}/tour/**
+#           filters:
+#             - StripPrefix=2
 
-        # --- FILE SERVICE ---
-        - id: file-service
-          uri: http://file_service:8080
-          predicates:
-            - Path=${app.api-prefix}/file/**
-          filters:
-            - StripPrefix=2
+#         # --- FILE SERVICE ---
+#         - id: file-service
+#           uri: http://file_service:8080
+#           predicates:
+#             - Path=${app.api-prefix}/file/**
+#           filters:
+#             - StripPrefix=2
 
-        # --- INVOICE SERVICE (Dùng chung file_service hoặc service riêng tùy bạn) ---
-        # Giả sử bạn có container tên là invoice_service
-        - id: invoice_service
-          uri: http://invoice_service:8080
-          predicates:
-            - Path=${app.api-prefix}/invoice/**
-          filters:
-            - StripPrefix=2
+#         # --- INVOICE SERVICE (Dùng chung file_service hoặc service riêng tùy bạn) ---
+#         # Giả sử bạn có container tên là invoice_service
+#         - id: invoice_service
+#           uri: http://invoice_service:8080
+#           predicates:
+#             - Path=${app.api-prefix}/invoice/**
+#           filters:
+#             - StripPrefix=2
 
-        # --- SEARCH SERVICE ---
-        - id: search-service
-          uri: http://search_service:8080
-          predicates:
-            - Path=${app.api-prefix}/search/**
-          filters:
-            - StripPrefix=2
+#         # --- SEARCH SERVICE ---
+#         - id: search-service
+#           uri: http://search_service:8080
+#           predicates:
+#             - Path=${app.api-prefix}/search/**
+#           filters:
+#             - StripPrefix=2
 
-# Cấu hình FeignClient hoặc WebClient gọi nội bộ
-identity-service:
-  base-url: http://auth_service:8080   # Cấu hình cho Docker
+# # Cấu hình FeignClient hoặc WebClient gọi nội bộ
+# identity-service:
+#   base-url: http://auth_service:8080   # Cấu hình cho Docker

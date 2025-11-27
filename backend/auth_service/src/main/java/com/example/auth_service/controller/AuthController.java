@@ -19,15 +19,16 @@ import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-        
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
     AuthService authService;
+
     @PostMapping("/login")
-    ApiResponse<AuthenticationResponse>  login (@RequestBody @Valid AuthenticationRequest request){
+    ApiResponse<AuthenticationResponse> login(@RequestBody @Valid AuthenticationRequest request) {
         var result = authService.authenticated(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result).build();
@@ -39,7 +40,7 @@ public class AuthController {
         return ApiResponse.<IntrospectResponse>builder().result(result).build();
     }
 
-     @PostMapping("/refresh")
+    @PostMapping("/refresh")
     ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request)
             throws ParseException, JOSEException {
         var result = authService.refreshToken(request);
@@ -59,13 +60,10 @@ public class AuthController {
     }
 
     @PostMapping("/google")
-    ApiResponse<AuthenticationResponse>  loginWithGG(@RequestHeader("Authorization") String header) throws Exception {
+    ApiResponse<AuthenticationResponse> loginWithGG(@RequestHeader("Authorization") String header) throws Exception {
         var result = authService.authenticatedWithGG(header);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result).build();
     }
-
-
-
 
 }
