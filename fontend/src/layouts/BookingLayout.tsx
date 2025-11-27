@@ -96,10 +96,10 @@ export default function BookingLayout() {
        *  ===================================================== */
       const user = sessionService.getUser();
       if (!user) throw new Error("Không tìm thấy thông tin người dùng.");
-
+      
       const bookingRequest: BookingRequest = {
-        userId: String(user.id),
-        tourDepartureId: String(tourDepartureId),
+        userId: `${user.id}`,
+        tourDepartureId: `${tourDepartureId}`,
         listOfCustomers: customers.map((c: CustomerRequest) => ({
           fullName: c.fullName,
           birthdate: c.birthDate?.format("YYYY-MM-DD"),
@@ -114,14 +114,14 @@ export default function BookingLayout() {
        *  🔹 Gọi API tạo booking
        *  ===================================================== */
       const res = await bookingServices.create(bookingRequest as any);
-
+      console.log(res)
       Modal.success({
         title: "Thành công",
         content: "Đã tạo booking!",
       });
 
       // Navigate ABSOLUTE PATH
-      navigate(`/invoice/booking/${res.result.id}`);
+      navigate(`/invoice/booking/${res.result.tourDepartureId}`);
 
     } catch (err: any) {
       Modal.error({

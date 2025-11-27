@@ -4,6 +4,8 @@ import { Spin, Card, Result, Button, Descriptions, message } from 'antd';
 import paymentServices from '@/services/paymentServices';
 import invoiceServices from '@/services/invoiceServices';
 import { formatCurrencyVND, formatDatetime } from "@/utils/index"
+import { useAppSelector } from '@/store/hooks';
+import type { RootState } from '@/store';
 
 export default function VnPayCallback() {
   const [loading, setLoading] = useState(true);
@@ -12,6 +14,10 @@ export default function VnPayCallback() {
   const [error, setError] = useState("");
   const calledRef = useRef(false);
 
+   const { user } = useAppSelector((state: RootState) => state.auth);
+ console.log(user)
+
+ console.log(invoice)
   /**
    * Xử lý tạo invoice sau khi thanh toán thành công
    */
@@ -33,38 +39,100 @@ export default function VnPayCallback() {
     return false;
   };
 
+  const formatPayDate = (raw: string) => {
+  if (!raw) return "";
+  const year = raw.substring(0, 4);
+  const month = raw.substring(4, 6);
+  const day = raw.substring(6, 8);
+  const hour = raw.substring(8, 10);
+  const minute = raw.substring(10, 12);
+  const second = raw.substring(12, 14);
+
+  return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
+};
+
   /**
    * Gọi API kiểm tra callback thanh toán
    */
   const fetchPaymentStatus = async () => {
-    try {
-      const queryString = window.location.search;
-      const callbackPaymentUrl = `http://localhost:8888/api/v1/payment/vnpay/return${queryString}`;
+  try {
+    const queryString = window.location.search;
+    const callbackPaymentUrl = `http://localhost:8888/api/v1/payment/vnpay/return${queryString}`;
 
-      const paymentCallbackRes = await paymentServices.get(callbackPaymentUrl);
+    const paymentCallbackRes = await paymentServices.get(callbackPaymentUrl);
 
-      if (paymentCallbackRes.code === 1000) {
-        setStatus("success");
-        setInvoice(paymentCallbackRes.result);
+    if (paymentCallbackRes.code === 1000) {
 
-        // Tạo invoice sau khi thanh toán thành công
-        const ok = await createInvoiceAfterPayment();
-        if (!ok) {
-          setError("Thanh toán thành công nhưng tạo hóa đơn thất bại.");
-        }
+      setStatus("success");
+      setInvoice(paymentCallbackRes.result);
 
-      } else {
-        setStatus("fail");
-        setError(paymentCallbackRes.result || "Thanh toán thất bại!");
+      // TẠO INVOICE
+      const ok = await createInvoiceAfterPayment();
+      if (!ok) {
+        setError("Thanh toán thành công nhưng tạo hóa đơn thất bại.");
       }
 
-    } catch (err: any) {
+      // GỬI EMAIL XÁC NHẬN
+      await sendEmail(paymentCallbackRes.result);
+
+    } else {
       setStatus("fail");
-      setError(err?.message || "Lỗi không xác định");
-    } finally {
-      setLoading(false);
+      setError(paymentCallbackRes.result || "Thanh toán thất bại!");
     }
-  };
+
+  } catch (err: any) {
+    setStatus("fail");
+    setError(err?.message || "Lỗi không xác định");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+const sendEmail = async (invoice: any) => {
+  try {
+    await fetch("http://localhost:5678/webhook/send-confirm-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        to: user?.email || "user@example.com",
+        subject: "Xác nhận thanh toán thành công",
+        body: `
+          <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="color: #4CAF50;">Thanh toán thành công!</h2>
+
+            <p>Xin chào <strong>${user?.username}</strong>,</p>
+            <p>Cảm ơn bạn đã thực hiện giao dịch. Dưới đây là thông tin chi tiết:</p>
+
+            <table style="border-collapse: collapse; margin-top: 16px;">
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">Mã giao dịch</td>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>${invoice?.orderId}</strong></td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">Số tiền</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${formatCurrencyVND(invoice?.amount)}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">Ngày thanh toán</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${formatPayDate(invoice?.payDate)}</td>
+              </tr>
+            </table>
+
+            <p style="margin-top: 24px;">Nếu bạn có bất kỳ thắc mắc nào, xin vui lòng liên hệ hỗ trợ.</p>
+
+            <p>Trân trọng,<br/>Hệ thống thanh toán</p>
+          </div>
+        `
+      }),
+    });
+  } catch (err) {
+    console.error("Gửi email thất bại:", err);
+  }
+};
+
 
   /**
    * Hook chạy 1 lần (kể cả StrictMode)
