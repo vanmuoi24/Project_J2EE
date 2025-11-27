@@ -5,13 +5,14 @@ import Container from '@/components/Share/Container';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store';
 import { logoutUser } from '@/store/slices/authSlice';
+import fallback from '@/assets/images/fallback.png';
 
 const Navbar: React.FC = () => {
   const { user } = useAppSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userMenu = (user &&
-    user !== null && [
+    [
       {
         key: 'profile',
         label: (
@@ -20,14 +21,17 @@ const Navbar: React.FC = () => {
           </Button>
         ),
       },
-      {
-        key: 'quản trị',
+
+      // Chỉ hiển thị nếu KHÔNG phải khách hàng
+      user.role?.name !== 'Khách Hàng' && {
+        key: 'admin',
         label: (
           <Button type="link" onClick={() => navigate('/admin')}>
             Trang quản trị
           </Button>
         ),
       },
+
       {
         key: 'logout',
         label: (
@@ -42,7 +46,7 @@ const Navbar: React.FC = () => {
           </Button>
         ),
       },
-    ]) || [
+    ].filter(Boolean)) || [
     {
       key: 'login',
       label: (
@@ -60,6 +64,7 @@ const Navbar: React.FC = () => {
       ),
     },
   ];
+
   return (
     <div className="bg-white shadow-sm">
       <Container className="flex items-center justify-between relative py-[10px]">
@@ -118,7 +123,7 @@ const Navbar: React.FC = () => {
               {user != null && user.username ? (
                 <Avatar
                   size={40}
-                  src={user?.avatar}
+                  src={user?.avatar || fallback}
                   className="border-2 border-gray-200 cursor-pointer"
                 />
               ) : (

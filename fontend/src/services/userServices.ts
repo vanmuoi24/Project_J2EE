@@ -29,7 +29,7 @@ export const updateProfile = (
 
 export const getAllUsers = (): Promise<AxiosResponse> => {
   return axiosClient.get(`auth/users/list`);
-}
+};
 export const getListUser = (): Promise<AxiosResponse> => {
   return axiosClient.get('auth/users/list');
 };
@@ -51,6 +51,7 @@ export const updateAvt = (
 export const createUser = (data: IUserCreate): Promise<AxiosResponse> => {
   return axiosClient.post('auth/users/register', data);
 };
+
 export const updateUser = (data: IUserUpdate, id: number | undefined): Promise<AxiosResponse> => {
   const formData = new FormData();
   if (data.username) formData.append('username', data.username);

@@ -115,7 +115,103 @@ services:
       - app-network
 
   # ====================================================
-  # 9. FRONTEND (React)
+  # 7. BOOKING SERVICE
+  # ====================================================
+  booking-service:
+    build: ./backend/booking_service
+    container_name: booking_service
+    restart: unless-stopped
+    environment:
+      - SERVER_PORT=8080
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/j2ee_project_db?useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root123
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # ====================================================
+  # 8. INVOICE SERVICE
+  # ====================================================
+  invoice-service:
+    build: ./backend/invoice_service
+    container_name: invoice_service
+    restart: unless-stopped
+    environment:
+      - SERVER_PORT=8080
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/j2ee_project_db?useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root123
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # ====================================================
+  # 9. SCHEDULE SERVICE
+  # ====================================================
+  schedule-service:
+    build: ./backend/schedule_service
+    container_name: schedule_service
+    restart: unless-stopped
+    environment:
+      - SERVER_PORT=8080
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/j2ee_project_db?useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root123
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  
+  # ====================================================
+  # 10. PAYMENT SERVICE
+  # ====================================================
+  payment-service:
+    build: ./backend/payment_service
+    container_name: payment_service
+    restart: unless-stopped
+    environment:
+      - SERVER_PORT=8080
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/j2ee_project_db?useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root123
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # ====================================================
+  # 11. NOTIFICATION SERVICE
+  # ====================================================
+  notification-service:
+    build: ./backend/notification_sevice
+    container_name: notification_service
+    restart: unless-stopped
+    environment:
+      - SERVER_PORT=8080
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/j2ee_project_db?useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root123
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # ====================================================
+  # 12. FRONTEND (React)
   # ====================================================
   frontend:
     build: ./fontend   # Lưu ý: folder của bạn tên là 'fontend' (thiếu chữ r)

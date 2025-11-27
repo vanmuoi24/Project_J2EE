@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  EditOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Modal, Space, message, Tooltip } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 import type { AddTourDepartureRequest, ITourDeparture } from '@/types/Tour';
-import { addTourDeparture, getDepartureByTourId, updateTourDeparture } from '@/services/tourServices';
+import {
+  addTourDeparture,
+  getDepartureByTourId,
+  updateTourDeparture,
+} from '@/services/tourServices';
 import { useLocation } from 'react-router-dom';
 import AddTourDeparture from './ModelTourDeparture/AddTourDeparture';
 import EditTourDeparture from './ModelTourDeparture/EditTourDeparture';
@@ -16,7 +16,7 @@ import EditTourDeparture from './ModelTourDeparture/EditTourDeparture';
 const ManagerTourDeparture: React.FC = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const tourIdParam = params.get("tourId");
+  const tourIdParam = params.get('tourId');
   const tourId = tourIdParam ? Number(tourIdParam) : null;
   const [data, setData] = useState<ITourDeparture[]>([]);
 
@@ -33,7 +33,7 @@ const ManagerTourDeparture: React.FC = () => {
         setData(res.result);
       }
     } catch (error) {
-      console.error("Failed to fetch tours:", error);
+      console.error('Failed to fetch tours:', error);
     }
   }, []);
 
@@ -47,24 +47,23 @@ const ManagerTourDeparture: React.FC = () => {
         departureDate: values.departureDate,
         returnDate: values.returnDate,
         availableSeats: values.availableSeats,
-        tourId: tourId!
+        tourId: tourId!,
       };
-      console.log("📤 Data gửi lên backend:", newLocation);
+      console.log('📤 Data gửi lên backend:', newLocation);
       const res = await addTourDeparture(newLocation);
 
       if (res.code === 1000) {
         setData([res.result, ...data]);
-        message.success("Thêm ngày khởi hành thành công");
+        message.success('Thêm ngày khởi hành thành công');
         setOpenAdd(false);
       } else {
         message.error(`Thêm ngày khởi hành thất bại: ${res.result}`);
       }
     } catch (error: any) {
-
-      const backendMsg = error.response?.data?.message || "Lỗi không xác định";
+      const backendMsg = error.response?.data?.message || 'Lỗi không xác định';
       message.error(`Lỗi: ${backendMsg}`);
 
-      console.error("ERROR API:", error);
+      console.error('ERROR API:', error);
     }
   };
 
@@ -84,14 +83,16 @@ const ManagerTourDeparture: React.FC = () => {
     const res = await updateTourDeparture(updateData);
 
     if (res.code === 1000) {
-      setData(prev => prev.map(tour =>
-        tour.id === selectedTourDeparture.id ? { ...tour, ...res.result } : tour
-      ));
-      message.success("Cập nhật ngày khởi hành thành công");
+      setData((prev) =>
+        prev.map((tour) =>
+          tour.id === selectedTourDeparture.id ? { ...tour, ...res.result } : tour
+        )
+      );
+      message.success('Cập nhật ngày khởi hành thành công');
       setOpenEdit(false);
       setSelectedTourDeparture(null);
     } else {
-      message.error("Cập nhật ngày khởi hành thất bại");
+      message.error('Cập nhật ngày khởi hành thất bại');
     }
   };
 
@@ -110,10 +111,9 @@ const ManagerTourDeparture: React.FC = () => {
           <EditOutlined
             style={{ color: '#1890ff', fontSize: 18 }}
             onClick={() => {
-              handleEditClick(record)
+              handleEditClick(record);
             }}
           />
-
         </Space>
       ),
     },
@@ -123,12 +123,7 @@ const ManagerTourDeparture: React.FC = () => {
     if (!tourId) {
       return (
         <Tooltip title="Vui lòng chọn tour trước khi thêm ngày khởi hành">
-          <Button
-            key="create"
-            type="primary"
-            icon={<PlusOutlined />}
-            disabled
-          >
+          <Button key="create" type="primary" icon={<PlusOutlined />} disabled>
             Thêm mới
           </Button>
         </Tooltip>
@@ -136,12 +131,7 @@ const ManagerTourDeparture: React.FC = () => {
     }
 
     return (
-      <Button
-        key="create"
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => setOpenAdd(true)}
-      >
+      <Button key="create" type="primary" icon={<PlusOutlined />} onClick={() => setOpenAdd(true)}>
         Thêm mới
       </Button>
     );
@@ -155,9 +145,7 @@ const ManagerTourDeparture: React.FC = () => {
         dataSource={data}
         search={false}
         headerTitle="Danh sách ngày khởi hành tour"
-        toolBarRender={() => [
-          renderAddButton()
-        ]}
+        toolBarRender={() => [renderAddButton()]}
         pagination={{ pageSize: 5 }}
       />
 
@@ -182,9 +170,7 @@ const ManagerTourDeparture: React.FC = () => {
         destroyOnClose
         centered
       >
-        <EditTourDeparture
-          data={selectedTourDeparture}
-          onSubmit={handleEdit} />
+        <EditTourDeparture data={selectedTourDeparture} onSubmit={handleEdit} />
       </Modal>
     </div>
   );

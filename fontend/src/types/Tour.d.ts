@@ -45,14 +45,14 @@ export interface IItinerary {
   meal: string;
 }
 
-export interface AddItineraryRequest{
+export interface AddItineraryRequest {
   title: string;
   description: string;
   meal: string;
   tourId: number;
 }
 
-export interface UpdateItineraryRequest{
+export interface UpdateItineraryRequest {
   id: number;
   title?: string;
   description?: string;
@@ -171,6 +171,7 @@ export interface ITourDepartureResponse {
 export interface IDestination {
   city: string;
   type: number;
+  img: string;
 }
 
 export interface ITourDeparture {
@@ -187,17 +188,20 @@ export interface ILocation {
   id: number;
   city: string;
   type: string;
+  img: string;
 }
 
 export interface AddLocationRequest {
   city: string;
   type: string;
+  img: File | null;
 }
 
 export interface UpdateLocationRequest {
   id: number;
   city?: string;
   type?: string;
+  img?: File;
 }
 
 type ToursResponse = AxiosResponse<ITour[]>;
@@ -215,5 +219,3 @@ export interface ITourDepartureResponse {
   message?: string;
   result: ITourDeparture;
 }
-
-

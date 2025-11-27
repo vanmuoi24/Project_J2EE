@@ -1,20 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { ProTable } from "@ant-design/pro-components";
-import type { ProColumns } from "@ant-design/pro-components";
-import type { BookingResponse, CustomerResponse } from "@/types/Booking";
-import type { UserResponse } from "@/types/comment";
-import type { ITourDeparture } from "@/types/Tour";
-import type { InvoiceResponse } from "@/types/Invoice";
+import React, { useEffect, useState } from 'react';
+import { ProTable } from '@ant-design/pro-components';
+import type { ProColumns } from '@ant-design/pro-components';
+import type { BookingResponse, CustomerResponse } from '@/types/Booking';
+import type { UserResponse } from '@/types/comment';
+import type { ITourDeparture } from '@/types/Tour';
+import type { InvoiceResponse } from '@/types/Invoice';
 
-import bookingServices from "@/services/bookingServices";
-import { sessionService } from "@/services/sessionServices";
-import { getAllDepartures, getAllTourDeparture } from "@/services/tourServices";
-import invoiceServices from "@/services/invoiceServices";
-import { formatCurrencyVND } from "@/utils";
-import { Tag, Modal } from "antd";
-import { formatDatetime } from "@/utils";
-import { Bold } from "lucide-react";
-import { Button } from "antd/lib";
+import bookingServices from '@/services/bookingServices';
+import { sessionService } from '@/services/sessionServices';
+import { getAllTourDeparture } from '@/services/tourServices';
+import invoiceServices from '@/services/invoiceServices';
+import { formatCurrencyVND } from '@/utils';
+import { Tag, Modal } from 'antd';
+import { Button } from 'antd/lib';
 
 type BookingWithFullInfo = BookingResponse & {
   userName?: string;
@@ -38,16 +36,15 @@ const ManagerBooking: React.FC = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [bookingRes, tourRes, customerRes, invoiceRes, userSession] =
-        await Promise.all([
-          bookingServices.getAll(),
-          getAllTourDeparture(),
-          bookingServices.getAllCustomers(),
-          invoiceServices.getAll(),
-          sessionService.getUser(),
-        ]);
+      const [bookingRes, tourRes, customerRes, invoiceRes, userSession] = await Promise.all([
+        bookingServices.getAll(),
+        getAllTourDeparture(),
+        bookingServices.getAllCustomers(),
+        invoiceServices.getAll(),
+        sessionService.getUser(),
+      ]);
 
-      if (!userSession) throw new Error("Current user not found");
+      if (!userSession) throw new Error('Current user not found');
 
       if (
         bookingRes.code === 1000 &&
@@ -76,19 +73,17 @@ const ManagerBooking: React.FC = () => {
 
           return {
             ...booking,
-            userName: String(booking.accountId) === String(user.id)
-              ? user.username
-              : "Unknown",
+            userName: String(booking.accountId) === String(user.id) ? user.username : 'Unknown',
             tourDeparture: matchedDeparture || null,
             listOfCustomers: matchedListCustomers,
             invoice: matchedInvoice || null,
           };
         });
-        console.log(combined)
+        console.log(combined);
         setData(combined);
       }
     } catch (err) {
-      console.error("Error loading data:", err);
+      console.error('Error loading data:', err);
       setData([]);
     } finally {
       setLoading(false);
@@ -97,27 +92,27 @@ const ManagerBooking: React.FC = () => {
 
   /** Cột bảng */
   const columns: ProColumns<BookingWithFullInfo>[] = [
-    { title: "Mã đặt chỗ", dataIndex: "id", width: 90 },
-    { title: "Tài khoản", dataIndex: "userName", width: 120 },
-    { title: "Tour khởi hành", dataIndex: "tourDepartureId", width: 120 },
+    { title: 'Mã đặt chỗ', dataIndex: 'id', width: 90 },
+    { title: 'Tài khoản', dataIndex: 'userName', width: 120 },
+    { title: 'Tour khởi hành', dataIndex: 'tourDepartureId', width: 120 },
     {
-      title: "Ngày đặt",
-      dataIndex: "createdAt",
-      valueType: "dateTime",
+      title: 'Ngày đặt',
+      dataIndex: 'createdAt',
+      valueType: 'dateTime',
     },
     {
-      title: "Trạng thái",
-      dataIndex: "status",
+      title: 'Trạng thái',
+      dataIndex: 'status',
       render: (_, row) =>
-        row.status === "CONFIRMED" ? (
+        row.status === 'CONFIRMED' ? (
           <Tag color="green">Xác nhận</Tag>
         ) : (
           <Tag color="red">Đã hủy</Tag>
         ),
     },
     {
-      title: "Hành động",
-      valueType: "option",
+      title: 'Hành động',
+      valueType: 'option',
       render: (_, record) => [
         <Button
           type="link"
@@ -147,34 +142,51 @@ const ManagerBooking: React.FC = () => {
 
       {/* Modal chi tiết Booking */}
       <Modal
-        title={`Chi tiết đặt tour #${detail?.id ?? ""}`}
+        title={`Chi tiết đặt tour #${detail?.id ?? ''}`}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={null}
       >
         {detail ? (
           <div>
-            <p><b>Mã booking:</b> {detail.id}</p>
-            <p><b>Tài khoản:</b> {detail.userName}</p>
-            <p><b>Ngày đặt:</b> {detail.createdAt}</p>
+            <p>
+              <b>Mã booking:</b> {detail.id}
+            </p>
+            <p>
+              <b>Tài khoản:</b> {detail.userName}
+            </p>
+            <p>
+              <b>Ngày đặt:</b> {detail.createdAt}
+            </p>
 
-            <p><b>Tour khởi hành:</b></p>
+            <p>
+              <b>Tour khởi hành:</b>
+            </p>
             {detail.tourDeparture ? (
               <ul>
-                <li><b>Mã tour:</b> {detail.tourDeparture.id}</li>
-                <li><b>Ngày đi:</b> {detail.tourDeparture.departureDate}</li>
-                <li><b>Ngày về:</b> {detail.tourDeparture.returnDate}</li>
+                <li>
+                  <b>Mã tour:</b> {detail.tourDeparture.id}
+                </li>
+                <li>
+                  <b>Ngày đi:</b> {detail.tourDeparture.departureDate}
+                </li>
+                <li>
+                  <b>Ngày về:</b> {detail.tourDeparture.returnDate}
+                </li>
               </ul>
             ) : (
               <i>Không có dữ liệu tour</i>
             )}
 
-            <p><b>Danh sách khách:</b></p>
+            <p>
+              <b>Danh sách khách:</b>
+            </p>
             {detail.listOfCustomers?.length ? (
               <ul>
                 {detail.listOfCustomers.map((c) => (
                   <li key={c.id}>
-                    {c.id} - {c.fullName} - {c.bookingType} - {c.status} - {c.dateOfBirth} - {c.address}
+                    {c.id} - {c.fullName} - {c.bookingType} - {c.status} - {c.dateOfBirth} -{' '}
+                    {c.address}
                   </li>
                 ))}
               </ul>
@@ -182,19 +194,27 @@ const ManagerBooking: React.FC = () => {
               <i>Không có khách</i>
             )}
 
-            <p><b>Hóa đơn:</b></p>
+            <p>
+              <b>Hóa đơn:</b>
+            </p>
             {detail.invoice ? (
               <>
                 <p>Mã hóa đơn: {detail.invoice.id}</p>
                 <p>Số tiền: {formatCurrencyVND(Number(detail.invoice.totalBookingTourExpense))}</p>
                 <p>Ngày thanh toán: {detail.invoice.dayOfPay}</p>
-                <p>Trạng thái hóa đơn: {detail.invoice.status === "PAID" ? "Đã thanh toán" : "Chưa thanh toán"}</p>
+                <p>
+                  Trạng thái hóa đơn:{' '}
+                  {detail.invoice.status === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                </p>
               </>
             ) : (
-              <i >Chưa tạo hóa đơn</i>
+              <i>Chưa tạo hóa đơn</i>
             )}
 
-            <p><b>Trạng thái đăng ký:</b> {detail.status === "CONFIRMED" ? "Đã xác nhận đặt tour" : "Chưa đăng ký thành công"}</p>
+            <p>
+              <b>Trạng thái đăng ký:</b>{' '}
+              {detail.status === 'CONFIRMED' ? 'Đã xác nhận đặt tour' : 'Chưa đăng ký thành công'}
+            </p>
           </div>
         ) : (
           <p>Không có dữ liệu</p>

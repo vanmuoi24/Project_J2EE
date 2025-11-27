@@ -1,10 +1,21 @@
-import { Card, Typography, Table, Select, Form, Button, message, Modal, Descriptions, Divider, Alert } from "antd";
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { formatCurrencyVND, formatDatetime } from "@/utils";
-import type { CustomerResponse } from "@/types/Booking";
-import type { ITourDeparture } from "@/types/Tour";
-import type { InvoiceFormProps } from "@/types/Invoice";
+import {
+  Card,
+  Typography,
+  Table,
+  Select,
+  Form,
+  Button,
+  Modal,
+  Descriptions,
+  Divider,
+  Alert,
+} from 'antd';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { formatCurrencyVND, formatDatetime } from '@/utils';
+// import type { CustomerResponse } from "@/types/Booking";
+// import type { ITourDeparture } from "@/types/Tour";
+import type { InvoiceFormProps } from '@/types/Invoice';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -24,7 +35,8 @@ export default function InvoiceForm({
 }: InvoiceFormProps) {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  const loading = false; // CMT tạm để build
 
   /** 🔹 Tính tổng tiền khách hàng */
   const baseAmount = useMemo(() => {
@@ -35,10 +47,7 @@ export default function InvoiceForm({
       TODDLER: tourDeparture.tourPrice.toddlerPrice || 0,
       INFANT: tourDeparture.tourPrice.infantPrice || 0,
     };
-    return customers.reduce(
-      (sum, c) => sum + (priceMap[c.bookingType || ""] || 0),
-      0
-    );
+    return customers.reduce((sum, c) => sum + (priceMap[c.bookingType || ''] || 0), 0);
   }, [customers, tourDeparture]);
 
   const totalAmount = useMemo(
@@ -46,11 +55,10 @@ export default function InvoiceForm({
     [baseAmount, tourDeparture]
   );
 
-
   /** 🔹 Submit handler */
   const handleSubmit = async (values: { paymentMethod: string }) => {
     Modal.confirm({
-      title: "Xác nhận thanh toán",
+      title: 'Xác nhận thanh toán',
       content: (
         <>
           <p>Bạn có chắc chắn muốn thanh toán hóa đơn này?</p>
@@ -59,8 +67,8 @@ export default function InvoiceForm({
           </p>
         </>
       ),
-      okText: "Thanh toán",
-      cancelText: "Hủy",
+      okText: 'Thanh toán',
+      cancelText: 'Hủy',
       async onOk() {
         await onCreate(values.paymentMethod, totalAmount);
       },
@@ -68,19 +76,20 @@ export default function InvoiceForm({
   };
 
   const columns = [
-    { title: "STT", render: (_: any, __: any, i: number) => i + 1 },
-    { title: "Tên khách hàng", dataIndex: "fullName" },
-    { title: "Ngày sinh", dataIndex: "dateOfBirth" },
+    { title: 'STT', render: (_: any, __: any, i: number) => i + 1 },
+    { title: 'Tên khách hàng', dataIndex: 'fullName' },
+    { title: 'Ngày sinh', dataIndex: 'dateOfBirth' },
     {
-      title: "Thể loại",
-      dataIndex: "bookingType",
+      title: 'Thể loại',
+      dataIndex: 'bookingType',
       render: (v: string) =>
-        ({ ADULT: "Người lớn", CHILD: "Trẻ em", TODDLER: "Em bé", INFANT: "Trẻ sơ sinh" }[v] || "--"),
+        ({ ADULT: 'Người lớn', CHILD: 'Trẻ em', TODDLER: 'Em bé', INFANT: 'Trẻ sơ sinh' })[v] ||
+        '--',
     },
-    { title: "Địa chỉ", dataIndex: "address" },
+    { title: 'Địa chỉ', dataIndex: 'address' },
     {
-      title: "Giá tour",
-      dataIndex: "bookingType",
+      title: 'Giá tour',
+      dataIndex: 'bookingType',
       render: (type: string | number) => {
         const map: Record<string, number | undefined> = {
           ADULT: tourDeparture?.tourPrice.adultPrice,
@@ -89,14 +98,14 @@ export default function InvoiceForm({
           INFANT: tourDeparture?.tourPrice.infantPrice,
         };
         const price = map[String(type)];
-        return price ? formatCurrencyVND(price) : "--";
+        return price ? formatCurrencyVND(price) : '--';
       },
     },
   ];
 
   return (
     <Card loading={loading}>
-      <Title level={4} style={{ textAlign: "center" }}>
+      <Title level={4} style={{ textAlign: 'center' }}>
         Hóa đơn thanh toán
       </Title>
 
@@ -114,11 +123,21 @@ export default function InvoiceForm({
           <Title level={5}>Thông tin chuyến đi</Title>
           <Descriptions size="small" bordered column={1}>
             <Descriptions.Item label="Mã chuyến đi">{tourDeparture.tourCode}</Descriptions.Item>
-            <Descriptions.Item label="Ngày khởi hành">{formatDatetime(tourDeparture.departureDate)}</Descriptions.Item>
-            <Descriptions.Item label="Ngày về">{formatDatetime(tourDeparture.returnDate)}</Descriptions.Item>
-            <Descriptions.Item label="Giá vé người lớn">{formatCurrencyVND(tourDeparture.tourPrice.adultPrice)}</Descriptions.Item>
-            <Descriptions.Item label="Giá vé trẻ em">{formatCurrencyVND(tourDeparture.tourPrice.childPrice)}</Descriptions.Item>
-            <Descriptions.Item label="Phụ phí">{formatCurrencyVND(tourDeparture.tourPrice.singleSupplementPrice)}</Descriptions.Item>
+            <Descriptions.Item label="Ngày khởi hành">
+              {formatDatetime(tourDeparture.departureDate)}
+            </Descriptions.Item>
+            <Descriptions.Item label="Ngày về">
+              {formatDatetime(tourDeparture.returnDate)}
+            </Descriptions.Item>
+            <Descriptions.Item label="Giá vé người lớn">
+              {formatCurrencyVND(tourDeparture.tourPrice.adultPrice)}
+            </Descriptions.Item>
+            <Descriptions.Item label="Giá vé trẻ em">
+              {formatCurrencyVND(tourDeparture.tourPrice.childPrice)}
+            </Descriptions.Item>
+            <Descriptions.Item label="Phụ phí">
+              {formatCurrencyVND(tourDeparture.tourPrice.singleSupplementPrice)}
+            </Descriptions.Item>
           </Descriptions>
         </section>
       ) : (
@@ -138,8 +157,12 @@ export default function InvoiceForm({
       <Divider />
       <Title level={5}>Tổng thanh toán hóa đơn</Title>
       <Descriptions bordered size="small" column={1}>
-        <Descriptions.Item label="Tổng tiền tour">{formatCurrencyVND(baseAmount)}</Descriptions.Item>
-        <Descriptions.Item label="Phụ phí">{formatCurrencyVND(Number(tourDeparture?.tourPrice.singleSupplementPrice))}</Descriptions.Item>
+        <Descriptions.Item label="Tổng tiền tour">
+          {formatCurrencyVND(baseAmount)}
+        </Descriptions.Item>
+        <Descriptions.Item label="Phụ phí">
+          {formatCurrencyVND(Number(tourDeparture?.tourPrice.singleSupplementPrice))}
+        </Descriptions.Item>
         <Descriptions.Item label="Tổng cộng">
           <Text strong type="success" style={{ fontSize: 16 }}>
             {formatCurrencyVND(totalAmount)}
@@ -152,7 +175,7 @@ export default function InvoiceForm({
         <Form.Item
           label="Phương thức thanh toán"
           name="paymentMethod"
-          rules={[{ required: true, message: "Vui lòng chọn phương thức thanh toán" }]}
+          rules={[{ required: true, message: 'Vui lòng chọn phương thức thanh toán' }]}
         >
           <Select placeholder="Chọn phương thức thanh toán">
             <Option value="cash">Tiền mặt</Option>
@@ -161,11 +184,11 @@ export default function InvoiceForm({
           </Select>
         </Form.Item>
 
-        <Button type="primary" htmlType="submit" block size="large">
+        <Button type="primary" className="bg-[#7BBCB0]!" htmlType="submit" block size="large">
           Thanh toán
         </Button>
 
-        <Button type="text" block size="large" onClick={() => navigate("/")}>
+        <Button type="text" block size="large" onClick={() => navigate('/')}>
           Quay về trang chủ
         </Button>
       </Form>

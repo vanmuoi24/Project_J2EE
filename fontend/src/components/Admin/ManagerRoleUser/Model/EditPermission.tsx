@@ -31,7 +31,7 @@ const EditPermission: React.FC<EditPermissionProps> = ({
   onClose,
   onSubmit,
   editingPermission,
-  allRoles,
+  // allRoles,
 }) => {
   const [form] = Form.useForm();
 

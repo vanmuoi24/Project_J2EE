@@ -12,7 +12,6 @@ import type { BookingResponse, CustomerResponse } from '@/types/Booking';
 import type { InvoiceResponse } from '@/types/Invoice';
 import type { ITourDeparture } from '@/types/Tour';
 import type { UserResponse } from '@/types/comment';
-import { formatDatetime } from '@/utils'; // nếu không dùng thì xoá import này
 import { ALL_PERMISSIONS } from '@/config/permissions';
 import { useHasPermission } from '@/config/useHasPermission';
 
@@ -35,8 +34,8 @@ const ManagerInvoice: React.FC = () => {
   // QUYỀN
   const canList = useHasPermission(ALL_PERMISSIONS.BOOKINGS.GET_ALL); // xem danh sách booking
   const canView = useHasPermission(ALL_PERMISSIONS.BOOKINGS.GET_DETAIL); // xem chi tiết 1 booking
-  const canCreate = useHasPermission(ALL_PERMISSIONS.BOOKINGS.CREATE); // (để dành, nếu sau này tạo booking từ admin)
-  const canUpdate = useHasPermission(ALL_PERMISSIONS.BOOKINGS.UPDATE_STATUS); // (để dành, nếu sau này cập nhật trạng thái)
+  // const canCreate = useHasPermission(ALL_PERMISSIONS.BOOKINGS.CREATE); // (để dành, nếu sau này tạo booking từ admin)
+  // const canUpdate = useHasPermission(ALL_PERMISSIONS.BOOKINGS.UPDATE_STATUS); // (để dành, nếu sau này cập nhật trạng thái)
 
   const showModal = (record: BookingWithInvoice) => {
     if (!canView) return; // không có quyền xem chi tiết thì thôi
@@ -140,7 +139,7 @@ const ManagerInvoice: React.FC = () => {
       render: (val) =>
         val === 'PAID' ? (
           <Tag color="green">Đã thanh toán</Tag>
-        ) : val === 'WAITING' ? (
+        ) : val === 'UNPAID' ? (
           <Tag color="orange">Chưa thanh toán</Tag>
         ) : (
           '-'

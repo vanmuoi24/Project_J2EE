@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Form, Input, DatePicker, Select, Row, Col, Button, Divider, Typography } from 'antd';
 import dayjs from 'dayjs';
 
@@ -7,7 +7,7 @@ const { Option } = Select;
 
 export default function ListOfCustomerInfo({
   onFormReady,
-  personalFormGetter,
+  // personalFormGetter,
   onCustomersChange,
 }: {
   onFormReady?: (form: any) => void;
@@ -56,7 +56,7 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Người lớn</p>
                 <p className="text-xs text-gray-500">Từ 12 tuổi trở lên</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer('ADULT')}>
+              <Button type="primary" className="bg-[#7BBCB0]!" onClick={() => addCustomer('ADULT')}>
                 + Thêm
               </Button>
             </div>
@@ -67,7 +67,7 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Trẻ em</p>
                 <p className="text-xs text-gray-500">Từ 5 - 11 tuổi</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer('CHILD')}>
+              <Button type="primary" className="bg-[#7BBCB0]!" onClick={() => addCustomer('CHILD')}>
                 + Thêm
               </Button>
             </div>
@@ -78,7 +78,11 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Trẻ nhỏ</p>
                 <p className="text-xs text-gray-500">Từ 2 - 4 tuổi</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer('TODDLER')}>
+              <Button
+                type="primary"
+                className="bg-[#7BBCB0]!"
+                onClick={() => addCustomer('TODDLER')}
+              >
                 + Thêm
               </Button>
             </div>
@@ -89,7 +93,11 @@ export default function ListOfCustomerInfo({
                 <p className="font-medium">Em bé</p>
                 <p className="text-xs text-gray-500">Dưới 2 tuổi</p>
               </div>
-              <Button type="primary" onClick={() => addCustomer('INFANT')}>
+              <Button
+                type="primary"
+                className="bg-[#7BBCB0]!"
+                onClick={() => addCustomer('INFANT')}
+              >
                 + Thêm
               </Button>
             </div>

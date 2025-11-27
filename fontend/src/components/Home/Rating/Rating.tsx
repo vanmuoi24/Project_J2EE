@@ -23,7 +23,7 @@ const renderStars = (rating: number) => {
 const Rating = () => {
   const [reviews, setReviews] = useState<ReviewResponse[]>();
   useEffect(() => {
-    const getHighRating = async (size: number = 4) => {
+    const getHighRating = async (size: number = 3) => {
       const res = await getHighReviews(size);
       if (res.code === 1000) {
         setReviews(res.result);

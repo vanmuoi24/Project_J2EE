@@ -46,14 +46,13 @@ export const loginWithGGService = async (googleToken: string) => {
   }
 };
 
-export const registerService = async (data: RegisterRequest): Promise<RegisterResponse> => {
+export const registerService = async (data: RegisterRequest) => {
   try {
     const res: RegisterResponse = await axiosClient.post('/auth/users/register', data);
     console.log('>>>', res);
     if (res.code !== 1000) {
       throw new Error(res?.message || 'Register failed');
     }
-
     return res;
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
@@ -111,6 +110,6 @@ export const createComent = (data: CreateCommentRequest): Promise<AxiosResponse>
   return axiosClient.post('/auth/reviews', data);
 };
 
-export const getHighReviews = (size: number = 4): Promise<AxiosResponse<ReviewResponse[]>> => {
+export const getHighReviews = (size: number = 3): Promise<AxiosResponse<ReviewResponse[]>> => {
   return axiosClient.get(`/auth/reviews/high-rating?size=${size}`);
 };

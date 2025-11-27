@@ -17,18 +17,22 @@ export default function LoginPage() {
     if (res.code === 1000) {
       sessionService.setSession(res.result.token, res.result.user);
       message.success('Đăng nhập thành công!', 3);
-      navigate('/admin');
+      navigate('/');
     } else message.error('Đăng nhập thất bại!', 3);
   };
 
   const handleGGLogin = async (credentialResponse: GoogleCredentialResponse) => {
-    const googleToken = credentialResponse.credential || '';
+    const googleToken = credentialResponse.credential;
+    if (!googleToken) {
+      message.error('Đăng nhập thất bại!');
+      return;
+    }
 
     const res = await dispatch(loginUserWithGG(googleToken)).unwrap();
     if (res.code === 1000) {
       sessionService.setSession(res.result.token, res.result.user);
       message.success('Đăng nhập thành công!', 3);
-      navigate('/admin');
+      navigate('/');
     } else {
       message.error('Đăng nhập thất bại!', 3);
     }

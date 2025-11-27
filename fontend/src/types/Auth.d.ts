@@ -20,6 +20,7 @@ export type RegisterRequest = {
   email: string;
   firstName: string;
   lastName: string;
+  roleId: number;
   dob?: string;
   city?: string;
 };

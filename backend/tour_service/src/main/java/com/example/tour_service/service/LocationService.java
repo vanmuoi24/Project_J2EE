@@ -9,6 +9,7 @@ import com.example.tour_service.entity.Vehicle;
 import com.example.tour_service.enums.LocationType;
 import com.example.tour_service.repository.LocationRepository;
 import com.example.tour_service.repository.VehicleRepository;
+import com.example.tour_service.repository.httpClient.FileClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LocationService {
     private final LocationRepository locationRepository;
+    private final FileClient fileClient;
 
     public LocationResponse createLocation(LocationRequest request) {
+        String imgUrl = "";
+
+        if (request.getImg() != null && !request.getImg().isEmpty()) {
+            try {
+                var response = fileClient.uploadLocationImg(null,request.getImg());
+                if (response.getUrl() != null) {
+                    imgUrl = response.getUrl();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Upload image failed");
+            }
+        }
         Location location = Location.builder()
                 .city(request.getCity())
+                .img(imgUrl)
                 .type(request.getType())
                 .build();
         Location saved = locationRepository.save(location);
@@ -34,9 +49,26 @@ public class LocationService {
     public LocationResponse updateLocation(int id, LocationRequest request) {
         Location location = locationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Location not found with id: " + id));
-
         location.setCity(request.getCity());
         location.setType(request.getType());
+
+        if (request.getImg() != null && !request.getImg().isEmpty()) {
+            try {
+                // Gọi sang File Service để upload
+                // Tham số: (File ảnh, locationId, tourId=null)
+                var apiResponse = fileClient.uploadLocationImg(id ,request.getImg());
+
+                // Kiểm tra kết quả trả về để lấy URL
+                if (apiResponse != null && apiResponse.getUrl() != null) {
+                    String newImageUrl = apiResponse.getUrl();
+
+                    // Cập nhật URL mới vào entity
+                    location.setImg(newImageUrl);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to upload new location image: " + e.getMessage());
+            }
+        }
 
         Location updated = locationRepository.save(location);
         return toResponse(updated);
@@ -100,12 +132,19 @@ public class LocationService {
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
+    public List<LocationResponse> attractiveDestinationLocations() {
+        return locationRepository.findRandom7Locations()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 
 
     private LocationResponse toResponse(Location location) {
         return LocationResponse.builder()
                 .id(location.getId())
                 .city(location.getCity())
+                .img(location.getImg())
                 .type(location.getType())
                 .build();
     }

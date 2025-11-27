@@ -24,6 +24,11 @@ public class FileMgmt {
 
     @Column(name = "tour_id", nullable = false)
     String tourId;
+
+    @Column(name = "location_id") // Thêm cột này
+    Integer locationId;
+
+
     @Column(name = "content_type")
     String contentType;
 

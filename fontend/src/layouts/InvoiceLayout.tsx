@@ -1,4 +1,4 @@
-import { Row, Col, Card, Spin, Alert, Modal, message } from 'antd';
+import { Row, Col, Card, Spin, Alert, message } from 'antd';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
 
@@ -76,6 +76,7 @@ export default function InvoiceLayout() {
    * 🔹 Xử lý tạo hóa đơn
    ----------------------------------------------------------*/
   const handleCreatePayment = async (paymentMethod: string, totalAmount: number) => {
+    console.log(paymentMethod); // log để build
     try {
       const totalAmountStr = String(totalAmount * 100000);
       const paymentRequest: PaymentRequest = { amount: totalAmountStr };

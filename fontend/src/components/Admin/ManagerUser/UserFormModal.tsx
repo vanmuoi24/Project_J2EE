@@ -1,6 +1,6 @@
 // src/pages/admin/users/components/UserFormModal.tsx
 import React, { useEffect } from 'react';
-import { Modal, Form, Row, Col, Input, Select, message } from 'antd';
+import { Modal, Form, Row, Col, Input, Select } from 'antd';
 import type { User } from '@/types/User.d';
 import { createUser, updateUser } from '@/services/userServices';
 import { toast } from 'react-toastify';
@@ -29,7 +29,7 @@ const UserFormModal: React.FC<Props> = ({
   roles,
   initialValues,
   onCancel,
-  onSubmit,
+  // onSubmit,
 }) => {
   const [form] = Form.useForm();
 

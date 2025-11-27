@@ -32,6 +32,16 @@ public class FileController {
         return ResponseEntity.ok(fileService.uploadFile(file));
     }
 
+
+    @PostMapping(value = "/media/upload/location", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<FileResponse> uploadLocationImg(
+            @RequestParam(value = "locationId", required = false) Integer locationId,
+            @RequestPart("file") MultipartFile file
+    ) throws IOException {
+        System.out.println("📂 Upload Location Img - File: " + file.getOriginalFilename() + ", LocID: " + locationId);
+        return ResponseEntity.ok(fileService.uploadFile(file, locationId));
+    }
+
     @GetMapping("/media/download/{fileName}")
     ResponseEntity<Resource> downloadMedia(@PathVariable String fileName) throws IOException {
         var fileData = fileService.download(fileName);

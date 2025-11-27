@@ -41,6 +41,7 @@ public class User {
     @Column
     private String googleId;   // id duy nhất từ Google
 
+    @Builder.Default
     private String provider = "LOCAL";
 
 }

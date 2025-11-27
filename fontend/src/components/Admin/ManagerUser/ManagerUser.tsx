@@ -33,7 +33,7 @@ const ManagerUser: React.FC = () => {
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-
+  console.log('Log để build không bị lỗi never read', loadingUsers, loadingRoles);
   const fetchData = async () => {
     setLoadingUsers(true);
     try {
