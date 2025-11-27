@@ -12,6 +12,7 @@ export type CustomerResponse = {
 };
 
 export type InvoiceCustomerResponse = {
+	id: string;
 	fullName: string;
 	birthdate: string; // ISO date string (yyyy-MM-dd)
 	address?: string;

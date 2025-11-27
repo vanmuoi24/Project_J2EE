@@ -40,6 +40,7 @@ export default function InvoiceLayout() {
           bookingServices.getListOfCustomersByBookingId(bookingId),
         ]);
 
+        console.log(customerRes.result)
         if (bookingRes.code === 1000 && customerRes.code === 1000) {
           const booking = bookingRes?.result as BookingResponse;
           const customerList = customerRes?.result as CustomerResponse[];
@@ -76,9 +77,9 @@ export default function InvoiceLayout() {
    * 🔹 Xử lý tạo hóa đơn
    ----------------------------------------------------------*/
   const handleCreatePayment = async (paymentMethod: string, totalAmount: number) => {
-    console.log(paymentMethod); // log để build
+    console.log(totalAmount);
     try {
-      const totalAmountStr = String(totalAmount * 100000);
+      const totalAmountStr = String(totalAmount)
       const paymentRequest: PaymentRequest = { amount: totalAmountStr };
       const paymentResponse = await paymentServices.create(paymentRequest);
 
@@ -141,7 +142,7 @@ export default function InvoiceLayout() {
                   email: currentUser?.email || '',
                   phone: currentUser?.phone || '',
                 }}
-                // customers={customerResult}
+                customers={customerResult}
                 tourDeparture={tourDepartureResult}
                 onCreate={handleCreatePayment}
               />

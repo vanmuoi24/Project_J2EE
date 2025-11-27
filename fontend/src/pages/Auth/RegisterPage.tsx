@@ -24,7 +24,7 @@ export default function RegisterPage() {
       email: values.email,
       firstName: values.fullname,
       lastName: values.fullname,
-      roleId: 4,
+      roleId: "",
       dob: '',
       city: '',
     };

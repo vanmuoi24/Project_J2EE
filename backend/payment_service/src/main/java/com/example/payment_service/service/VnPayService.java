@@ -39,6 +39,7 @@ public class VnPayService {
         long vnp_amount = 0;
         try {
             vnp_amount = Long.parseLong(paymentRequest.getAmount());
+            System.err.println(vnp_amount);
             vnp_amount_STR = String.valueOf(vnp_amount);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Số tiền không hợp lệ");

@@ -39,18 +39,19 @@ export default function InvoiceForm({
   const loading = false; // CMT tạm để build
 
   /** 🔹 Tính tổng tiền khách hàng */
-  const baseAmount = useMemo(() => {
+  const baseAmount : number = useMemo(() => {
     if (!customers || !tourDeparture?.tourPrice) return 0;
+    console.log(customers)
     const priceMap: Record<string, number> = {
       ADULT: tourDeparture.tourPrice.adultPrice || 0,
       CHILD: tourDeparture.tourPrice.childPrice || 0,
       TODDLER: tourDeparture.tourPrice.toddlerPrice || 0,
       INFANT: tourDeparture.tourPrice.infantPrice || 0,
     };
-    return customers.reduce((sum, c) => sum + (priceMap[c.bookingType || ''] || 0), 0);
+    return customers.reduce((sum:any, c:any) => sum + (priceMap[c.bookingType || ''] || 0), 0);
   }, [customers, tourDeparture]);
 
-  const totalAmount = useMemo(
+  const totalAmount : number = useMemo(
     () => baseAmount + (tourDeparture?.tourPrice.singleSupplementPrice || 0),
     [baseAmount, tourDeparture]
   );

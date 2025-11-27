@@ -6,7 +6,7 @@ export type InvoiceItem = {
 
 interface InvoiceFormProps {
   account: { fullName: string; email: string; phone: string };
-  customers?: CustomerResponse[];
+  customers?: any;
   tourDeparture?: ITourDeparture;
   onCreate: (paymentMethod: string, totalAmount: number) => Promise<void>;
 }
