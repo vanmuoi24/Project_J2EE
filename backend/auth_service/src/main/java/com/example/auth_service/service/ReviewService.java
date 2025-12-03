@@ -41,7 +41,7 @@ public class ReviewService {
     public ReviewResponse createReview(ReviewRequest req) {
         Review review = Review.builder()
                 .tourId(req.getTourId())
-                .user(User.builder().id(req.getUserId()).build())
+                .user(User.builder().id(req.getUserId()).username(req.getUsername()).avatar(req.getAvatar()).build())
                 .content(req.getContent())
                 .rating(req.getRating())
                 .build();
@@ -102,14 +102,16 @@ public List<ReviewGroupResponse> getAllReviewsGroupedByTour() {
         }
 
         // Tạo ReviewResponse
-        ReviewResponse reviewRes = ReviewResponse.builder()
-                .id(review.getId())
-                .tourId(tourId)
-                .user(userResponse)
-                .content(review.getContent())
-                .rating(review.getRating())
-                .createdAt(review.getCreatedAt() != null ? review.getCreatedAt().toString() : null)
-                .build();
+        ReviewResponse reviewRes = new ReviewResponse(
+                review.getId(),
+                tourId,
+                userResponse,
+                review.getContent(),
+                review.getRating(),
+                review.getCreatedAt() != null ? review.getCreatedAt().toString() : null,
+                review.getUser().getUsername(),
+                review.getUser().getAvatar() != null ? review.getUser().getAvatar() : null
+        );
 
         // Nếu chưa có nhóm tour này → tạo mới
         grouped.computeIfAbsent(tourId, id -> new ReviewGroupResponse(id, "abc", new ArrayList<>()));

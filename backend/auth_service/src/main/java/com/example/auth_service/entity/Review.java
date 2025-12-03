@@ -21,7 +21,6 @@ public class Review {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user; // 👈 thay vì userId, dùng quan hệ ManyToOne
-
     @Column(nullable = false, length = 1000)
     private String content;
 

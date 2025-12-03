@@ -8,4 +8,6 @@ public class ReviewRequest {
     private Long userId;
     private String content;
     private Integer rating;
+    private String username;
+    private String avatar;
 }

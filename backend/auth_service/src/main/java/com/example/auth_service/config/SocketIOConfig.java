@@ -14,9 +14,6 @@ public class SocketIOConfig {
         com.corundumstudio.socketio.Configuration configuration = new com.corundumstudio.socketio.Configuration();
         configuration.setPort(8099);
         configuration.setOrigin("*");
-
-     
-
         return new SocketIOServer(configuration);
     }
 }
