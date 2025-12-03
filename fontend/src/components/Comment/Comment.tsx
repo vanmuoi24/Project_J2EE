@@ -69,6 +69,8 @@ const CommentTour: React.FC = () => {
       content: newComment,
       rating: rating,
       userId: Number(userLogin?.id) || 0,
+      username: userLogin?.username || '',
+      avatar: userLogin?.avatar || '',
     };
     try {
       const res = await createComent(data);
@@ -90,7 +92,7 @@ const CommentTour: React.FC = () => {
 
       {/* --- Form nhập bình luận --- */}
       <div className="flex gap-3 mb-4">
-        <Avatar size={40} icon={<UserOutlined />} />
+        <Avatar size={40} icon={<UserOutlined />} src={userLogin?.avatar} />
         <div className="flex-1">
           <Rate
             value={rating}
